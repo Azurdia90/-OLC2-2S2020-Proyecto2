@@ -1,0 +1,115 @@
+const enum tipo_dato
+{
+    VOID,
+    NULO,
+    BOOLEANO,
+    NUMERO,
+    CADENA,
+    IDENTIFICADOR
+}
+
+const enum tipo_acceso 
+{
+    PUBLICO,
+    PRIVADO,
+    PROTEGIDO
+}
+    
+const enum tipo_rol
+{    
+    valor,
+    arreglo,
+    type,
+    funcion,
+    parametro,
+    aceptado,
+    continuar,
+    retornar,
+    detener,
+    error
+}
+
+const enum tipo_operacion
+{
+    VALOR,
+    SUMA,
+    RESTA,
+    MULTIPLICACION,
+    DIVISION,
+    MODULO,
+    POTENCIA,
+    NEGATIVO,
+    MAYOR_QUE,
+    MENOR_QUE,
+    MAYOR_IGUAL_QUE,
+    MENOR_IGUAL_QUE,
+    DIFERENTE_QUE,
+    IGUAL_QUE,
+    TERNARIO,
+    NOT,
+    AND,
+    OR,
+    ERROR
+}
+
+const enum tipo_operacion_resultado
+{
+    suma_numero,
+    suma_numero_cadena,
+    suma_cadena_numero,      
+    resta_numero,
+    resta_numero_cadena,
+    resta_cadena_numero,
+    multiplicacion_numero,
+    multiplicacion_numero_cadena,
+    multiplicacion_cadena_numero,
+    division_numero,
+    division_numero_cadena,
+    division_cadena_numero,        
+    modulo_numero,
+    modulo_numero_cadena,
+    modulo_cadena_numero,
+    potencia_numero,
+    potencia_numero_cadena,
+    potencia_cadena_numero,
+    potencia_numero_booleano,
+    potencia_booleano_numero,
+    concatenacion,
+    mayorque_booleano,
+    mayorque_numerico,
+    mayorque_caracter,
+    mayorque_cadena,
+    mayorque_numerico_cadena,
+    mayorque_cadena_numerico,
+    menorque_booleano,
+    menorque_numerico,
+    menorque_cadena,
+    menorque_numerico_cadena,
+    menorque_cadena_numerico,
+    mayorigualque_booleano,
+    mayorigualque_numerico,
+    mayorigualque_cadena,
+    mayorigualque_numerico_cadena,
+    mayorigualque_cadena_numerico,
+    menorigualque_booleano,
+    menorigualque_numerico,
+    menorigualque_cadena,
+    menorigualque_numerico_cadena,
+    menorigualque_cadena_numerico,
+    diferente_booleano,
+    diferente_numerico,
+    diferente_cadena,
+    diferente_numerico_cadena,
+    diferente_cadena_numerico,
+    diferente_nulo,
+    igual_booleano,
+    igual_numerico,
+    igual_cadena,
+    igual_numerico_cadena,
+    igual_cadena_numerico,
+    igual_nulo,
+    not,
+    and,
+    or,        
+    error
+}

@@ -1,0 +1,17 @@
+<form [formGroup] = "formulario_traducir" (ngSubmit)="ejecutar($event)">
+  <ion-item>
+      <ion-label position="stacked" >Ingrese su código:</ion-label>
+      <ion-textarea type = "text" 
+                    rows = "25" 
+                    formControlName = "textarea">
+      </ion-textarea>
+      <ion-button expand="full" fill="outline" color = "success" type = "submit">Traducir</ion-button>
+      <ion-label position="stacked" color = "secondary">Terminal</ion-label>
+      <ion-textarea type = "text" 
+                    rows = "7"  
+                    formControlName = "consola"
+                    readonly [(ngModel)] = "salida"
+                    color = "success"> 
+      </ion-textarea>
+  </ion-item>
+</form>
