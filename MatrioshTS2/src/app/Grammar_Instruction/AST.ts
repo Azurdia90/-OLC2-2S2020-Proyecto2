@@ -1,4 +1,18 @@
+import Funcion_MatrioshTS from './Funcion_Matriosh';
 import Instruction from './Instruction';
+import Mayor_Igual_Que from './Mayor_Igual_Que';
+import Middle from './Middle';
+import Modulo from './Modulo';
+import Multiplicacion from './Multiplicacion';
+import Potencia from './Potencia';
+import Resta from './Resta';
+import Sentencia_Declaracion from './Sentencia_Declaración';
+import Simbolo from './Simbolo';
+import Suma from './Suma';
+import Tabla_Errores from './Tabla_Errores';
+import Tabla_Simbolos from './Tabla_Simbolos';
+import Tipo from './Tipo';
+import Type_MatrioshTS from './Type_MatrioshTS';
 
 //vscode://vscode.github-authentication/did-authenticate?windowid=1&code=56828868e702751f3978&state=1acf4bbc-47c2-47e3-9a88-e19e71a95d00
 class AST
@@ -65,13 +79,13 @@ class AST
 
     public recorrido2()
     {
-        var _funcion : Funcion_Matriosh;
+        var _funcion : Funcion_MatrioshTS;
 
         for(var r2 = 0; r2 < this.lista_instrucciones.length; r2++)
         {
-            if(this.lista_instrucciones[r2] instanceof Funcion_Matriosh)
+            if(this.lista_instrucciones[r2] instanceof Funcion_MatrioshTS)
             {
-                _funcion = <Funcion_Matriosh> this.lista_instrucciones[r2];
+                _funcion = <Funcion_MatrioshTS> this.lista_instrucciones[r2];
 
                 if(!Tabla_Simbolos.getInstance().existFuncion(_funcion.getIdentificador()))
                 {
@@ -98,7 +112,7 @@ class AST
         {
             if(this.lista_instrucciones[r3] instanceof Sentencia_Declaracion)
             {
-                _result = this.lista_instrucciones[r3].ejecutar(Tabla_Simbolos.getInstance().getEntorno_global(),Middle.getInstance());
+                _result = this.lista_instrucciones[r3].analizar("global", Tabla_Simbolos.getInstance().getEntorno_global(), Middle.getInstance());
             }
             else
             {
@@ -107,22 +121,22 @@ class AST
 
             if(_result != undefined && _result.getRol() == tipo_rol.error)
             {
-                var  error_encontrado = { tipo: "Análisis Semántico MatrioshTS", fila: _result.getFila() == undefined ? "0" : _result.getFila().toString(), columna: _result.getColumna() == undefined  ? "0" : _result.getColumna().toString(), identificador: "global", descripcion: _result.getValor().toString()};
+                let  error_encontrado = { tipo: "Análisis Semántico MatrioshTS", fila: _result.getFila() == undefined ? "0" : _result.getFila().toString(), columna: _result.getColumna() == undefined  ? "0" : _result.getColumna().toString(), identificador: "global", descripcion: _result.getMensaje().toString()};
                 Tabla_Errores.getInstance().push(error_encontrado);  
             }
             else if(_result != undefined && _result.getRol() == tipo_rol.detener)
             {
-                var  error_encontrado = { tipo: "Análisis Semántico MatrioshTS", fila: _result.getFila() == undefined ? "0" : _result.getFila().toString(), columna: _result.getColumna() == undefined  ? "0" : _result.getColumna().toString(), identificador: "global", descripcion: "NO se permite la sentencia Detener."};
+                let  error_encontrado = { tipo: "Análisis Semántico MatrioshTS", fila: _result.getFila() == undefined ? "0" : _result.getFila().toString(), columna: _result.getColumna() == undefined  ? "0" : _result.getColumna().toString(), identificador: "global", descripcion: "NO se permite la sentencia Detener."};
                 Tabla_Errores.getInstance().push(error_encontrado);  
             }
             else if(_result != undefined && _result.getRol() == tipo_rol.continuar)
             {
-                var  error_encontrado = { tipo: "Análisis Semántico MatrioshTS", fila: _result.getFila() == undefined ? "0" : _result.getFila().toString(), columna: _result.getColumna() == undefined  ? "0" : _result.getColumna().toString(), identificador: "global", descripcion: "NO se permite la sentencia Continuar."};
+                let  error_encontrado = { tipo: "Análisis Semántico MatrioshTS", fila: _result.getFila() == undefined ? "0" : _result.getFila().toString(), columna: _result.getColumna() == undefined  ? "0" : _result.getColumna().toString(), identificador: "global", descripcion: "NO se permite la sentencia Continuar."};
                 Tabla_Errores.getInstance().push(error_encontrado); 
             }
             else if(_result != undefined && _result.getRol() == tipo_rol.retornar)
             {
-                var  error_encontrado = { tipo: "Análisis Semántico MatrioshTS", fila: _result.getFila() == undefined ? "0" : _result.getFila().toString(), columna: _result.getColumna() == undefined  ? "0" : _result.getColumna().toString(), identificador: "global", descripcion: "NO se permite la sentencia Retornar"};
+                let  error_encontrado = { tipo: "Análisis Semántico MatrioshTS", fila: _result.getFila() == undefined ? "0" : _result.getFila().toString(), columna: _result.getColumna() == undefined  ? "0" : _result.getColumna().toString(), identificador: "global", descripcion: "NO se permite la sentencia Retornar"};
                 Tabla_Errores.getInstance().push(error_encontrado); 
             }
             else
@@ -138,9 +152,9 @@ class AST
         
         for(var f = 0; f < this.lista_instrucciones.length; f++)
         {    
-            if(!(this.lista_instrucciones[f] instanceof Type_MatrioshTS) && !(this.lista_instrucciones[f] instanceof Funcion_Matriosh) && !(this.lista_instrucciones[f] instanceof Sentencia_Declaracion))
+            if(!(this.lista_instrucciones[f] instanceof Type_MatrioshTS) && !(this.lista_instrucciones[f] instanceof Funcion_MatrioshTS) && !(this.lista_instrucciones[f] instanceof Sentencia_Declaracion))
             {   //console.log(this.lista_instrucciones[f]);
-                _result = this.lista_instrucciones[f].ejecutar(Tabla_Simbolos.getInstance().getEntorno_global(),Middle.getInstance());
+                _result = this.lista_instrucciones[f].analizar("global",Tabla_Simbolos.getInstance().getEntorno_global(),Middle.getInstance());
             }
             else
             {
@@ -149,22 +163,22 @@ class AST
             //console.log(_result);
             if(_result != undefined && _result.getRol() == tipo_rol.error)
             {
-                var  error_encontrado = { tipo: "Análisis Semántico MatrioshTS", fila: _result.getFila() == undefined ? "0" : _result.getFila().toString(), columna: _result.getColumna() == undefined  ? "0" : _result.getColumna().toString(), identificador: "global", descripcion: _result.getValor().toString()};
+                let error_encontrado = { tipo: "Análisis Semántico MatrioshTS", fila: _result.getFila() == undefined ? "0" : _result.getFila().toString(), columna: _result.getColumna() == undefined  ? "0" : _result.getColumna().toString(), identificador: "global", descripcion: _result.getMensaje().toString()};
                 Tabla_Errores.getInstance().push(error_encontrado);  
             }
             else if(_result != undefined && _result.getRol() == tipo_rol.detener)
             {
-                var  error_encontrado = { tipo: "Análisis Semántico MatrioshTS", fila: _result.getFila() == undefined ? "0" : _result.getFila().toString(), columna: _result.getColumna() == undefined  ? "0" : _result.getColumna().toString(), identificador: "global", descripcion: "NO se permite la sentencia Detener."};
+                let  error_encontrado = { tipo: "Análisis Semántico MatrioshTS", fila: _result.getFila() == undefined ? "0" : _result.getFila().toString(), columna: _result.getColumna() == undefined  ? "0" : _result.getColumna().toString(), identificador: "global", descripcion: "NO se permite la sentencia Detener."};
                 Tabla_Errores.getInstance().push(error_encontrado);  
             }
             else if(_result != undefined && _result.getRol() == tipo_rol.continuar)
             {
-                var  error_encontrado = { tipo: "Análisis Semántico MatrioshTS", fila: _result.getFila() == undefined ? "0" : _result.getFila().toString(), columna: _result.getColumna() == undefined  ? "0" : _result.getColumna().toString(), identificador: "global", descripcion: "NO se permite la sentencia Continuar."};
+                let  error_encontrado = { tipo: "Análisis Semántico MatrioshTS", fila: _result.getFila() == undefined ? "0" : _result.getFila().toString(), columna: _result.getColumna() == undefined  ? "0" : _result.getColumna().toString(), identificador: "global", descripcion: "NO se permite la sentencia Continuar."};
                 Tabla_Errores.getInstance().push(error_encontrado); 
             }
             else if(_result != undefined && _result.getRol() == tipo_rol.retornar)
             {
-                var  error_encontrado = { tipo: "Análisis Semántico MatrioshTS", fila: _result.getFila() == undefined ? "0" : _result.getFila().toString(), columna: _result.getColumna() == undefined  ? "0" : _result.getColumna().toString(), identificador: "global", descripcion: "NO se permite la sentencia Retornar"};
+                let  error_encontrado = { tipo: "Análisis Semántico MatrioshTS", fila: _result.getFila() == undefined ? "0" : _result.getFila().toString(), columna: _result.getColumna() == undefined  ? "0" : _result.getColumna().toString(), identificador: "global", descripcion: "NO se permite la sentencia Retornar"};
                 Tabla_Errores.getInstance().push(error_encontrado); 
             }
             else
@@ -225,184 +239,184 @@ class AST
         {
             return new Sentencia_Declaracion(instruccion_jason['linea'],instruccion_jason['columna'],instruccion_jason['constante'],instruccion_jason['identificador'],instruccion_jason['tipo'] == null ? undefined : this.fabrica_tipo(instruccion_jason['tipo']),instruccion_jason['tipo'] == null ? undefined : instruccion_jason['tipo']['rol'],instruccion_jason['tipo'] == null ? undefined : instruccion_jason['tipo']['dimensiones'],instruccion_jason['valor'] == null ? undefined : this.fabrica_expresiones(instruccion_jason['valor']));
         }
-        else if(instruccion_jason['etiqueta'] == 'sentencia_asignacion')
-        {
-            let lista_dimensiones: Array<Instruction>;
+        // else if(instruccion_jason['etiqueta'] == 'sentencia_asignacion')
+        // {
+        //     let lista_dimensiones: Array<Instruction>;
 
-            lista_dimensiones = new Array<Instruction>();
+        //     lista_dimensiones = new Array<Instruction>();
 
-            for(var d = 0; d < instruccion_jason['acceso1'].length; d++)
-            {
-                lista_dimensiones.push(this.fabrica_expresiones(instruccion_jason['acceso1'][d]));
-            }
+        //     for(var d = 0; d < instruccion_jason['acceso1'].length; d++)
+        //     {
+        //         lista_dimensiones.push(this.fabrica_expresiones(instruccion_jason['acceso1'][d]));
+        //     }
 
-            return new Sentencia_Asignacion(instruccion_jason['linea'],instruccion_jason['columna'],instruccion_jason['tipo'],instruccion_jason['acceso0'] == null ? "" : instruccion_jason['acceso0'],lista_dimensiones,instruccion_jason['acceso2'] == null ? undefined : this.fabrica_expresiones(instruccion_jason['acceso2']),this.fabrica_expresiones(instruccion_jason['valor']));
-        }
-        else if(instruccion_jason['etiqueta'] == 'sentencia_if')
-        {
-            let lista_sentencias_if : Array<Instruction>;
-            let lista_sentencias_else_if : Array<Instruction>;
-            let lista_sentencias_else : Array<Instruction>;
+        //     return new Sentencia_Asignacion(instruccion_jason['linea'],instruccion_jason['columna'],instruccion_jason['tipo'],instruccion_jason['acceso0'] == null ? "" : instruccion_jason['acceso0'],lista_dimensiones,instruccion_jason['acceso2'] == null ? undefined : this.fabrica_expresiones(instruccion_jason['acceso2']),this.fabrica_expresiones(instruccion_jason['valor']));
+        // }
+        // else if(instruccion_jason['etiqueta'] == 'sentencia_if')
+        // {
+        //     let lista_sentencias_if : Array<Instruction>;
+        //     let lista_sentencias_else_if : Array<Instruction>;
+        //     let lista_sentencias_else : Array<Instruction>;
 
-            lista_sentencias_if = new Array<Instruction>();
-            lista_sentencias_else_if = new Array<Instruction>();
-            lista_sentencias_else = new Array<Instruction>();
+        //     lista_sentencias_if = new Array<Instruction>();
+        //     lista_sentencias_else_if = new Array<Instruction>();
+        //     lista_sentencias_else = new Array<Instruction>();
 
-            for(var x = 0; x < instruccion_jason['sentencias1'].length; x++)
-            {
-                lista_sentencias_if.push(this.fabrica_instrucciones(instruccion_jason['sentencias1'][x]));
-            }
+        //     for(var x = 0; x < instruccion_jason['sentencias1'].length; x++)
+        //     {
+        //         lista_sentencias_if.push(this.fabrica_instrucciones(instruccion_jason['sentencias1'][x]));
+        //     }
             
-            if(instruccion_jason['lista_else_if'] != null)
-            {
-                for(var y = 0; y < instruccion_jason['lista_else_if'].length; y++)
-                {
-                    lista_sentencias_else_if.push(this.fabrica_instrucciones(instruccion_jason['lista_else_if'][y]));
-                }
-            }
+        //     if(instruccion_jason['lista_else_if'] != null)
+        //     {
+        //         for(var y = 0; y < instruccion_jason['lista_else_if'].length; y++)
+        //         {
+        //             lista_sentencias_else_if.push(this.fabrica_instrucciones(instruccion_jason['lista_else_if'][y]));
+        //         }
+        //     }
 
-            if(instruccion_jason['sentencias2'] != null)
-            {
-                for(var z = 0; z < instruccion_jason['sentencias2'].length; z++)
-                {
-                    lista_sentencias_else.push(this.fabrica_instrucciones(instruccion_jason['sentencias2'][z]));
-                }
-            }
+        //     if(instruccion_jason['sentencias2'] != null)
+        //     {
+        //         for(var z = 0; z < instruccion_jason['sentencias2'].length; z++)
+        //         {
+        //             lista_sentencias_else.push(this.fabrica_instrucciones(instruccion_jason['sentencias2'][z]));
+        //         }
+        //     }
 
-            return new Sentencia_If(instruccion_jason['linea'],instruccion_jason['columna'],this.fabrica_expresiones(instruccion_jason['condicion']),lista_sentencias_if,lista_sentencias_else_if,lista_sentencias_else);
-        }
-        else if(instruccion_jason['etiqueta'] == 'sentencia_switch')
-        {
-            let lista_casos : Array<Instruction>;
+        //     return new Sentencia_If(instruccion_jason['linea'],instruccion_jason['columna'],this.fabrica_expresiones(instruccion_jason['condicion']),lista_sentencias_if,lista_sentencias_else_if,lista_sentencias_else);
+        // }
+        // else if(instruccion_jason['etiqueta'] == 'sentencia_switch')
+        // {
+        //     let lista_casos : Array<Instruction>;
 
-            lista_casos = new Array<Tipo_Acceso>();
+        //     lista_casos = new Array<Tipo_Acceso>();
 
-            for(var x = 0; x < instruccion_jason['lista_casos'].length; x++)
-            {
-                lista_casos.push(this.fabrica_instrucciones(instruccion_jason['lista_casos'][x]));
-            }
+        //     for(var x = 0; x < instruccion_jason['lista_casos'].length; x++)
+        //     {
+        //         lista_casos.push(this.fabrica_instrucciones(instruccion_jason['lista_casos'][x]));
+        //     }
 
-            return new Sentencia_Switch(instruccion_jason['linea'],instruccion_jason['columna'],this.fabrica_expresiones(instruccion_jason['condicion']),lista_casos);
-        }
-        else if(instruccion_jason['etiqueta'] == 'sentencia_caso')
-        {
-            let lista_sentencias : Array<Instruction>;
+        //     return new Sentencia_Switch(instruccion_jason['linea'],instruccion_jason['columna'],this.fabrica_expresiones(instruccion_jason['condicion']),lista_casos);
+        // }
+        // else if(instruccion_jason['etiqueta'] == 'sentencia_caso')
+        // {
+        //     let lista_sentencias : Array<Instruction>;
 
-            lista_sentencias = new Array<Tipo_Acceso>();
+        //     lista_sentencias = new Array<Tipo_Acceso>();
 
-            for(var x = 0; x < instruccion_jason['lista_sentencias'].length; x++)
-            {
-                lista_sentencias.push(this.fabrica_instrucciones(instruccion_jason['lista_sentencias'][x]));
-            }
+        //     for(var x = 0; x < instruccion_jason['lista_sentencias'].length; x++)
+        //     {
+        //         lista_sentencias.push(this.fabrica_instrucciones(instruccion_jason['lista_sentencias'][x]));
+        //     }
 
-            return new Sentencia_Caso(instruccion_jason['linea'],instruccion_jason['columna'],instruccion_jason['default'],instruccion_jason['condicion'] == null ? undefined : this.fabrica_expresiones(instruccion_jason['condicion']),lista_sentencias);
-        }
-        else if(instruccion_jason['etiqueta'] == 'sentencia_while')
-        {
-            let lista_sentencias : Array<Instruction>;
+        //     return new Sentencia_Caso(instruccion_jason['linea'],instruccion_jason['columna'],instruccion_jason['default'],instruccion_jason['condicion'] == null ? undefined : this.fabrica_expresiones(instruccion_jason['condicion']),lista_sentencias);
+        // }
+        // else if(instruccion_jason['etiqueta'] == 'sentencia_while')
+        // {
+        //     let lista_sentencias : Array<Instruction>;
 
-            lista_sentencias = new Array<Tipo_Acceso>();
+        //     lista_sentencias = new Array<Tipo_Acceso>();
 
-            for(var x = 0; x < instruccion_jason['sentencias'].length; x++)
-            {
-                lista_sentencias.push(this.fabrica_instrucciones(instruccion_jason['sentencias'][x]));
-            }
+        //     for(var x = 0; x < instruccion_jason['sentencias'].length; x++)
+        //     {
+        //         lista_sentencias.push(this.fabrica_instrucciones(instruccion_jason['sentencias'][x]));
+        //     }
 
-            return new Sentencia_While(instruccion_jason['linea'],instruccion_jason['columna'],this.fabrica_expresiones(instruccion_jason['condicion']),lista_sentencias);
-        }
-        else if(instruccion_jason['etiqueta'] == 'sentencia_do_while')
-        {
-            let lista_sentencias : Array<Instruction>;
+        //     return new Sentencia_While(instruccion_jason['linea'],instruccion_jason['columna'],this.fabrica_expresiones(instruccion_jason['condicion']),lista_sentencias);
+        // }
+        // else if(instruccion_jason['etiqueta'] == 'sentencia_do_while')
+        // {
+        //     let lista_sentencias : Array<Instruction>;
 
-            lista_sentencias = new Array<Tipo_Acceso>();
+        //     lista_sentencias = new Array<Tipo_Acceso>();
 
-            for(var x = 0; x < instruccion_jason['sentencias'].length; x++)
-            {
-                lista_sentencias.push(this.fabrica_instrucciones(instruccion_jason['sentencias'][x]));
-            }
+        //     for(var x = 0; x < instruccion_jason['sentencias'].length; x++)
+        //     {
+        //         lista_sentencias.push(this.fabrica_instrucciones(instruccion_jason['sentencias'][x]));
+        //     }
 
-            return new Sentencia_Do_While(instruccion_jason['linea'],instruccion_jason['columna'],this.fabrica_expresiones(instruccion_jason['condicion']),lista_sentencias);
-        }
-        else if(instruccion_jason['etiqueta'] == 'sentencia_for')
-        {
-            let lista_sentencias : Array<Instruction>;
+        //     return new Sentencia_Do_While(instruccion_jason['linea'],instruccion_jason['columna'],this.fabrica_expresiones(instruccion_jason['condicion']),lista_sentencias);
+        // }
+        // else if(instruccion_jason['etiqueta'] == 'sentencia_for')
+        // {
+        //     let lista_sentencias : Array<Instruction>;
 
-            lista_sentencias = new Array<Tipo_Acceso>();
+        //     lista_sentencias = new Array<Tipo_Acceso>();
 
-            for(var x = 0; x < instruccion_jason['lista_sentencias'].length; x++)
-            {
-                lista_sentencias.push(this.fabrica_instrucciones(instruccion_jason['lista_sentencias'][x]));
-            }
+        //     for(var x = 0; x < instruccion_jason['lista_sentencias'].length; x++)
+        //     {
+        //         lista_sentencias.push(this.fabrica_instrucciones(instruccion_jason['lista_sentencias'][x]));
+        //     }
             
-            return new Sentencia_For(instruccion_jason['linea'],instruccion_jason['columna'],this.fabrica_instrucciones(instruccion_jason['sentencia1']), this.fabrica_expresiones(instruccion_jason['sentencia2']), this.fabrica_expresiones(instruccion_jason['sentencia3']),lista_sentencias);
-        }
-        else if(instruccion_jason['etiqueta'] == 'sentencia_for_list')
-        {
-            let lista_sentencias : Array<Instruction>;
+        //     return new Sentencia_For(instruccion_jason['linea'],instruccion_jason['columna'],this.fabrica_instrucciones(instruccion_jason['sentencia1']), this.fabrica_expresiones(instruccion_jason['sentencia2']), this.fabrica_expresiones(instruccion_jason['sentencia3']),lista_sentencias);
+        // }
+        // else if(instruccion_jason['etiqueta'] == 'sentencia_for_list')
+        // {
+        //     let lista_sentencias : Array<Instruction>;
 
-            lista_sentencias = new Array<Tipo_Acceso>();
+        //     lista_sentencias = new Array<Tipo_Acceso>();
 
-            for(var x = 0; x < instruccion_jason['lista_sentencias'].length; x++)
-            {
-                lista_sentencias.push(this.fabrica_instrucciones(instruccion_jason['lista_sentencias'][x]));
-            }
+        //     for(var x = 0; x < instruccion_jason['lista_sentencias'].length; x++)
+        //     {
+        //         lista_sentencias.push(this.fabrica_instrucciones(instruccion_jason['lista_sentencias'][x]));
+        //     }
             
-            return new Sentencia_For_List(instruccion_jason['linea'],instruccion_jason['columna'],instruccion_jason['tipo'],instruccion_jason['id1'],instruccion_jason['id2'],lista_sentencias);
-        }
-        else if(instruccion_jason['etiqueta'] == 'sentencia_acceso')
-        {
-            let lista_accesos : Array<Tipo_Acceso>;
-            let tipo_acceso_jason : JSON;
+        //     return new Sentencia_For_List(instruccion_jason['linea'],instruccion_jason['columna'],instruccion_jason['tipo'],instruccion_jason['id1'],instruccion_jason['id2'],lista_sentencias);
+        // }
+        // else if(instruccion_jason['etiqueta'] == 'sentencia_acceso')
+        // {
+        //     let lista_accesos : Array<Tipo_Acceso>;
+        //     let tipo_acceso_jason : JSON;
 
-            lista_accesos = new Array<Tipo_Acceso>();
+        //     lista_accesos = new Array<Tipo_Acceso>();
 
-            for(var cont = 0; cont < instruccion_jason['lista_acceso'].length; cont++)
-            {
-                tipo_acceso_jason = instruccion_jason['lista_acceso'][cont];
-                lista_accesos.push(<Tipo_Acceso>this.fabrica_instrucciones(tipo_acceso_jason));
-            }
+        //     for(var cont = 0; cont < instruccion_jason['lista_acceso'].length; cont++)
+        //     {
+        //         tipo_acceso_jason = instruccion_jason['lista_acceso'][cont];
+        //         lista_accesos.push(<Tipo_Acceso>this.fabrica_instrucciones(tipo_acceso_jason));
+        //     }
 
-            return new Sentencia_Acceso(instruccion_jason['fila'], instruccion_jason['columna'], instruccion_jason['identificador'], instruccion_jason['dimensiones'], lista_accesos);
-        }
-        else if(instruccion_jason['etiqueta'] == 'operador_incremento')
-        {
-            return this.fabrica_expresiones(instruccion_jason);
-        }
-        else if(instruccion_jason['etiqueta'] == 'operador_decremento')
-        {
-            return this.fabrica_expresiones(instruccion_jason);
-        }
-        else if(instruccion_jason['etiqueta'] == 'tipo_acceso')
-        {
-            return new Tipo_Acceso(instruccion_jason['fila'], instruccion_jason['columna'], instruccion_jason['tipo'], instruccion_jason['acceso0'] == null ? undefined : this.fabrica_expresiones(instruccion_jason['acceso0']), instruccion_jason['acceso2'] == null ? undefined : this.fabrica_expresiones(instruccion_jason['acceso2']),instruccion_jason['acceso1'] == null ? "": instruccion_jason['acceso1']);
-        }
-        else if(instruccion_jason['etiqueta'] == 'sentencia_llamada')
-        {
-            let lista_parametros : Array<Expresion>;
-            let parametro_jason : JSON;
+        //     return new Sentencia_Acceso(instruccion_jason['fila'], instruccion_jason['columna'], instruccion_jason['identificador'], instruccion_jason['dimensiones'], lista_accesos);
+        // }
+        // else if(instruccion_jason['etiqueta'] == 'operador_incremento')
+        // {
+        //     return this.fabrica_expresiones(instruccion_jason);
+        // }
+        // else if(instruccion_jason['etiqueta'] == 'operador_decremento')
+        // {
+        //     return this.fabrica_expresiones(instruccion_jason);
+        // }
+        // else if(instruccion_jason['etiqueta'] == 'tipo_acceso')
+        // {
+        //     return new Tipo_Acceso(instruccion_jason['fila'], instruccion_jason['columna'], instruccion_jason['tipo'], instruccion_jason['acceso0'] == null ? undefined : this.fabrica_expresiones(instruccion_jason['acceso0']), instruccion_jason['acceso2'] == null ? undefined : this.fabrica_expresiones(instruccion_jason['acceso2']),instruccion_jason['acceso1'] == null ? "": instruccion_jason['acceso1']);
+        // }
+        // else if(instruccion_jason['etiqueta'] == 'sentencia_llamada')
+        // {
+        //     let lista_parametros : Array<Expresion>;
+        //     let parametro_jason : JSON;
 
-            lista_parametros = new Array<Expresion>();
+        //     lista_parametros = new Array<Expresion>();
 
-            for(var cont = 0; cont < instruccion_jason['parametros'].length; cont++)
-            {
-                parametro_jason = instruccion_jason['parametros'][cont];
-                lista_parametros.push(this.fabrica_expresiones(parametro_jason));
-            }
+        //     for(var cont = 0; cont < instruccion_jason['parametros'].length; cont++)
+        //     {
+        //         parametro_jason = instruccion_jason['parametros'][cont];
+        //         lista_parametros.push(this.fabrica_expresiones(parametro_jason));
+        //     }
 
-            return new Sentencia_Llamada(instruccion_jason['fila'], instruccion_jason['columna'], instruccion_jason['identificador'], lista_parametros);
-        }
-        else if(instruccion_jason['etiqueta'] == 'sentencia_break')
-        {
-            return new Sentencia_Break(instruccion_jason['fila'], instruccion_jason['columna']);
-        }
-        else if(instruccion_jason['etiqueta'] == 'sentencia_continue')
-        {
-            return new Sentencia_Continue(instruccion_jason['fila'], instruccion_jason['columna']);
-        }
-        else if(instruccion_jason['etiqueta'] == 'sentencia_return')
-        {
-            return new Sentencia_Return(instruccion_jason['fila'], instruccion_jason['columna'], instruccion_jason['valor'] == null ? undefined : this.fabrica_expresiones(instruccion_jason['valor']));
-        }
+        //     return new Sentencia_Llamada(instruccion_jason['fila'], instruccion_jason['columna'], instruccion_jason['identificador'], lista_parametros);
+        // }
+        // else if(instruccion_jason['etiqueta'] == 'sentencia_break')
+        // {
+        //     return new Sentencia_Break(instruccion_jason['fila'], instruccion_jason['columna']);
+        // }
+        // else if(instruccion_jason['etiqueta'] == 'sentencia_continue')
+        // {
+        //     return new Sentencia_Continue(instruccion_jason['fila'], instruccion_jason['columna']);
+        // }
+        // else if(instruccion_jason['etiqueta'] == 'sentencia_return')
+        // {
+        //     return new Sentencia_Return(instruccion_jason['fila'], instruccion_jason['columna'], instruccion_jason['valor'] == null ? undefined : this.fabrica_expresiones(instruccion_jason['valor']));
+        // }
         else
         {
             return undefined;

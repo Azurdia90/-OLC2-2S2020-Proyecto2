@@ -44,9 +44,14 @@ class Type_MatrioshTS extends Instruction
         return this.lista_tipos;
     }
 
-    public ejecutar(entorno_padre : Map<String,Simbolo>, salida : Middle)
+    public anlizar(entorno: String, entorno_padre : Map<String,Simbolo>, salida : Middle)
     {
+        return undefined;
+    }
 
+    public traducir(entorno: String, entorno_padre : Map<String,Simbolo>, salida : Middle)
+    {
+        return undefined;
     }
 
     public getThis()

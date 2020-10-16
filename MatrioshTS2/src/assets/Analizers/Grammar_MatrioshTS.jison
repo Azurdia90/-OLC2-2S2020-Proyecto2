@@ -95,7 +95,8 @@
 %left     s_greather s_greather_equal s_less s_less_equal
 
 %left     s_plus s_minus
-%left     s_mul s_div s_exponential s_mod 
+%left     s_mul s_div s_mod 
+%right    s_exponential
 
 %right    r_new
 
