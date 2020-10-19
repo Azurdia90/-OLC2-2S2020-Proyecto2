@@ -7,6 +7,9 @@ class Tabla_Simbolos
 {
     private static instance : Tabla_Simbolos  = new Tabla_Simbolos();
     
+    private temporal : number;
+    private etiqueta : number;
+
     private stack : Stack;
     private entorno_global : Map<String,Simbolo>;
     private lista_funciones : Array<Funcion>;    
@@ -19,6 +22,10 @@ class Tabla_Simbolos
         this.stack._push(0,0,this.entorno_global);
 
         this.lista_funciones = new Array<Funcion>();
+        this.lista_types = new Array<Type_MatrioshTS>();
+
+        this.temporal = 1;
+        this.etiqueta = 1;
     }
     
     public static getInstance()
@@ -41,6 +48,18 @@ class Tabla_Simbolos
         this.stack._push(0,0,this.entorno_global);
         this.lista_funciones = new Array<Funcion>();
         this.lista_types = new Array<Type_MatrioshTS>();
+
+        this.lista_types = new Array<Type_MatrioshTS>();
+    }
+
+    limpiar_temporal()
+    {
+        this.temporal = 100;
+    }
+
+    limpiar_etiqueta()
+    {
+        this.etiqueta = 100;
     }
     
     public existFuncion(p_identificador : String)
@@ -145,6 +164,30 @@ class Tabla_Simbolos
     public setLista_types(lista_types : Array<Type_MatrioshTS>) 
     {
         this.lista_types = lista_types;
+    }
+
+    public getTemporal()
+    {
+        var t = this.temporal;
+        this.temporal++;
+        return t;
+    }
+
+    public setTemporal(p_temporal : number)
+    {
+        this.temporal = p_temporal;
+    }
+
+    public getEtiqueta()
+    {
+        var e = this.etiqueta;
+        this.etiqueta++;
+        return e;
+    }
+
+    public setEtiqueta(p_etiqueta : number)
+    {
+        this.etiqueta = p_etiqueta;
     }
 }
 

@@ -10,7 +10,7 @@ class Simbolo
     private rol : tipo_rol;
     private tipo : Tipo;
     private identificador : String;
-    private mensaje: String;
+    private mensaje: Object;
     private pos_s : number;
 
     private lista_funciones : Array<Funcion>;
@@ -87,7 +87,7 @@ class Simbolo
         return this.mensaje;
     }
 
-    public setMensaje(valor : String) {
+    public setMensaje(valor : Object) {
         this.mensaje = valor;
     }
 

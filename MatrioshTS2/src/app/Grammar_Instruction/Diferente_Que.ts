@@ -8,13 +8,13 @@ class Diferente_Que extends Expresion
 {
     protected matriz_operacion_diferente_que : tipo_operacion_resultado[][] = 
     [   /*                                      void                            nulo                           booleano                                       numero                                                cadena                                           identificador                          error 
-        /*void*/          [ tipo_operacion_resultado.error, tipo_operacion_resultado.error,          tipo_operacion_resultado.error,          tipo_operacion_resultado.error,                     tipo_operacion_resultado.error,                     tipo_operacion_resultado.error,          tipo_operacion_resultado.error],
-        /*nulo*/          [ tipo_operacion_resultado.error, tipo_operacion_resultado.diferente_nulo, tipo_operacion_resultado.diferente_nulo, tipo_operacion_resultado.diferente_nulo,            tipo_operacion_resultado.diferente_nulo,            tipo_operacion_resultado.diferente_nulo, tipo_operacion_resultado.error],
-        /*booleano*/      [ tipo_operacion_resultado.error, tipo_operacion_resultado.diferente_nulo, tipo_operacion_resultado.diferente_nulo, tipo_operacion_resultado.error,                     tipo_operacion_resultado.error,                     tipo_operacion_resultado.error,          tipo_operacion_resultado.error],
-        /*numero*/        [ tipo_operacion_resultado.error, tipo_operacion_resultado.diferente_nulo, tipo_operacion_resultado.error,          tipo_operacion_resultado.diferente_numerico,        tipo_operacion_resultado.diferente_numerico_cadena, tipo_operacion_resultado.error,          tipo_operacion_resultado.error],
-        /*String*/        [ tipo_operacion_resultado.error, tipo_operacion_resultado.diferente_nulo, tipo_operacion_resultado.error,          tipo_operacion_resultado.diferente_cadena_numerico, tipo_operacion_resultado.diferente_cadena,          tipo_operacion_resultado.error,          tipo_operacion_resultado.error],
-        /*identificador*/ [ tipo_operacion_resultado.error, tipo_operacion_resultado.diferente_nulo, tipo_operacion_resultado.error,          tipo_operacion_resultado.error,                     tipo_operacion_resultado.error,                     tipo_operacion_resultado.error,          tipo_operacion_resultado.error],
-        /*error*/         [ tipo_operacion_resultado.error, tipo_operacion_resultado.error,          tipo_operacion_resultado.error,          tipo_operacion_resultado.error,                     tipo_operacion_resultado.error,                     tipo_operacion_resultado.error,          tipo_operacion_resultado.error],
+        /*void*/          [ tipo_operacion_resultado.error, tipo_operacion_resultado.error,          tipo_operacion_resultado.error,              tipo_operacion_resultado.error,                     tipo_operacion_resultado.error,                     tipo_operacion_resultado.error,          tipo_operacion_resultado.error],
+        /*nulo*/          [ tipo_operacion_resultado.error, tipo_operacion_resultado.diferente_nulo, tipo_operacion_resultado.diferente_nulo,     tipo_operacion_resultado.diferente_nulo,            tipo_operacion_resultado.diferente_nulo,            tipo_operacion_resultado.diferente_nulo, tipo_operacion_resultado.error],
+        /*booleano*/      [ tipo_operacion_resultado.error, tipo_operacion_resultado.diferente_nulo, tipo_operacion_resultado.diferente_booleano, tipo_operacion_resultado.error,                     tipo_operacion_resultado.error,                     tipo_operacion_resultado.error,          tipo_operacion_resultado.error],
+        /*numero*/        [ tipo_operacion_resultado.error, tipo_operacion_resultado.diferente_nulo, tipo_operacion_resultado.error,              tipo_operacion_resultado.diferente_numerico,        tipo_operacion_resultado.diferente_numerico_cadena, tipo_operacion_resultado.error,          tipo_operacion_resultado.error],
+        /*String*/        [ tipo_operacion_resultado.error, tipo_operacion_resultado.diferente_nulo, tipo_operacion_resultado.error,              tipo_operacion_resultado.diferente_cadena_numerico, tipo_operacion_resultado.diferente_cadena,          tipo_operacion_resultado.error,          tipo_operacion_resultado.error],
+        /*identificador*/ [ tipo_operacion_resultado.error, tipo_operacion_resultado.diferente_nulo, tipo_operacion_resultado.error,              tipo_operacion_resultado.error,                     tipo_operacion_resultado.error,                     tipo_operacion_resultado.error,          tipo_operacion_resultado.error],
+        /*error*/         [ tipo_operacion_resultado.error, tipo_operacion_resultado.error,          tipo_operacion_resultado.error,              tipo_operacion_resultado.error,                     tipo_operacion_resultado.error,                     tipo_operacion_resultado.error,          tipo_operacion_resultado.error],
     ];
 
     constructor(p_fila : number, p_columna : number, p_operador_izq : Instruction, p_operador_der : Instruction)
@@ -22,14 +22,14 @@ class Diferente_Que extends Expresion
         super(p_fila,p_columna,tipo_operacion.DIFERENTE_QUE,p_operador_izq,p_operador_der);
     }
 
-    public ejecutar(entorno_padre : Map<String,Simbolo>, salida : Middle)
+    public analizar(entorno: String, entorno_padre : Map<String,Simbolo>, salida : Middle)
     {
         let _return : Simbolo;
         
         try
         {
-            let op1 : Simbolo = (this.operador_izq == null) ? null : this.operador_izq.ejecutar(entorno_padre, salida);
-            let op2 : Simbolo = (this.operador_der == null) ? null : this.operador_der.ejecutar(entorno_padre, salida);
+            let op1 : Simbolo = (this.operador_izq == null) ? null : this.operador_izq.analizar(entorno, entorno_padre, salida);
+            let op2 : Simbolo = (this.operador_der == null) ? null : this.operador_der.analizar(entorno, entorno_padre, salida);
 
             let tipo_diferente_que :tipo_operacion_resultado;
 
@@ -38,7 +38,7 @@ class Diferente_Que extends Expresion
                 _return = new Simbolo(tipo_rol.error,new Tipo(tipo_dato.CADENA),"33-12");
                 _return.setFila(this.fila);
                 _return.setColumna(this.columna);
-                _return.setValor("Operador vacio");
+                _return.setMensaje("Operador vacio");
                 return _return;
             }
 
@@ -58,61 +58,33 @@ class Diferente_Que extends Expresion
             {
                 case tipo_operacion_resultado.diferente_nulo:
                     _return = new Simbolo(tipo_rol.valor,new Tipo(tipo_dato.BOOLEANO), "");
-                    _return.setValor((op1.getValor().toString() != "null") && (op2.getValor().toString() == "null"));
+                    _return.setMensaje("Diferente que exitoso.");
                     return _return;
                 case tipo_operacion_resultado.diferente_booleano:
                         _return = new Simbolo(tipo_rol.valor,new Tipo(tipo_dato.BOOLEANO), "");
-                        _return.setValor(<Boolean>(op1.getValor()) != <Boolean>(op2.getValor()));
+                        _return.setMensaje("Diferente que exitoso.");
                         return _return;
                 case tipo_operacion_resultado.diferente_numerico:
                     _return = new Simbolo(tipo_rol.valor,new Tipo(tipo_dato.BOOLEANO), "");
-                    _return.setValor(Number(op1.getValor().toString()) != Number(op2.getValor().toString()));
+                    _return.setMensaje("Diferente que exitoso.");
                     return _return;
                 case tipo_operacion_resultado.diferente_cadena_numerico:
-                    var numero = 0;
-
-                    for(var i : number = 0; i < op1.getValor().toString().length; i++)
-                    {
-                        numero = numero + Number(op1.getValor().toString().charAt(i));
-                    }
-
                     _return = new Simbolo(tipo_rol.valor,new Tipo(tipo_dato.BOOLEANO), "");
-                    _return.setValor(numero != Number(op2.getValor().toString()));
+                    _return.setMensaje("Diferente que exitoso.");
                     return _return;
                 case tipo_operacion_resultado.diferente_numerico_cadena:
-                    var numero = 0;
-
-                    for(var i : number = 0; i < op2.getValor().toString().length; i++)
-                    {
-                        numero = numero + Number(op2.getValor().toString().charAt(i));
-                    }
-                    
                     _return = new Simbolo(tipo_rol.valor,new Tipo(tipo_dato.BOOLEANO), "");
-                    _return.setValor(Number(op1.getValor().toString()) != numero);
+                    _return.setMensaje("Diferente que exitoso.");
                     return _return;
                 case tipo_operacion_resultado.diferente_cadena:
-                    var numero1 = 0;
-
-                    for(var i : number = 0; i < op1.getValor().toString().length; i++)
-                    {
-                        numero1 = numero1 + Number(op1.getValor().toString().charAt(i));
-                    }
-
-                    var numero2 = 0;
-
-                    for(var i : number = 0; i < op2.getValor().toString().length; i++)
-                    {
-                        numero2 = numero2 + Number(op2.getValor().toString().charAt(i));
-                    }
-
                     _return = new Simbolo(tipo_rol.valor,new Tipo(tipo_dato.BOOLEANO), "");
-                    _return.setValor(numero1 != numero2);
+                    _return.setMensaje("Diferente que exitoso.");
                     return _return;
                 default:
                     _return = new Simbolo(tipo_rol.error,new Tipo(tipo_dato.CADENA), "33-12");
                     _return.setFila(this.fila);
                     _return.setColumna(this.columna);
-                    _return.setValor("No es posible realizar una Comparación Diferente Que del tipo: " + op1.getTipo().getTraduccion()  +  " * " + op2.getTipo().getTraduccion());
+                    _return.setMensaje("No es posible realizar una Comparación Diferente Que del tipo: " + op1.getTipo().getTraduccion()  +  " * " + op2.getTipo().getTraduccion());
                     return _return;
             }
         }
@@ -121,7 +93,7 @@ class Diferente_Que extends Expresion
             _return = new Simbolo(tipo_rol.error,new Tipo(tipo_dato.CADENA), "33-12");
             _return.setFila(this.fila);
             _return.setColumna(this.columna);
-            _return.setValor("Operacion Diferente Que: " + Exception.Message);
+            _return.setMensaje("Operacion Diferente Que: " + Exception.Message);
             return _return;
         }
     }

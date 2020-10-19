@@ -1,17 +1,35 @@
+import And from './And';
+import Dato_Primitivo from './Dato_Primitivo';
+import Diferente_Que from './Diferente_Que';
+import Division from './Division';
+import Expresion from './Expresion';
 import Funcion_MatrioshTS from './Funcion_Matriosh';
+import Igual_Que from './Igual_Que';
 import Instruction from './Instruction';
 import Mayor_Igual_Que from './Mayor_Igual_Que';
+import Mayor_Que from './Mayor_Que';
+import Menor_Que from './Menor_Que';
 import Middle from './Middle';
 import Modulo from './Modulo';
 import Multiplicacion from './Multiplicacion';
+import Not from './Not';
+import Operador_Decremento from './Operador_Decremento';
+import Operador_Incremento from './Operador_Incremento';
+import Operador_Ternario from './Operador_Ternario';
+import Operador_Unario from './Operador_Unario';
+import Or from './Or';
 import Potencia from './Potencia';
 import Resta from './Resta';
+import Sentencia_Acceso from './Sentencia_Acceso';
 import Sentencia_Declaracion from './Sentencia_Declaración';
+import Sentencia_Instancia from './Sentencia_Instancia';
+import Sentencia_Llamada from './Sentencia_Llamada';
 import Simbolo from './Simbolo';
 import Suma from './Suma';
 import Tabla_Errores from './Tabla_Errores';
 import Tabla_Simbolos from './Tabla_Simbolos';
 import Tipo from './Tipo';
+import Tipo_Acceso from './Tipo_Acceso';
 import Type_MatrioshTS from './Type_MatrioshTS';
 
 //vscode://vscode.github-authentication/did-authenticate?windowid=1&code=56828868e702751f3978&state=1acf4bbc-47c2-47e3-9a88-e19e71a95d00
@@ -463,7 +481,7 @@ class AST
         }
         else if(expresion_jason['etiqueta'] == 'menor_igual_que')
         {
-            return new Menor_Igual_Que(expresion_jason['fila'], expresion_jason['columna'], this.fabrica_expresiones(expresion_jason['expresion1']), this.fabrica_expresiones(expresion_jason['expresion2']));
+            return new Mayor_Igual_Que(expresion_jason['fila'], expresion_jason['columna'], this.fabrica_expresiones(expresion_jason['expresion1']), this.fabrica_expresiones(expresion_jason['expresion2']));
         }
         else if(expresion_jason['etiqueta'] == 'igual_que')
         {

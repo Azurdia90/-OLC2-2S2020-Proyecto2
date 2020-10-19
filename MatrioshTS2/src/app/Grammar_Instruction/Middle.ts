@@ -50,6 +50,11 @@ class Middle
         this.output = "";
     }
 
+    public clear3D()
+    {
+        this.output = "";
+    }
+
 }
 
 export default Middle;

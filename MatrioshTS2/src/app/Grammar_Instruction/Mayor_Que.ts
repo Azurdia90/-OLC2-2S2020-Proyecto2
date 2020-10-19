@@ -22,7 +22,7 @@ class Mayor_Que extends Expresion
         super(p_fila,p_columna,tipo_operacion.MAYOR_QUE,p_operador_izq,p_operador_der);
     }
 
-    public ejecutar(entorno: String, entorno_padre : Map<String,Simbolo>, salida : Middle)
+    public analizar(entorno: String, entorno_padre : Map<String,Simbolo>, salida : Middle)
     {
         let _return : Simbolo;
         
