@@ -129,7 +129,7 @@ class Simbolo
         {
             let funcion_actual : Funcion = this.lista_funciones[x];
             if(funcion_actual.getIdentificador() == p_identificador)
-            {
+            {  
                 return funcion_actual.getThis();
             }
         }

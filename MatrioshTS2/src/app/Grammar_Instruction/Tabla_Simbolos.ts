@@ -1,6 +1,6 @@
-import Simbolo from './Simbolo';
 import Stack from './Stack';
 import Funcion from './Funcion';
+import Entorno from './Entorno';
 import Type_MatrioshTS from './Type_MatrioshTS';
 
 class Tabla_Simbolos
@@ -11,21 +11,21 @@ class Tabla_Simbolos
     private etiqueta : number;
 
     private stack : Stack;
-    private entorno_global : Map<String,Simbolo>;
+    private entorno_global : Entorno;
     private lista_funciones : Array<Funcion>;    
     private lista_types : Array<Type_MatrioshTS>;
 
     constructor() 
     {
         this.stack = new Stack();
-        this.entorno_global = new Map<String,Simbolo>();
+        this.entorno_global = new Entorno("global");
         this.stack._push(0,0,this.entorno_global);
 
         this.lista_funciones = new Array<Funcion>();
         this.lista_types = new Array<Type_MatrioshTS>();
 
-        this.temporal = 1;
-        this.etiqueta = 1;
+        this.temporal = 51;
+        this.etiqueta = 51;
     }
     
     public static getInstance()
@@ -131,7 +131,7 @@ class Tabla_Simbolos
         return this.entorno_global;
     }
 
-    public setEntorno_global(entorno_global : Map<String, Simbolo>) 
+    public setEntorno_global(entorno_global : Entorno) 
     {
         this.entorno_global = entorno_global;
     }

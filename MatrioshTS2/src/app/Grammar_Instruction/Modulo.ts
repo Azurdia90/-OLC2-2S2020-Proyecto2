@@ -4,6 +4,7 @@ import Simbolo from './Simbolo';
 import Middle from './Middle';
 import Tipo from './Tipo';
 import Tabla_Simbolos from './Tabla_Simbolos';
+import Entorno from './Entorno';
 
 class Modulo extends Expresion
 {
@@ -23,14 +24,14 @@ class Modulo extends Expresion
         super(p_fila,p_columna,tipo_operacion.MODULO,p_operador_izq,p_operador_der);
     }
 
-    public analizar(entorno: String, entorno_padre : Map<String,Simbolo>, salida : Middle)
+    public analizar(entorno_padre : Entorno, salida : Middle)
     {
         let _return : Simbolo;
         
         try
         {
-            let op1 : Simbolo = (this.operador_izq == null) ? null : this.operador_izq.analizar(entorno, entorno_padre, salida);
-            let op2 : Simbolo = (this.operador_der == null) ? null : this.operador_der.analizar(entorno, entorno_padre, salida);
+            let op1 : Simbolo = (this.operador_izq == null) ? null : this.operador_izq.analizar(entorno_padre, salida);
+            let op2 : Simbolo = (this.operador_der == null) ? null : this.operador_der.analizar(entorno_padre, salida);
 
             let tipo_modulo :tipo_operacion_resultado;
 
@@ -79,14 +80,14 @@ class Modulo extends Expresion
         }
     }
 
-    public traducir(entorno: String, entorno_padre : Map<String,Simbolo>, salida : Middle)
+    public traducir(entorno_padre : Entorno, salida : Middle)
     {
         let _return : Simbolo;
         
         try
         {
-            let op1 : Simbolo = (this.operador_izq == null) ? null : this.operador_izq.traducir(entorno, entorno_padre, salida);
-            let op2 : Simbolo = (this.operador_der == null) ? null : this.operador_der.traducir(entorno, entorno_padre, salida);
+            let op1 : Simbolo = (this.operador_izq == null) ? null : this.operador_izq.traducir(entorno_padre, salida);
+            let op2 : Simbolo = (this.operador_der == null) ? null : this.operador_der.traducir(entorno_padre, salida);
 
             let tipo_modulo :tipo_operacion_resultado;
 
@@ -105,7 +106,7 @@ class Modulo extends Expresion
             {
                 case tipo_operacion_resultado.modulo_numero:
                     var etiqueta_actual = Tabla_Simbolos.getInstance().getTemporal();
-                    Middle.getInstance().setOuput("t" + etiqueta_actual + " = " + op1.getMensaje().toString() + " % " + op2.getMensaje().toString() + ";\n");               
+                    Middle.getInstance().setOuput("t" + etiqueta_actual + " = " + op1.getMensaje().toString() + " % " + op2.getMensaje().toString() + ";");               
       
                     _return = new Simbolo(tipo_rol.valor,new Tipo(tipo_dato.NUMERO), "");
                     _return.setFila(this.fila);

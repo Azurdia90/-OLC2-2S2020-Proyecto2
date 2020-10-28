@@ -2,6 +2,7 @@ import Instruction from './Instruction';
 import Tipo from './Tipo';
 import Simbolo from './Simbolo';
 import Middle from './Middle';
+import Entorno from './Entorno';
 
 class Expresion extends Instruction
 {
@@ -27,12 +28,12 @@ class Expresion extends Instruction
         this.valor = p_valor;
     }
 
-    analizar(entorno: String, entorno_padre : Map<String,Simbolo>, salida : Middle)
+    analizar(entorno_padre : Entorno, salida : Middle)
     {
         return undefined;
     }
 
-    traducir(entorno: String, entorno_padre : Map<String,Simbolo>, salida : Middle)
+    traducir(entorno_padre : Entorno, salida : Middle)
     {
         return undefined;
     }

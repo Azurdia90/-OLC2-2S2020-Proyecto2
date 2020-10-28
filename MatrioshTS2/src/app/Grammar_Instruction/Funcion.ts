@@ -2,13 +2,14 @@ import Instruction from './Instruction';
 import Simbolo from './Simbolo';
 import Middle from './Middle';
 import Tipo from './Tipo';
+import Entorno from './Entorno';
 
 class Funcion extends Instruction
 {
     protected tipo : Tipo;
     protected identificador : String;
     
-    protected entorno_local : Map<String,Simbolo>;
+    protected entorno_local : Entorno;
     protected lista_valores : Array<Simbolo>;
     protected lista_parametros : Array<Instruction>;
     protected lista_sentencias : Array<Instruction>;  
@@ -25,22 +26,22 @@ class Funcion extends Instruction
 
     public getTipo()
     {
-        return undefined;
+        return this.tipo;
     }
     
     public getIdentificador() 
     {
-        return undefined;
+        return this.identificador;
     }  
 
     public getLista_parametros() 
     {
-        return undefined;
+        return this.lista_parametros;
     }
 
-    public setLista_parametros(lista_parametros : Array<Instruction> ) 
+    public setLista_parametros(p_lista_parametros : Array<Instruction> ) 
     {
-        return undefined;
+        this.lista_parametros = p_lista_parametros;
     }   
     
     public getThis()
@@ -54,8 +55,14 @@ class Funcion extends Instruction
         //To change body of generated methods, choose Tools | Templates.
         return undefined;        
     }
+
+    public analizar(entorno_padre : Entorno, salida : Middle) 
+    {
+        //To change body of generated methods, choose Tools | Templates.
+        return undefined;
+    }
     
-    public traducir(entorno: String, entorno_padre : Map<String, Simbolo>, salida : Middle) 
+    public traducir(entorno_padre : Entorno, salida : Middle) 
     {
         //To change body of generated methods, choose Tools | Templates.
         return undefined;

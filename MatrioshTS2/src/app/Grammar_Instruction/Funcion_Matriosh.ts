@@ -6,6 +6,7 @@ import Tipo from './Tipo';
 import Tabla_Simbolos from './Tabla_Simbolos';
 import Tabla_Errores from './Tabla_Errores';
 import Sentencia_Declaracion from './Sentencia_Declaración';
+import Entorno from './Entorno';
 
 class Funcion_MatrioshTS extends Funcion
 {
@@ -34,7 +35,7 @@ class Funcion_MatrioshTS extends Funcion
     {
         let _return : Simbolo;
         
-        this.entorno_local = new Map<String,Simbolo>();
+        this.entorno_local = new Entorno(this.identificador);
         //if(this.identificador == "SentenciasAnidadas"){console.log(this.lista_parametros);}
         //if(this.identificador == "SentenciasAnidadas"){console.log(lista_parametros_enviados);}
         if(this.lista_parametros.length == lista_parametros_enviados.length)
@@ -48,11 +49,11 @@ class Funcion_MatrioshTS extends Funcion
                     declaracion_actual.setValor_Ext(lista_parametros_enviados[x]);
                 }
 
-                var _result : Simbolo = declaracion_actual.ejecutar(this.entorno_local, salida);
+                var _result : Simbolo = declaracion_actual.analizar(this.entorno_local, salida);
               
                 if(_result.getRol() != tipo_rol.aceptado)
                 {
-                    this.entorno_local = new Map<String,Simbolo>();
+                    this.entorno_local = new Entorno(this.identificador);
                     return _result;
                 }        
             }
@@ -65,7 +66,7 @@ class Funcion_MatrioshTS extends Funcion
         }
         else
         {
-            this.entorno_local = new Map<String,Simbolo>();
+            this.entorno_local = new Entorno(this.identificador);
 
             _return = new Simbolo(tipo_rol.error,new Tipo(tipo_dato.CADENA), "33-12");
             _return.setFila(this.fila);
@@ -75,7 +76,7 @@ class Funcion_MatrioshTS extends Funcion
         }        
     }
 
-    public analizar(entorno: String, entorno_padre : Map<String, Simbolo>, salida : Middle) 
+    public analizar(entorno_padre : Entorno, salida : Middle) 
     {
         let _return : Simbolo;
 
@@ -88,43 +89,43 @@ class Funcion_MatrioshTS extends Funcion
             
             for(var x = 0; x < this.lista_sentencias.length; x++)            
             {
-                _tmp_return = this.lista_sentencias[x].ejecutar(this.entorno_local, salida);
+                _tmp_return = this.lista_sentencias[x].analizar(this.entorno_local, salida);
                 
                 if (_tmp_return.getRol() == tipo_rol.error)
                 {
-                    var  error_encontrado = { tipo: "Análisis Semántico MatrioshTS", fila: _tmp_return.getFila() == undefined ? "0" : _tmp_return.getFila().toString(), columna: _tmp_return.getColumna() == undefined  ? "0" : _tmp_return.getColumna().toString(), identificador: this.identificador, descripcion: _tmp_return.getValor().toString()};
+                    let error_encontrado = { tipo: "Análisis Semántico MatrioshTS", fila: _tmp_return.getFila() == undefined ? "0" : _tmp_return.getFila().toString(), columna: _tmp_return.getColumna() == undefined  ? "0" : _tmp_return.getColumna().toString(), identificador: this.identificador, descripcion: _tmp_return.getMensaje().toString()};
                     Tabla_Errores.getInstance().push(error_encontrado);    
                                  
                     _return = new Simbolo(tipo_rol.valor,new Tipo(tipo_dato.NULO), "");
                     _return.setFila(this.fila);
                     _return.setColumna(this.columna);
-                    _return.setValor("null");  
+                    _return.setMensaje("null");  
                 }
                 else if (_tmp_return.getRol() == tipo_rol.detener)
                 {
-                    var  error_encontrado = { tipo: "Análisis Semántico MatrioshTS", fila: _tmp_return.getFila() == undefined ? "0" : _tmp_return.getFila().toString(), columna: _tmp_return.getColumna() == undefined  ? "0" : _tmp_return.getColumna().toString(), identificador: this.identificador, descripcion: "Error en Funcion: No se permite el uso de sentencia Break"};
+                    let  error_encontrado = { tipo: "Análisis Semántico MatrioshTS", fila: _tmp_return.getFila() == undefined ? "0" : _tmp_return.getFila().toString(), columna: _tmp_return.getColumna() == undefined  ? "0" : _tmp_return.getColumna().toString(), identificador: this.identificador, descripcion: "Error en Funcion: No se permite el uso de sentencia Break"};
                     Tabla_Errores.getInstance().push(error_encontrado);   
                     
                     _return = new Simbolo(tipo_rol.valor,new Tipo(tipo_dato.NULO), "");
                     _return.setFila(this.fila);
                     _return.setColumna(this.columna);
-                    _return.setValor("null");  
+                    _return.setMensaje("null");  
                 }
                 else if(_tmp_return.getRol() == tipo_rol.continuar)
                 {
-                    var  error_encontrado = { tipo: "Análisis Semántico MatrioshTS", fila: _tmp_return.getFila() == undefined ? "0" : _tmp_return.getFila().toString(), columna: _tmp_return.getColumna() == undefined  ? "0" : _tmp_return.getColumna().toString(), identificador: this.identificador, descripcion: "Error en Funcion: No se permite el uso de sentencia Continue"};
+                    let  error_encontrado = { tipo: "Análisis Semántico MatrioshTS", fila: _tmp_return.getFila() == undefined ? "0" : _tmp_return.getFila().toString(), columna: _tmp_return.getColumna() == undefined  ? "0" : _tmp_return.getColumna().toString(), identificador: this.identificador, descripcion: "Error en Funcion: No se permite el uso de sentencia Continue"};
                     Tabla_Errores.getInstance().push(error_encontrado); 
 
                     _return = new Simbolo(tipo_rol.valor,new Tipo(tipo_dato.NULO), "");
                     _return.setFila(this.fila);
                     _return.setColumna(this.columna);
-                    _return.setValor("null");  
+                    _return.setMensaje("null");  
                 }
                 else if(_tmp_return.getRol() == tipo_rol.retornar) 
                 {                                                           
-                    _return = <Simbolo> _tmp_return.getValor();                 
+                    _return = <Simbolo> _tmp_return.getMensaje();                 
                     Tabla_Simbolos.getInstance().getStack().pop();
-                    this.entorno_local = new Map<String,Simbolo>();
+                    this.entorno_local = new Entorno(this.identificador);
                     //console.log("Se retorno de un metodo cantidad de ambitos: " + Tabla_Simbolos.getInstance().getStack().size());
                     return _return;
                 }
@@ -133,12 +134,12 @@ class Funcion_MatrioshTS extends Funcion
                     _return = new Simbolo(tipo_rol.valor,new Tipo(tipo_dato.NULO), "");
                     _return.setFila(this.fila);
                     _return.setColumna(this.columna);
-                    _return.setValor("null");   
+                    _return.setMensaje("null");   
                 }                
             }
             
             Tabla_Simbolos.getInstance().getStack().pop();
-            this.entorno_local = new Map<String,Simbolo>();
+            this.entorno_local = new Entorno(this.identificador);
           
             return _return;
         }
@@ -152,10 +153,9 @@ class Funcion_MatrioshTS extends Funcion
         }
     } 
 
-    public traducir(entorno: String, entorno_padre : Map<String, Simbolo>, salida : Middle) 
+    public traducir(entorno_padre : Entorno, salida : Middle) 
     {
         let _return : Simbolo;
-        let _c3d : String; 
 
         try
         {

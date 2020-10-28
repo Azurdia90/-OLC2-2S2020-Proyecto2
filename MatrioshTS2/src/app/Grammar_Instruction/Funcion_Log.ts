@@ -1,3 +1,4 @@
+import Entorno from './Entorno';
 import Funcion from "./Funcion";
 import Instruction from './Instruction';
 import Middle from './Middle';
@@ -38,7 +39,7 @@ class Funcion_Log extends Funcion
         }      
     }
 
-    public analizar(entorno: String, entorno_local : Map<String, Simbolo>, salida : Middle) 
+    public analizar(entorno_local : Entorno, salida : Middle) 
     {
         let _return : Simbolo;
 
@@ -81,16 +82,54 @@ class Funcion_Log extends Funcion
         }
     } 
     
-    public traducir(entorno: String, entorno_local : Map<String, Simbolo>, salida : Middle) 
+    public traducir(entorno_local : Entorno, salida : Middle) 
     {
         let _return : Simbolo;
 
         try
-        {   //console.log(this.valores_imprimir);
+        {   console.log(this.valores_imprimir);
 
             for(var i = 0; i < this.valores_imprimir.length; i++)
             {
-                this.print(this.valores_imprimir[i]);
+                let tam_metodo = entorno_local.getPos_Stack();
+                let temporal_simulado = "t" + Tabla_Simbolos.getInstance().getTemporal();
+                let temporal_contador = "t" + Tabla_Simbolos.getInstance().getTemporal();
+
+                if(this.valores_imprimir[i].getTipo().Equals(new Tipo(tipo_dato.VOID)) || this.valores_imprimir[i].getTipo().Equals(new Tipo(tipo_dato.BOOLEANO)))
+                {
+                    continue;
+                }
+                else if(this.valores_imprimir[i].getTipo().Equals(new Tipo(tipo_dato.BOOLEANO)))
+                {
+                    Middle.getInstance().setOuput(temporal_simulado + " = P + " +  tam_metodo + ";");
+                    Middle.getInstance().setOuput(temporal_contador + " = " + temporal_simulado + " +  2;");
+                    Middle.getInstance().setOuput("Stack[(int)" + temporal_contador + "] = " + this.valores_imprimir[i].getMensaje() + ";");
+                    Middle.getInstance().setOuput("P = P + " + tam_metodo + ";");
+                    Middle.getInstance().setOuput("imprimir_booleano();");
+                    Middle.getInstance().setOuput("P = P - " + tam_metodo + ";"); 
+                }
+                else if(this.valores_imprimir[i].getTipo().Equals(new Tipo(tipo_dato.NUMERO)))
+                {
+                    Middle.getInstance().setOuput(temporal_simulado + " = P + " +  tam_metodo + ";");
+                    Middle.getInstance().setOuput(temporal_contador + " = " + temporal_simulado + " +  2;");
+                    Middle.getInstance().setOuput("Stack[(int)" + temporal_contador + "] = " + this.valores_imprimir[i].getMensaje() + ";");
+                    Middle.getInstance().setOuput("P = P + " + tam_metodo + ";");
+                    Middle.getInstance().setOuput("imprimir_numero();");
+                    Middle.getInstance().setOuput("P = P - " + tam_metodo + ";");
+                }
+                else if(this.valores_imprimir[i].getTipo().Equals(new Tipo(tipo_dato.CADENA)))
+                {
+                    Middle.getInstance().setOuput(temporal_simulado + " = P + " +  tam_metodo + ";");
+                    Middle.getInstance().setOuput(temporal_contador + " = " + temporal_simulado + " +  2;");
+                    Middle.getInstance().setOuput("Stack[(int)" + temporal_contador + "] = " + this.valores_imprimir[i].getMensaje() + ";");
+                    Middle.getInstance().setOuput("P = P + " + tam_metodo + ";");                
+                    Middle.getInstance().setOuput("imprimir_cadena();");
+                    Middle.getInstance().setOuput("P = P - " + tam_metodo + ";");
+                }
+                else
+                {
+                    continue;
+                }
             }
             
             _return = new Simbolo(tipo_rol.aceptado,new Tipo(tipo_dato.CADENA),"10-4");
@@ -100,13 +139,10 @@ class Funcion_Log extends Funcion
             return _return;
             
         }
-        catch(Exception)
+        catch(Error)
         {
-            _return = new Simbolo(tipo_rol.error,new Tipo(tipo_dato.CADENA), "33-12");
-            _return.setFila(this.fila);
-            _return.setColumna(this.columna);
-            _return.setMensaje("Error en Sentencia Imprimir: " + Exception);
-            return _return;
+            Middle.getInstance().clear3D();
+            Middle.getInstance().setOuput("Error Sentencia Log: " + Error.Mesage);
         }
     }    
 
@@ -121,57 +157,57 @@ class Funcion_Log extends Funcion
 
         if(valor_imprimir.getTipo().Equals(new Tipo(tipo_dato.VOID)))
         {   
-            Middle.getInstance().setOuput(temporal_simulado + " = P + " +  tam_metodo + ";\n");
-            Middle.getInstance().setOuput(temporal_contador + " = " + temporal_simulado + " +  2;\n");
-            Middle.getInstance().setOuput("Stack[" + temporal_contador + "] = " + valor_imprimir.getMensaje() + ";\n");
-            Middle.getInstance().setOuput("P = P + " + tam_metodo + ";\n");
-            Middle.getInstance().setOuput("call imprimir_nulo;\n");
-            Middle.getInstance().setOuput("P = P - " + tam_metodo + ";\n"); 
+            Middle.getInstance().setOuput(temporal_simulado + " = P + " +  tam_metodo + ";");
+            Middle.getInstance().setOuput(temporal_contador + " = " + temporal_simulado + " +  2;");
+            Middle.getInstance().setOuput("Stack[" + temporal_contador + "] = " + valor_imprimir.getMensaje() + ";");
+            Middle.getInstance().setOuput("P = P + " + tam_metodo + ";");
+            Middle.getInstance().setOuput("call imprimir_nulo;");
+            Middle.getInstance().setOuput("P = P - " + tam_metodo + ";"); 
         }
         else if(valor_imprimir.getTipo().Equals(new Tipo(tipo_dato.NULO)))
         {   
-            Middle.getInstance().setOuput(temporal_simulado + " = P + " +  tam_metodo + ";\n");
-            Middle.getInstance().setOuput(temporal_contador + " = " + temporal_simulado + " +  2;\n");
-            Middle.getInstance().setOuput("Stack[" + temporal_contador + "] = " + valor_imprimir.getMensaje() + ";\n");
-            Middle.getInstance().setOuput("P = P + " + tam_metodo + ";\n");
-            Middle.getInstance().setOuput("call imprimir_nulo;\n");
-            Middle.getInstance().setOuput("P = P - " + tam_metodo + ";\n"); 
+            Middle.getInstance().setOuput(temporal_simulado + " = P + " +  tam_metodo + ";");
+            Middle.getInstance().setOuput(temporal_contador + " = " + temporal_simulado + " +  2;");
+            Middle.getInstance().setOuput("Stack[" + temporal_contador + "] = " + valor_imprimir.getMensaje() + ";");
+            Middle.getInstance().setOuput("P = P + " + tam_metodo + ";");
+            Middle.getInstance().setOuput("call imprimir_nulo;");
+            Middle.getInstance().setOuput("P = P - " + tam_metodo + ";"); 
         }
         else if(valor_imprimir.getTipo().Equals(new Tipo(tipo_dato.BOOLEANO)))
         {   
-            Middle.getInstance().setOuput(temporal_simulado + " = P + " +  tam_metodo + ";\n");
-            Middle.getInstance().setOuput(temporal_contador + " = " + temporal_simulado + " +  2;\n");
-            Middle.getInstance().setOuput("Stack[" + temporal_contador + "] = " + valor_imprimir.getMensaje() + ";\n");
-            Middle.getInstance().setOuput("P = P + " + tam_metodo + ";\n");
-            Middle.getInstance().setOuput("call imprimir_booleano;\n");
-            Middle.getInstance().setOuput("P = P - " + tam_metodo + ";\n"); 
+            Middle.getInstance().setOuput(temporal_simulado + " = P + " +  tam_metodo + ";");
+            Middle.getInstance().setOuput(temporal_contador + " = " + temporal_simulado + " +  2;");
+            Middle.getInstance().setOuput("Stack[" + temporal_contador + "] = " + valor_imprimir.getMensaje() + ";");
+            Middle.getInstance().setOuput("P = P + " + tam_metodo + ";");
+            Middle.getInstance().setOuput("call imprimir_booleano;");
+            Middle.getInstance().setOuput("P = P - " + tam_metodo + ";"); 
         }
         else if(valor_imprimir.getTipo().Equals(new Tipo(tipo_dato.NUMERO)))
         {   
-            Middle.getInstance().setOuput(temporal_simulado + " = P + " +  tam_metodo + ";\n");
-            Middle.getInstance().setOuput(temporal_contador + " = " + temporal_simulado + " +  2;\n");
-            Middle.getInstance().setOuput("Stack[" + temporal_contador + "] = " + valor_imprimir.getMensaje() + ";\n");
-            Middle.getInstance().setOuput("P = P + " + tam_metodo + ";\n");
-            Middle.getInstance().setOuput("call imprimir_numero;\n");
-            Middle.getInstance().setOuput("P = P - " + tam_metodo + ";\n"); 
+            Middle.getInstance().setOuput(temporal_simulado + " = P + " +  tam_metodo + ";");
+            Middle.getInstance().setOuput(temporal_contador + " = " + temporal_simulado + " +  2;");
+            Middle.getInstance().setOuput("Stack[" + temporal_contador + "] = " + valor_imprimir.getMensaje() + ";");
+            Middle.getInstance().setOuput("P = P + " + tam_metodo + ";");
+            Middle.getInstance().setOuput("call imprimir_numero;");
+            Middle.getInstance().setOuput("P = P - " + tam_metodo + ";"); 
         }
         else if(valor_imprimir.getTipo().Equals(new Tipo(tipo_dato.CADENA)))
         {   
-            Middle.getInstance().setOuput(temporal_simulado + " = P + " +  tam_metodo + ";\n");
-            Middle.getInstance().setOuput(temporal_contador + " = " + temporal_simulado + " +  2;\n");
-            Middle.getInstance().setOuput("Stack[" + temporal_contador + "] = " + valor_imprimir.getMensaje() + ";\n");
-            Middle.getInstance().setOuput("P = P + " + tam_metodo + ";\n");
-            Middle.getInstance().setOuput("call imprimir_cadena;\n");
-            Middle.getInstance().setOuput("P = P - " + tam_metodo + ";\n"); 
+            Middle.getInstance().setOuput(temporal_simulado + " = P + " +  tam_metodo + ";");
+            Middle.getInstance().setOuput(temporal_contador + " = " + temporal_simulado + " +  2;");
+            Middle.getInstance().setOuput("Stack[" + temporal_contador + "] = " + valor_imprimir.getMensaje() + ";");
+            Middle.getInstance().setOuput("P = P + " + tam_metodo + ";");
+            Middle.getInstance().setOuput("call imprimir_cadena;");
+            Middle.getInstance().setOuput("P = P - " + tam_metodo + ";"); 
         }
         else
         {
-            Middle.getInstance().setOuput(temporal_simulado + " = P + " +  tam_metodo + ";\n");
-            Middle.getInstance().setOuput(temporal_contador + " = " + temporal_simulado + " +  2;\n");
-            Middle.getInstance().setOuput("Stack[" + temporal_contador + "] = " + valor_imprimir.getMensaje() + ";\n");
-            Middle.getInstance().setOuput("P = P + " + tam_metodo + ";\n");
-            Middle.getInstance().setOuput("call imprimir_nulo;\n");
-            Middle.getInstance().setOuput("P = P - " + tam_metodo + ";\n"); 
+            Middle.getInstance().setOuput(temporal_simulado + " = P + " +  tam_metodo + ";");
+            Middle.getInstance().setOuput(temporal_contador + " = " + temporal_simulado + " +  2;");
+            Middle.getInstance().setOuput("Stack[" + temporal_contador + "] = " + valor_imprimir.getMensaje() + ";");
+            Middle.getInstance().setOuput("P = P + " + tam_metodo + ";");
+            Middle.getInstance().setOuput("call imprimir_nulo;");
+            Middle.getInstance().setOuput("P = P - " + tam_metodo + ";"); 
         }        
     }
     

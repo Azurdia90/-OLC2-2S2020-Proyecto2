@@ -3,6 +3,7 @@ import Instruction from './Instruction';
 import Simbolo from './Simbolo';
 import Middle from './Middle';
 import Tipo from './Tipo';
+import Entorno from './Entorno';
 
 class Diferente_Que extends Expresion
 {
@@ -22,14 +23,14 @@ class Diferente_Que extends Expresion
         super(p_fila,p_columna,tipo_operacion.DIFERENTE_QUE,p_operador_izq,p_operador_der);
     }
 
-    public analizar(entorno: String, entorno_padre : Map<String,Simbolo>, salida : Middle)
+    public analizar(entorno_padre : Entorno, salida : Middle)
     {
         let _return : Simbolo;
         
         try
         {
-            let op1 : Simbolo = (this.operador_izq == null) ? null : this.operador_izq.analizar(entorno, entorno_padre, salida);
-            let op2 : Simbolo = (this.operador_der == null) ? null : this.operador_der.analizar(entorno, entorno_padre, salida);
+            let op1 : Simbolo = (this.operador_izq == null) ? null : this.operador_izq.analizar(entorno_padre, salida);
+            let op2 : Simbolo = (this.operador_der == null) ? null : this.operador_der.analizar(entorno_padre, salida);
 
             let tipo_diferente_que :tipo_operacion_resultado;
 

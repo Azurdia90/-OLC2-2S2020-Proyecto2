@@ -4,6 +4,7 @@ import Simbolo from './Simbolo';
 import Middle from './Middle';
 import Tipo from './Tipo';
 import Tabla_Simbolos from './Tabla_Simbolos';
+import Entorno from './Entorno';
 
 class Suma extends Expresion
 {
@@ -23,14 +24,14 @@ class Suma extends Expresion
         super(p_fila,p_columna,tipo_operacion.SUMA,p_operador_izq,p_operador_der);
     }
 
-    public analizar(entorno: String, entorno_padre : Map<String,Simbolo>, salida : Middle)
+    public analizar(entorno_padre : Entorno, salida : Middle)
     {
         let _return : Simbolo;
         
         try
         {
-            let op1 : Simbolo = (this.operador_izq == null) ? null : this.operador_izq.analizar(entorno, entorno_padre, salida);
-            let op2 : Simbolo = (this.operador_der == null) ? null : this.operador_der.analizar(entorno, entorno_padre, salida);
+            let op1 : Simbolo = (this.operador_izq == null) ? null : this.operador_izq.analizar(entorno_padre, salida);
+            let op2 : Simbolo = (this.operador_der == null) ? null : this.operador_der.analizar(entorno_padre, salida);
             
             let tipo_suma :tipo_operacion_resultado;
 
@@ -86,14 +87,14 @@ class Suma extends Expresion
         }
     }
 
-    public traducir(entorno: String, entorno_padre : Map<String,Simbolo>, salida : Middle)
+    public traducir(entorno_padre : Entorno, salida : Middle)
     {
         let _return : Simbolo;
         
         try
         {
-            let op1 : Simbolo = (this.operador_izq == null) ? null : this.operador_izq.traducir(entorno, entorno_padre, salida);
-            let op2 : Simbolo = (this.operador_der == null) ? null : this.operador_der.traducir(entorno, entorno_padre, salida);
+            let op1 : Simbolo = (this.operador_izq == null) ? null : this.operador_izq.traducir(entorno_padre, salida);
+            let op2 : Simbolo = (this.operador_der == null) ? null : this.operador_der.traducir(entorno_padre, salida);
             
             let tipo_suma :tipo_operacion_resultado;
 
@@ -113,7 +114,7 @@ class Suma extends Expresion
             {
                 case tipo_operacion_resultado.suma_numero:
                     let etiqueta_actual = Tabla_Simbolos.getInstance().getTemporal();
-                    Middle.getInstance().setOuput("t" + etiqueta_actual + " = " + op1.getMensaje().toString() + " + " + op2.getMensaje().toString() + ";\n");               
+                    Middle.getInstance().setOuput("t" + etiqueta_actual + " = " + op1.getMensaje().toString() + " + " + op2.getMensaje().toString() + ";");               
       
                     _return = new Simbolo(tipo_rol.valor,new Tipo(tipo_dato.NUMERO), "");
                     _return.setFila(this.fila);
@@ -130,16 +131,16 @@ class Suma extends Expresion
                         let temporal_pos_return  = "t" + Tabla_Simbolos.getInstance().getTemporal();
                         let temporal_retorno     = "t" + Tabla_Simbolos.getInstance().getTemporal();
                                                                                 
-                        Middle.getInstance().setOuput(temporal_simulado + " = P + " +  tam_metodo + ";\n");
-                        Middle.getInstance().setOuput(temporal_contador + " = " + temporal_simulado + " +  2;\n");
-                        Middle.getInstance().setOuput("Stack[" + temporal_contador + "] = " + op1.getMensaje() + ";\n");
-                        Middle.getInstance().setOuput(temporal_contador + " = " + temporal_simulado + " +  3;\n");
-                        Middle.getInstance().setOuput("Stack[" + temporal_contador + "] = " + op2.getMensaje() + ";\n");
-                        Middle.getInstance().setOuput("P = P + " + tam_metodo + ";\n");                
-                        Middle.getInstance().setOuput("call concatenacion_cadena;\n");
-                        Middle.getInstance().setOuput(temporal_pos_return + " = P + 1;\n");
-                        Middle.getInstance().setOuput(temporal_retorno + " = Stack[" + temporal_pos_return + "];\n");
-                        Middle.getInstance().setOuput("P = P - " + tam_metodo + ";\n");
+                        Middle.getInstance().setOuput(temporal_simulado + " = P + " +  tam_metodo + ";");
+                        Middle.getInstance().setOuput(temporal_contador + " = " + temporal_simulado + " +  2;");
+                        Middle.getInstance().setOuput("Stack[(int)" + temporal_contador + "] = " + op1.getMensaje() + ";");
+                        Middle.getInstance().setOuput(temporal_contador + " = " + temporal_simulado + " +  3;");
+                        Middle.getInstance().setOuput("Stack[(int)" + temporal_contador + "] = " + op2.getMensaje() + ";");
+                        Middle.getInstance().setOuput("P = P + " + tam_metodo + ";");                
+                        Middle.getInstance().setOuput("concatenacion_cadena();");
+                        Middle.getInstance().setOuput(temporal_pos_return + " = P + 1;");
+                        Middle.getInstance().setOuput(temporal_retorno + " = Stack[(int)" + temporal_pos_return + "];");
+                        Middle.getInstance().setOuput("P = P - " + tam_metodo + ";");
                     
                         _return = new Simbolo(tipo_rol.valor,new Tipo(tipo_dato.CADENA), "");
                         _return.setFila(this.fila);
@@ -155,25 +156,25 @@ class Suma extends Expresion
                         let temporal_pos_return  = "t" + Tabla_Simbolos.getInstance().getTemporal();
                         let temporal_retorno     = "t" + Tabla_Simbolos.getInstance().getTemporal();
                                                                                 
-                        Middle.getInstance().setOuput(temporal_simulado + " = P + " +  tam_metodo + ";\n");
-                        Middle.getInstance().setOuput(temporal_contador + " = " + temporal_simulado + " +  2;\n");
-                        Middle.getInstance().setOuput("Stack[" + temporal_contador + "] = " + op1.getMensaje() + ";\n");                        
-                        Middle.getInstance().setOuput("P = P + " + tam_metodo + ";\n");                
-                        Middle.getInstance().setOuput("call cast_boolean_cadena;\n");
-                        Middle.getInstance().setOuput(temporal_pos_return + " = P + 1;\n");
-                        Middle.getInstance().setOuput(temporal_retorno + " = Stack[" + temporal_pos_return + "];\n");
-                        Middle.getInstance().setOuput("P = P - " + tam_metodo + ";\n");
+                        Middle.getInstance().setOuput(temporal_simulado + " = P + " +  tam_metodo + ";");
+                        Middle.getInstance().setOuput(temporal_contador + " = " + temporal_simulado + " +  2;");
+                        Middle.getInstance().setOuput("Stack[(int)" + temporal_contador + "] = " + op1.getMensaje() + ";");                        
+                        Middle.getInstance().setOuput("P = P + " + tam_metodo + ";");                
+                        Middle.getInstance().setOuput("cast_boolean_cadena();");
+                        Middle.getInstance().setOuput(temporal_pos_return + " = P + 1;");
+                        Middle.getInstance().setOuput(temporal_retorno + " = Stack[(int)" + temporal_pos_return + "];");
+                        Middle.getInstance().setOuput("P = P - " + tam_metodo + ";");
                         
-                        Middle.getInstance().setOuput(temporal_simulado + " = P + " +  tam_metodo + ";\n");
-                        Middle.getInstance().setOuput(temporal_contador + " = " + temporal_simulado + " +  2;\n");
-                        Middle.getInstance().setOuput("Stack[" + temporal_contador + "] = " + temporal_retorno + ";\n");
-                        Middle.getInstance().setOuput(temporal_contador + " = " + temporal_simulado + " +  3;\n");
-                        Middle.getInstance().setOuput("Stack[" + temporal_contador + "] = " + op2.getMensaje() + ";\n");
-                        Middle.getInstance().setOuput("P = P + " + tam_metodo + ";\n");                
-                        Middle.getInstance().setOuput("call concatenacion_cadena;\n");
-                        Middle.getInstance().setOuput(temporal_pos_return + " = P + 1;\n");
-                        Middle.getInstance().setOuput(temporal_retorno + " = Stack[" + temporal_pos_return + "];\n");
-                        Middle.getInstance().setOuput("P = P - " + tam_metodo + ";\n");
+                        Middle.getInstance().setOuput(temporal_simulado + " = P + " +  tam_metodo + ";");
+                        Middle.getInstance().setOuput(temporal_contador + " = " + temporal_simulado + " +  2;");
+                        Middle.getInstance().setOuput("Stack[(int)" + temporal_contador + "] = " + temporal_retorno + ";");
+                        Middle.getInstance().setOuput(temporal_contador + " = " + temporal_simulado + " +  3;");
+                        Middle.getInstance().setOuput("Stack[(int)" + temporal_contador + "] = " + op2.getMensaje() + ";");
+                        Middle.getInstance().setOuput("P = P + " + tam_metodo + ";");                
+                        Middle.getInstance().setOuput("concatenacion_cadena();");
+                        Middle.getInstance().setOuput(temporal_pos_return + " = P + 1;");
+                        Middle.getInstance().setOuput(temporal_retorno + " = Stack[(int)" + temporal_pos_return + "];");
+                        Middle.getInstance().setOuput("P = P - " + tam_metodo + ";");
                         
                         _return = new Simbolo(tipo_rol.valor,new Tipo(tipo_dato.CADENA), "");
                         _return.setFila(this.fila);
@@ -189,25 +190,25 @@ class Suma extends Expresion
                         let temporal_pos_return  = "t" + Tabla_Simbolos.getInstance().getTemporal();
                         let temporal_retorno     = "t" + Tabla_Simbolos.getInstance().getTemporal();
                                                                                 
-                        Middle.getInstance().setOuput(temporal_simulado + " = P + " +  tam_metodo + ";\n");
-                        Middle.getInstance().setOuput(temporal_contador + " = " + temporal_simulado + " +  2;\n");
-                        Middle.getInstance().setOuput("Stack[" + temporal_contador + "] = " + op2.getMensaje() + ";\n");                        
-                        Middle.getInstance().setOuput("P = P + " + tam_metodo + ";\n");                
-                        Middle.getInstance().setOuput("call cast_boolean_cadena;\n");
-                        Middle.getInstance().setOuput(temporal_pos_return + " = P + 1;\n");
-                        Middle.getInstance().setOuput(temporal_retorno + " = Stack[" + temporal_pos_return + "];\n");
-                        Middle.getInstance().setOuput("P = P - " + tam_metodo + ";\n");
+                        Middle.getInstance().setOuput(temporal_simulado + " = P + " +  tam_metodo + ";");
+                        Middle.getInstance().setOuput(temporal_contador + " = " + temporal_simulado + " +  2;");
+                        Middle.getInstance().setOuput("Stack[(int)" + temporal_contador + "] = " + op2.getMensaje() + ";");                        
+                        Middle.getInstance().setOuput("P = P + " + tam_metodo + ";");                
+                        Middle.getInstance().setOuput("cast_boolean_cadena();");
+                        Middle.getInstance().setOuput(temporal_pos_return + " = P + 1;");
+                        Middle.getInstance().setOuput(temporal_retorno + " = Stack[(int)" + temporal_pos_return + "];");
+                        Middle.getInstance().setOuput("P = P - " + tam_metodo + ";");
                         
-                        Middle.getInstance().setOuput(temporal_simulado + " = P + " +  tam_metodo + ";\n");
-                        Middle.getInstance().setOuput(temporal_contador + " = " + temporal_simulado + " +  2;\n");
-                        Middle.getInstance().setOuput("Stack[" + temporal_contador + "] = " + op1.getMensaje() + ";\n");
-                        Middle.getInstance().setOuput(temporal_contador + " = " + temporal_simulado + " +  3;\n");
-                        Middle.getInstance().setOuput("Stack[" + temporal_contador + "] = " + temporal_retorno + ";\n");
-                        Middle.getInstance().setOuput("P = P + " + tam_metodo + ";\n");                
-                        Middle.getInstance().setOuput("call concatenacion_cadena;\n");
-                        Middle.getInstance().setOuput(temporal_pos_return + " = P + 1;\n");
-                        Middle.getInstance().setOuput(temporal_retorno + " = Stack[" + temporal_pos_return + "];\n");
-                        Middle.getInstance().setOuput("P = P - " + tam_metodo + ";\n");
+                        Middle.getInstance().setOuput(temporal_simulado + " = P + " +  tam_metodo + ";");
+                        Middle.getInstance().setOuput(temporal_contador + " = " + temporal_simulado + " +  2;");
+                        Middle.getInstance().setOuput("Stack[(int)" + temporal_contador + "] = " + op1.getMensaje() + ";");
+                        Middle.getInstance().setOuput(temporal_contador + " = " + temporal_simulado + " +  3;");
+                        Middle.getInstance().setOuput("Stack[(int)" + temporal_contador + "] = " + temporal_retorno + ";");
+                        Middle.getInstance().setOuput("P = P + " + tam_metodo + ";");                
+                        Middle.getInstance().setOuput("concatenacion_cadena();");
+                        Middle.getInstance().setOuput(temporal_pos_return + " = P + 1;");
+                        Middle.getInstance().setOuput(temporal_retorno + " = Stack[(int)" + temporal_pos_return + "];");
+                        Middle.getInstance().setOuput("P = P - " + tam_metodo + ";");
                         
                         _return = new Simbolo(tipo_rol.valor,new Tipo(tipo_dato.CADENA), "");
                         _return.setFila(this.fila);
@@ -223,25 +224,25 @@ class Suma extends Expresion
                         let temporal_pos_return  = "t" + Tabla_Simbolos.getInstance().getTemporal();
                         let temporal_retorno     = "t" + Tabla_Simbolos.getInstance().getTemporal();
                                                                                 
-                        Middle.getInstance().setOuput(temporal_simulado + " = P + " +  tam_metodo + ";\n");
-                        Middle.getInstance().setOuput(temporal_contador + " = " + temporal_simulado + " +  2;\n");
-                        Middle.getInstance().setOuput("Stack[" + temporal_contador + "] = " + op1.getMensaje() + ";\n");                        
-                        Middle.getInstance().setOuput("P = P + " + tam_metodo + ";\n");                
-                        Middle.getInstance().setOuput("call cast_int_cadena;\n");
-                        Middle.getInstance().setOuput(temporal_pos_return + " = P + 1;\n");
-                        Middle.getInstance().setOuput(temporal_retorno + " = Stack[" + temporal_pos_return + "];\n");
-                        Middle.getInstance().setOuput("P = P - " + tam_metodo + ";\n");
+                        Middle.getInstance().setOuput(temporal_simulado + " = P + " +  tam_metodo + ";");
+                        Middle.getInstance().setOuput(temporal_contador + " = " + temporal_simulado + " +  2;");
+                        Middle.getInstance().setOuput("Stack[(int)" + temporal_contador + "] = " + op1.getMensaje() + ";");                        
+                        Middle.getInstance().setOuput("P = P + " + tam_metodo + ";");                
+                        Middle.getInstance().setOuput("cast_numero_cadena();");
+                        Middle.getInstance().setOuput(temporal_pos_return + " = P + 1;");
+                        Middle.getInstance().setOuput(temporal_retorno + " = Stack[(int)" + temporal_pos_return + "];");
+                        Middle.getInstance().setOuput("P = P - " + tam_metodo + ";");
                         
-                        Middle.getInstance().setOuput(temporal_simulado + " = P + " +  tam_metodo + ";\n");
-                        Middle.getInstance().setOuput(temporal_contador + " = " + temporal_simulado + " +  2;\n");
-                        Middle.getInstance().setOuput("Stack[" + temporal_contador + "] = " + temporal_retorno + ";\n");
-                        Middle.getInstance().setOuput(temporal_contador + " = " + temporal_simulado + " +  3;\n");
-                        Middle.getInstance().setOuput("Stack[" + temporal_contador + "] = " + op2.getMensaje() + ";\n");
-                        Middle.getInstance().setOuput("P = P + " + tam_metodo + ";\n");                
-                        Middle.getInstance().setOuput("call concatenacion_cadena;\n");
-                        Middle.getInstance().setOuput(temporal_pos_return + " = P + 1;\n");
-                        Middle.getInstance().setOuput(temporal_retorno + " = Stack[" + temporal_pos_return + "];\n");
-                        Middle.getInstance().setOuput("P = P - " + tam_metodo + ";\n");
+                        Middle.getInstance().setOuput(temporal_simulado + " = P + " +  tam_metodo + ";");
+                        Middle.getInstance().setOuput(temporal_contador + " = " + temporal_simulado + " +  2;");
+                        Middle.getInstance().setOuput("Stack[(int)" + temporal_contador + "] = " + temporal_retorno + ";");
+                        Middle.getInstance().setOuput(temporal_contador + " = " + temporal_simulado + " +  3;");
+                        Middle.getInstance().setOuput("Stack[(int)" + temporal_contador + "] = " + op2.getMensaje() + ";");
+                        Middle.getInstance().setOuput("P = P + " + tam_metodo + ";");                
+                        Middle.getInstance().setOuput("concatenacion_cadena();");
+                        Middle.getInstance().setOuput(temporal_pos_return + " = P + 1;");
+                        Middle.getInstance().setOuput(temporal_retorno + " = Stack[(int)" + temporal_pos_return + "];");
+                        Middle.getInstance().setOuput("P = P - " + tam_metodo + ";");
                         
                         _return = new Simbolo(tipo_rol.valor,new Tipo(tipo_dato.CADENA), "");
                         _return.setFila(this.fila);
@@ -257,25 +258,25 @@ class Suma extends Expresion
                         let temporal_pos_return  = "t" + Tabla_Simbolos.getInstance().getTemporal();
                         let temporal_retorno     = "t" + Tabla_Simbolos.getInstance().getTemporal();
                                                                                 
-                        Middle.getInstance().setOuput(temporal_simulado + " = P + " +  tam_metodo + ";\n");
-                        Middle.getInstance().setOuput(temporal_contador + " = " + temporal_simulado + " +  2;\n");
-                        Middle.getInstance().setOuput("Stack[" + temporal_contador + "] = " + op2.getMensaje() + ";\n");                        
-                        Middle.getInstance().setOuput("P = P + " + tam_metodo + ";\n");                
-                        Middle.getInstance().setOuput("call cast_int_cadena;\n");
-                        Middle.getInstance().setOuput(temporal_pos_return + " = P + 1;\n");
-                        Middle.getInstance().setOuput(temporal_retorno + " = Stack[" + temporal_pos_return + "];\n");
-                        Middle.getInstance().setOuput("P = P - " + tam_metodo + ";\n");
+                        Middle.getInstance().setOuput(temporal_simulado + " = P + " +  tam_metodo + ";");
+                        Middle.getInstance().setOuput(temporal_contador + " = " + temporal_simulado + " +  2;");
+                        Middle.getInstance().setOuput("Stack[(int)" + temporal_contador + "] = " + op2.getMensaje() + ";");                        
+                        Middle.getInstance().setOuput("P = P + " + tam_metodo + ";");                
+                        Middle.getInstance().setOuput("cast_numero_cadena();");
+                        Middle.getInstance().setOuput(temporal_pos_return + " = P + 1;");
+                        Middle.getInstance().setOuput(temporal_retorno + " = Stack[(int)" + temporal_pos_return + "];");
+                        Middle.getInstance().setOuput("P = P - " + tam_metodo + ";");
                         
-                        Middle.getInstance().setOuput(temporal_simulado + " = P + " +  tam_metodo + ";\n");
-                        Middle.getInstance().setOuput(temporal_contador + " = " + temporal_simulado + " +  2;\n");
-                        Middle.getInstance().setOuput("Stack[" + temporal_contador + "] = " + op1.getMensaje() + ";\n");
-                        Middle.getInstance().setOuput(temporal_contador + " = " + temporal_simulado + " +  3;\n");
-                        Middle.getInstance().setOuput("Stack[" + temporal_contador + "] = " + temporal_retorno + ";\n");
-                        Middle.getInstance().setOuput("P = P + " + tam_metodo + ";\n");                
-                        Middle.getInstance().setOuput("call concatenacion_cadena;\n");
-                        Middle.getInstance().setOuput(temporal_pos_return + " = P + 1;\n");
-                        Middle.getInstance().setOuput(temporal_retorno + " = Stack[" + temporal_pos_return + "];\n");
-                        Middle.getInstance().setOuput("P = P - " + tam_metodo + ";\n");
+                        Middle.getInstance().setOuput(temporal_simulado + " = P + " +  tam_metodo + ";");
+                        Middle.getInstance().setOuput(temporal_contador + " = " + temporal_simulado + " +  2;");
+                        Middle.getInstance().setOuput("Stack[(int)" + temporal_contador + "] = " + op1.getMensaje() + ";");
+                        Middle.getInstance().setOuput(temporal_contador + " = " + temporal_simulado + " +  3;");
+                        Middle.getInstance().setOuput("Stack[(int)" + temporal_contador + "] = " + temporal_retorno + ";");
+                        Middle.getInstance().setOuput("P = P + " + tam_metodo + ";");                
+                        Middle.getInstance().setOuput("concatenacion_cadena();");
+                        Middle.getInstance().setOuput(temporal_pos_return + " = P + 1;");
+                        Middle.getInstance().setOuput(temporal_retorno + " = Stack[(int)" + temporal_pos_return + "];");
+                        Middle.getInstance().setOuput("P = P - " + tam_metodo + ";");
                         
                         _return = new Simbolo(tipo_rol.valor,new Tipo(tipo_dato.CADENA), "");
                         _return.setFila(this.fila);
@@ -304,7 +305,7 @@ class Suma extends Expresion
         catch(Error)
         {
             Middle.getInstance().clear3D();
-            Middle.getInstance().setOuput("Error Resta: " + Error.Mesage);
+            Middle.getInstance().setOuput("Error Suma: " + Error.Mesage);
         }
     }
 

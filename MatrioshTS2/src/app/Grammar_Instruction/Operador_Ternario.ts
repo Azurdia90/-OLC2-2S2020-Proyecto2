@@ -3,6 +3,7 @@ import Instruction from './Instruction';
 import Simbolo from './Simbolo';
 import Middle from './Middle';
 import Tipo from './Tipo';
+import Entorno from './Entorno';
 
 class Operador_Ternario extends Expresion
 {
@@ -13,14 +14,14 @@ class Operador_Ternario extends Expresion
         this.condicion = p_condicion;
     }
     
-    public analizar(entorno: String, entorno_padre : Map<String,Simbolo>, salida : Middle)
+    public analizar(entorno_padre : Entorno, salida : Middle)
     {
         let _return : Simbolo;
         let tmp_val : Simbolo;
 
         try
         {
-            tmp_val = (this.condicion == null) ? null : this.condicion.analizar(entorno, entorno_padre, salida);
+            tmp_val = (this.condicion == null) ? null : this.condicion.analizar(entorno_padre, salida);
 
             if (tmp_val == null)
             {

@@ -1,3 +1,4 @@
+import { mainModule } from 'process';
 import And from './And';
 import Dato_Primitivo from './Dato_Primitivo';
 import Diferente_Que from './Diferente_Que';
@@ -21,6 +22,7 @@ import Or from './Or';
 import Potencia from './Potencia';
 import Resta from './Resta';
 import Sentencia_Acceso from './Sentencia_Acceso';
+import Sentencia_Asignacion from './Sentencia_Asignacion';
 import Sentencia_Declaracion from './Sentencia_Declaración';
 import Sentencia_Instancia from './Sentencia_Instancia';
 import Sentencia_Llamada from './Sentencia_Llamada';
@@ -57,7 +59,7 @@ class AST
         for(var i :number = 0; i < this.superjason.length; i++ )
         {            
             this.lista_instrucciones.push(this.fabrica_instrucciones(this.superjason[i]));    
-        }
+        } 
     }  
     public exec_ast()
     {
@@ -65,7 +67,10 @@ class AST
         this.recorrido1();
         this.recorrido2();
         this.recorrido3();
-        this.recorridof();
+        this.recorrido4();
+        this.traducir_3D_1();
+        this.traducir_3D_2();
+        this.traducir_3D_3();
     }
 
     public recorrido1()
@@ -124,13 +129,13 @@ class AST
 
     public recorrido3()
     {
-        var _result : Simbolo;
+        let _result : Simbolo;
 
         for(var r3 = 0; r3 < this.lista_instrucciones.length; r3++)
         {
             if(this.lista_instrucciones[r3] instanceof Sentencia_Declaracion)
             {
-                _result = this.lista_instrucciones[r3].analizar("global", Tabla_Simbolos.getInstance().getEntorno_global(), Middle.getInstance());
+                _result = this.lista_instrucciones[r3].analizar(Tabla_Simbolos.getInstance().getEntorno_global(), Middle.getInstance());
             }
             else
             {
@@ -164,15 +169,15 @@ class AST
         }
     }
 
-    public recorridof()
+    public recorrido4()
     {
-        var _result : Simbolo;
+        let _result : Simbolo;
         
-        for(var f = 0; f < this.lista_instrucciones.length; f++)
+        for(var r4 = 0; r4 < this.lista_instrucciones.length; r4++)
         {    
-            if(!(this.lista_instrucciones[f] instanceof Type_MatrioshTS) && !(this.lista_instrucciones[f] instanceof Funcion_MatrioshTS) && !(this.lista_instrucciones[f] instanceof Sentencia_Declaracion))
+            if(!(this.lista_instrucciones[r4] instanceof Type_MatrioshTS) && !(this.lista_instrucciones[r4] instanceof Funcion_MatrioshTS) && !(this.lista_instrucciones[r4] instanceof Sentencia_Declaracion))
             {   //console.log(this.lista_instrucciones[f]);
-                _result = this.lista_instrucciones[f].analizar("global",Tabla_Simbolos.getInstance().getEntorno_global(),Middle.getInstance());
+                _result = this.lista_instrucciones[r4].analizar(Tabla_Simbolos.getInstance().getEntorno_global(),Middle.getInstance());
             }
             else
             {
@@ -204,7 +209,101 @@ class AST
                 continue;
             }
         }
-    }  
+    }
+
+    public traducir_3D_1()
+    {
+        var _result : Simbolo;
+        
+        Middle.getInstance().setOuput("void main()");
+        Middle.getInstance().setOuput("{\n");
+
+        for(var _3D1 = 0; _3D1 < this.lista_instrucciones.length; _3D1++)
+        {
+            if(this.lista_instrucciones[_3D1] instanceof Sentencia_Declaracion)
+            {
+                _result = this.lista_instrucciones[_3D1].traducir(Tabla_Simbolos.getInstance().getEntorno_global(), Middle.getInstance());
+            }
+            else
+            {
+                continue;
+            }
+
+            if(_result != undefined && _result.getRol() == tipo_rol.error)
+            {
+                let  error_encontrado = { tipo: "Análisis Semántico MatrioshTS", fila: _result.getFila() == undefined ? "0" : _result.getFila().toString(), columna: _result.getColumna() == undefined  ? "0" : _result.getColumna().toString(), identificador: "global", descripcion: _result.getMensaje().toString()};
+                Tabla_Errores.getInstance().push(error_encontrado);  
+            }
+            else if(_result != undefined && _result.getRol() == tipo_rol.detener)
+            {
+                let  error_encontrado = { tipo: "Análisis Semántico MatrioshTS", fila: _result.getFila() == undefined ? "0" : _result.getFila().toString(), columna: _result.getColumna() == undefined  ? "0" : _result.getColumna().toString(), identificador: "global", descripcion: "NO se permite la sentencia Detener."};
+                Tabla_Errores.getInstance().push(error_encontrado);  
+            }
+            else if(_result != undefined && _result.getRol() == tipo_rol.continuar)
+            {
+                let  error_encontrado = { tipo: "Análisis Semántico MatrioshTS", fila: _result.getFila() == undefined ? "0" : _result.getFila().toString(), columna: _result.getColumna() == undefined  ? "0" : _result.getColumna().toString(), identificador: "global", descripcion: "NO se permite la sentencia Continuar."};
+                Tabla_Errores.getInstance().push(error_encontrado); 
+            }
+            else if(_result != undefined && _result.getRol() == tipo_rol.retornar)
+            {
+                let  error_encontrado = { tipo: "Análisis Semántico MatrioshTS", fila: _result.getFila() == undefined ? "0" : _result.getFila().toString(), columna: _result.getColumna() == undefined  ? "0" : _result.getColumna().toString(), identificador: "global", descripcion: "NO se permite la sentencia Retornar"};
+                Tabla_Errores.getInstance().push(error_encontrado); 
+            }
+            else
+            {
+                continue;
+            }
+        }
+    }
+    
+    public traducir_3D_2()
+    {
+        var _result : Simbolo;
+
+        for(var _3D2 = 0; _3D2 < this.lista_instrucciones.length; _3D2++)
+        {    
+            if(!(this.lista_instrucciones[_3D2] instanceof Type_MatrioshTS) && !(this.lista_instrucciones[_3D2] instanceof Funcion_MatrioshTS) && !(this.lista_instrucciones[_3D2] instanceof Sentencia_Declaracion))
+            {   //console.log(this.lista_instrucciones[f]);
+                _result = this.lista_instrucciones[_3D2].traducir(Tabla_Simbolos.getInstance().getEntorno_global(),Middle.getInstance());
+            }
+            else
+            {
+                continue;
+            }
+            //console.log(_result);
+            if(_result != undefined && _result.getRol() == tipo_rol.error)
+            {
+                let error_encontrado = { tipo: "Análisis Semántico MatrioshTS", fila: _result.getFila() == undefined ? "0" : _result.getFila().toString(), columna: _result.getColumna() == undefined  ? "0" : _result.getColumna().toString(), identificador: "global", descripcion: _result.getMensaje().toString()};
+                Tabla_Errores.getInstance().push(error_encontrado);  
+            }
+            else if(_result != undefined && _result.getRol() == tipo_rol.detener)
+            {
+                let  error_encontrado = { tipo: "Análisis Semántico MatrioshTS", fila: _result.getFila() == undefined ? "0" : _result.getFila().toString(), columna: _result.getColumna() == undefined  ? "0" : _result.getColumna().toString(), identificador: "global", descripcion: "NO se permite la sentencia Detener."};
+                Tabla_Errores.getInstance().push(error_encontrado);  
+            }
+            else if(_result != undefined && _result.getRol() == tipo_rol.continuar)
+            {
+                let  error_encontrado = { tipo: "Análisis Semántico MatrioshTS", fila: _result.getFila() == undefined ? "0" : _result.getFila().toString(), columna: _result.getColumna() == undefined  ? "0" : _result.getColumna().toString(), identificador: "global", descripcion: "NO se permite la sentencia Continuar."};
+                Tabla_Errores.getInstance().push(error_encontrado); 
+            }
+            else if(_result != undefined && _result.getRol() == tipo_rol.retornar)
+            {
+                let  error_encontrado = { tipo: "Análisis Semántico MatrioshTS", fila: _result.getFila() == undefined ? "0" : _result.getFila().toString(), columna: _result.getColumna() == undefined  ? "0" : _result.getColumna().toString(), identificador: "global", descripcion: "NO se permite la sentencia Retornar"};
+                Tabla_Errores.getInstance().push(error_encontrado); 
+            }
+            else
+            {
+                continue;
+            }
+        }
+
+        Middle.getInstance().setOuput("\n}");
+    }
+
+    public traducir_3D_3()
+    {
+    
+    }
 
     private fabrica_instrucciones(instruccion_jason : JSON)
     {
@@ -257,19 +356,19 @@ class AST
         {
             return new Sentencia_Declaracion(instruccion_jason['linea'],instruccion_jason['columna'],instruccion_jason['constante'],instruccion_jason['identificador'],instruccion_jason['tipo'] == null ? undefined : this.fabrica_tipo(instruccion_jason['tipo']),instruccion_jason['tipo'] == null ? undefined : instruccion_jason['tipo']['rol'],instruccion_jason['tipo'] == null ? undefined : instruccion_jason['tipo']['dimensiones'],instruccion_jason['valor'] == null ? undefined : this.fabrica_expresiones(instruccion_jason['valor']));
         }
-        // else if(instruccion_jason['etiqueta'] == 'sentencia_asignacion')
-        // {
-        //     let lista_dimensiones: Array<Instruction>;
+        else if(instruccion_jason['etiqueta'] == 'sentencia_asignacion')
+        {
+            let lista_dimensiones: Array<Instruction>;
 
-        //     lista_dimensiones = new Array<Instruction>();
+            lista_dimensiones = new Array<Instruction>();
 
-        //     for(var d = 0; d < instruccion_jason['acceso1'].length; d++)
-        //     {
-        //         lista_dimensiones.push(this.fabrica_expresiones(instruccion_jason['acceso1'][d]));
-        //     }
+            for(var d = 0; d < instruccion_jason['acceso1'].length; d++)
+            {
+                lista_dimensiones.push(this.fabrica_expresiones(instruccion_jason['acceso1'][d]));
+            }
 
-        //     return new Sentencia_Asignacion(instruccion_jason['linea'],instruccion_jason['columna'],instruccion_jason['tipo'],instruccion_jason['acceso0'] == null ? "" : instruccion_jason['acceso0'],lista_dimensiones,instruccion_jason['acceso2'] == null ? undefined : this.fabrica_expresiones(instruccion_jason['acceso2']),this.fabrica_expresiones(instruccion_jason['valor']));
-        // }
+            return new Sentencia_Asignacion(instruccion_jason['linea'],instruccion_jason['columna'],instruccion_jason['tipo'],instruccion_jason['acceso0'] == null ? "" : instruccion_jason['acceso0'],lista_dimensiones,instruccion_jason['acceso2'] == null ? undefined : this.fabrica_expresiones(instruccion_jason['acceso2']),this.fabrica_expresiones(instruccion_jason['valor']));
+        }
         // else if(instruccion_jason['etiqueta'] == 'sentencia_if')
         // {
         //     let lista_sentencias_if : Array<Instruction>;
@@ -381,21 +480,25 @@ class AST
             
         //     return new Sentencia_For_List(instruccion_jason['linea'],instruccion_jason['columna'],instruccion_jason['tipo'],instruccion_jason['id1'],instruccion_jason['id2'],lista_sentencias);
         // }
-        // else if(instruccion_jason['etiqueta'] == 'sentencia_acceso')
-        // {
-        //     let lista_accesos : Array<Tipo_Acceso>;
-        //     let tipo_acceso_jason : JSON;
+        else if(instruccion_jason['etiqueta'] == 'sentencia_acceso')
+        {
+            let lista_accesos : Array<Tipo_Acceso>;
+            let tipo_acceso_jason : JSON;
 
-        //     lista_accesos = new Array<Tipo_Acceso>();
+           lista_accesos = new Array<Tipo_Acceso>();
 
-        //     for(var cont = 0; cont < instruccion_jason['lista_acceso'].length; cont++)
-        //     {
-        //         tipo_acceso_jason = instruccion_jason['lista_acceso'][cont];
-        //         lista_accesos.push(<Tipo_Acceso>this.fabrica_instrucciones(tipo_acceso_jason));
-        //     }
+            for(var cont = 0; cont < instruccion_jason['lista_acceso'].length; cont++)
+            {
+                tipo_acceso_jason = instruccion_jason['lista_acceso'][cont];
+                lista_accesos.push(<Tipo_Acceso>this.fabrica_instrucciones(tipo_acceso_jason));
+            }
 
-        //     return new Sentencia_Acceso(instruccion_jason['fila'], instruccion_jason['columna'], instruccion_jason['identificador'], instruccion_jason['dimensiones'], lista_accesos);
-        // }
+            return new Sentencia_Acceso(instruccion_jason['fila'], instruccion_jason['columna'], instruccion_jason['identificador'], instruccion_jason['dimensiones'], lista_accesos);
+        }
+        else if(instruccion_jason['etiqueta'] == 'tipo_acceso')
+        {
+            return new Tipo_Acceso(instruccion_jason['fila'], instruccion_jason['columna'], instruccion_jason['tipo'], instruccion_jason['acceso0'] == null ? undefined : this.fabrica_expresiones(instruccion_jason['acceso0']), instruccion_jason['acceso2'] == null ? undefined : this.fabrica_expresiones(instruccion_jason['acceso2']),instruccion_jason['acceso1'] == null ? "": instruccion_jason['acceso1']);
+        }
         // else if(instruccion_jason['etiqueta'] == 'operador_incremento')
         // {
         //     return this.fabrica_expresiones(instruccion_jason);
@@ -403,10 +506,6 @@ class AST
         // else if(instruccion_jason['etiqueta'] == 'operador_decremento')
         // {
         //     return this.fabrica_expresiones(instruccion_jason);
-        // }
-        // else if(instruccion_jason['etiqueta'] == 'tipo_acceso')
-        // {
-        //     return new Tipo_Acceso(instruccion_jason['fila'], instruccion_jason['columna'], instruccion_jason['tipo'], instruccion_jason['acceso0'] == null ? undefined : this.fabrica_expresiones(instruccion_jason['acceso0']), instruccion_jason['acceso2'] == null ? undefined : this.fabrica_expresiones(instruccion_jason['acceso2']),instruccion_jason['acceso1'] == null ? "": instruccion_jason['acceso1']);
         // }
         // else if(instruccion_jason['etiqueta'] == 'sentencia_llamada')
         // {

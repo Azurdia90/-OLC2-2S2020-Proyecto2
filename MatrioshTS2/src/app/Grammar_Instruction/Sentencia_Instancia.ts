@@ -5,6 +5,7 @@ import Tipo from './Tipo';
 import Funcion_Length from './Funcion_Length';
 import Funcion_Push from './Funcion_Push';
 import Funcion_Pop from './Funcion_Pop';
+import Entorno from './Entorno';
 
 class Sentencia_Instancia extends Instruction
 {
@@ -22,7 +23,7 @@ class Sentencia_Instancia extends Instruction
         this.lista_valores2 = p_lista_valores2;
     }
 
-    public analizar(entorno: String, entorno_padre : Map<String,Simbolo>, salida : Middle) 
+    public analizar(entorno_padre : Entorno, salida : Middle) 
     {
         let _return : Simbolo;
         
@@ -50,7 +51,7 @@ class Sentencia_Instancia extends Instruction
                     for(var x = 0; x < this.lista_valores1.length; x++)
                     {
                         var val_tmp : Simbolo
-                        val_tmp = this.lista_valores1[x].analizar(entorno, entorno_padre,salida);
+                        val_tmp = this.lista_valores1[x].analizar(entorno_padre, salida);
 
                         if(val_tmp.getRol() == tipo_rol.valor || val_tmp.getRol() == tipo_rol.arreglo || val_tmp.getRol() == tipo_rol.type)
                         {
@@ -97,7 +98,7 @@ class Sentencia_Instancia extends Instruction
                     let simbolo_tmp: Simbolo;
                     let valor_tmp: Simbolo;
 
-                    valor_tmp = this.lista_valores2[t].analizar(entorno, entorno_padre, salida);
+                    valor_tmp = this.lista_valores2[t].analizar(entorno_padre, salida);
 
                     if(valor_tmp.getRol() != tipo_rol.valor && valor_tmp.getRol() != tipo_rol.arreglo && valor_tmp.getRol() != tipo_rol.type)
                     {

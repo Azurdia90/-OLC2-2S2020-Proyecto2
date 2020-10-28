@@ -1,5 +1,6 @@
 import Simbolo from "./Simbolo";
 import Middle from './Middle';
+import Entorno from './Entorno';
 
 class Instruction
 {
@@ -12,17 +13,17 @@ class Instruction
         this.columna = pcolumna;
     }
 
-    analizar(entorno: String, entorno_padre : Map<String,Simbolo>, salida : Middle)
+    analizar(entorno_padre : Entorno, salida : Middle)
     {
         return undefined;
     }
 
-    traducir(entorno: String, entorno_padre : Map<String,Simbolo>, salida : Middle)
+    traducir(entorno_padre : Entorno, salida : Middle)
     {
         return undefined;
     }
 
-    graficar(entorno_padre : Map<String,Simbolo>, salida : Middle)
+    graficar(entorno_padre : Entorno, salida : Middle)
     {
         return undefined;
     }

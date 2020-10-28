@@ -1,4 +1,4 @@
-import { Errores } from '../Interfaces/errores';
+import { Errores } from '../Interfaces/Errores';
 
 class Tabla_Errores extends Array<Errores>
 {

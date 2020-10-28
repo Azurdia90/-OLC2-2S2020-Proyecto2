@@ -1,4 +1,6 @@
 import { Component, OnInit } from '@angular/core';
+import { FormBuilder } from '@angular/forms';
+import { MenuController } from '@ionic/angular';
 
 @Component({
   selector: 'app-tabla-errores',
@@ -7,9 +9,24 @@ import { Component, OnInit } from '@angular/core';
 })
 export class TablaErroresPage implements OnInit {
 
-  constructor() { }
+  constructor(private menuController: MenuController,private formBuilder: FormBuilder) 
+  {
+    this.buildForm();
+  }
 
-  ngOnInit() {
+  ngOnInit()
+  {
+
+  }
+
+  toggleMenu()
+  {
+    this.menuController.toggle();
+  }
+
+  public buildForm()
+  {
+    
   }
 
 }

@@ -4,6 +4,7 @@ import Funcion from './Funcion';
 import Tabla_Simbolos from './Tabla_Simbolos';
 import Tipo from './Tipo';
 import Middle from './Middle';
+import Entorno from './Entorno';
 
 class Sentencia_Llamada extends Instruction
 {   
@@ -26,7 +27,7 @@ class Sentencia_Llamada extends Instruction
         this.padre = undefined;
     }  
     
-    public analizar(entorno: String, entorno_padre : Map<String, Simbolo> , salida : Middle) 
+    public analizar(entorno_padre : Entorno, salida : Middle) 
     {
         let funcion_actual : Funcion;
         let _return : Simbolo;
@@ -38,11 +39,11 @@ class Sentencia_Llamada extends Instruction
                 funcion_actual = Tabla_Simbolos.getInstance().getFuncion(this.identificador); 
             }
             else
-            {
+            {   
                 funcion_actual = this.padre.getFuncion(this.identificador);
                 this.global = true;
             }
-            //if(this.identificador == "relaciones1"){console.log(funcion_actual);}
+            //if(this.identificador == "log"){console.log(funcion_actual);}
             if(funcion_actual == undefined || funcion_actual == null)
             {
                 _return = new Simbolo(tipo_rol.error,new Tipo(tipo_dato.CADENA), "33-12");
@@ -54,7 +55,7 @@ class Sentencia_Llamada extends Instruction
              
             for(var x : number = 0; x < this.lista_parametros.length; x++)
             {
-                var tmp_val : Simbolo = this.lista_parametros[x].analizar(entorno, entorno_padre, salida);
+                var tmp_val : Simbolo = this.lista_parametros[x].analizar(entorno_padre, salida);
 
                 if (tmp_val == null)
                 {
@@ -83,7 +84,7 @@ class Sentencia_Llamada extends Instruction
                 return _result;
             }
                                     
-            _return = funcion_actual.analizar(entorno,entorno_padre, salida);
+            _return = funcion_actual.analizar(entorno_padre, salida);
            
             return _return;            
         }
@@ -94,6 +95,52 @@ class Sentencia_Llamada extends Instruction
             _return.setColumna(this.columna);
             _return.setMensaje("Error Sentencia Llamada: " + Exception.Message);
             return _return;
+        } 
+       
+    }
+
+    public traducir(entorno_padre : Entorno, salida : Middle) 
+    {
+        let funcion_actual : Funcion;
+        let _return : Simbolo;
+        
+        try
+        {   
+            if(this.global)
+            {
+                funcion_actual = Tabla_Simbolos.getInstance().getFuncion(this.identificador); 
+            }
+            else
+            {   
+                funcion_actual = this.padre.getFuncion(this.identificador);
+                this.global = true;
+            }
+
+            for(var x : number = 0; x < this.lista_parametros.length; x++)
+            {
+                var tmp_val : Simbolo = this.lista_parametros[x].traducir(entorno_padre, salida);
+
+                if(tmp_val.getRol() != tipo_rol.valor && tmp_val.getRol() != tipo_rol.arreglo && tmp_val.getRol() != tipo_rol.type)
+                {
+                    this.lista_parametros_enviar = new Array<Simbolo>();
+                    return tmp_val;
+                }
+                
+                this.lista_parametros_enviar.push(tmp_val);
+            }       
+
+            var _result :  Simbolo = funcion_actual.pasarParametros(this.padre,this.lista_parametros_enviar,salida);
+            
+            this.lista_parametros_enviar = new Array<Simbolo>();
+                                    
+            _return = funcion_actual.traducir(entorno_padre, salida);
+           
+            return _return;            
+        }
+        catch(Error)
+        {
+            Middle.getInstance().clear3D();
+            Middle.getInstance().setOuput("Error Sentencia Llamada: " + Error.Mesage);  
         } 
        
     }

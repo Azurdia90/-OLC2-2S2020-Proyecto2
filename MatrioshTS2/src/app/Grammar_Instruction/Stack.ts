@@ -1,8 +1,9 @@
+import Entorno from './Entorno';
 import Funcion_Log from './Funcion_Log';
 import Simbolo from "./Simbolo";
 import Tipo from './Tipo';
 
-class Stack extends Array<Map<String,Simbolo>>
+class Stack extends Array<Entorno>
 {
     //este objeto tiene metodo pop para
     //Eliminar el ultimo de la lista
@@ -33,7 +34,7 @@ class Stack extends Array<Map<String,Simbolo>>
         this.subambito = p_subambito;
     }
 
-    public _push(p_fila : number, p_columna : number, p_entorno_actual : Map<String,Simbolo>)
+    public _push(p_fila : number, p_columna : number, p_entorno_actual : Entorno)
     {
         var object_console :Simbolo;
         object_console = new Simbolo(tipo_rol.type, new Tipo(tipo_dato.IDENTIFICADOR,"console"), "console");
