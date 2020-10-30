@@ -45,10 +45,6 @@ class Funcion_Log extends Funcion
 
         try
         {   
-            var salida_tmp: String;
-
-            salida_tmp = "";
-
             for(var i = 0; i < this.valores_imprimir.length; i++)
             {
                 if(this.valores_imprimir[i].getRol() == tipo_rol.valor)
@@ -70,7 +66,6 @@ class Funcion_Log extends Funcion
             _return.setColumna(this.columna);
             _return.setMensaje("Imprimir: Sentencia realizada correctamente.");
             return _return;
-            
         }
         catch(Exception)
         {
@@ -87,19 +82,18 @@ class Funcion_Log extends Funcion
         let _return : Simbolo;
 
         try
-        {   console.log(this.valores_imprimir);
-
+        {   
             for(var i = 0; i < this.valores_imprimir.length; i++)
             {
                 let tam_metodo = entorno_local.getPos_Stack();
                 let temporal_simulado = "t" + Tabla_Simbolos.getInstance().getTemporal();
                 let temporal_contador = "t" + Tabla_Simbolos.getInstance().getTemporal();
-
-                if(this.valores_imprimir[i].getTipo().Equals(new Tipo(tipo_dato.VOID)) || this.valores_imprimir[i].getTipo().Equals(new Tipo(tipo_dato.BOOLEANO)))
+                
+                if(this.valores_imprimir[i].getTipo().getTipo() == tipo_dato.VOID || this.valores_imprimir[i].getTipo().getTipo() == tipo_dato.NULO)
                 {
                     continue;
                 }
-                else if(this.valores_imprimir[i].getTipo().Equals(new Tipo(tipo_dato.BOOLEANO)))
+                else if(this.valores_imprimir[i].getTipo().getTipo() == tipo_dato.BOOLEANO)
                 {
                     Middle.getInstance().setOuput(temporal_simulado + " = P + " +  tam_metodo + ";");
                     Middle.getInstance().setOuput(temporal_contador + " = " + temporal_simulado + " +  2;");
@@ -108,7 +102,7 @@ class Funcion_Log extends Funcion
                     Middle.getInstance().setOuput("imprimir_booleano();");
                     Middle.getInstance().setOuput("P = P - " + tam_metodo + ";"); 
                 }
-                else if(this.valores_imprimir[i].getTipo().Equals(new Tipo(tipo_dato.NUMERO)))
+                else if(this.valores_imprimir[i].getTipo().getTipo() == tipo_dato.NUMERO)
                 {
                     Middle.getInstance().setOuput(temporal_simulado + " = P + " +  tam_metodo + ";");
                     Middle.getInstance().setOuput(temporal_contador + " = " + temporal_simulado + " +  2;");
@@ -117,7 +111,7 @@ class Funcion_Log extends Funcion
                     Middle.getInstance().setOuput("imprimir_numero();");
                     Middle.getInstance().setOuput("P = P - " + tam_metodo + ";");
                 }
-                else if(this.valores_imprimir[i].getTipo().Equals(new Tipo(tipo_dato.CADENA)))
+                else if(this.valores_imprimir[i].getTipo().getTipo() == tipo_dato.CADENA)
                 {
                     Middle.getInstance().setOuput(temporal_simulado + " = P + " +  tam_metodo + ";");
                     Middle.getInstance().setOuput(temporal_contador + " = " + temporal_simulado + " +  2;");

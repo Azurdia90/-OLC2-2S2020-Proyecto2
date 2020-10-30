@@ -78,7 +78,7 @@ class Middle
 
         nativo_tmp = metodos_nativos.getMetodos_quemar();
 
-        this.output = encabezado_tmp.toString() + temporales_tmp.toString() + code_tmp.toString() + nativo_tmp.toString();
+        this.output = encabezado_tmp.toString() + temporales_tmp.toString() + nativo_tmp.toString() + code_tmp.toString();
     }
 
     public getInput()

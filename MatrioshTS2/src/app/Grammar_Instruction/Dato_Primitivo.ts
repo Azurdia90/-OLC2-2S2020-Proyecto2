@@ -21,6 +21,7 @@ class Dato_Primitivo extends Expresion
         let posicion: number
         try
         {   posicion = 0;
+            //verificando el tipo de dato a devolver
             if(this.tipo.getTipo() == tipo_dato.NULO && this.dimensiones.length == 0)
             {
                 _return = new Simbolo(tipo_rol.valor,new Tipo(tipo_dato.NULO),"");
@@ -154,9 +155,9 @@ class Dato_Primitivo extends Expresion
             }
             else if(this.tipo.getTipo() == tipo_dato.CADENA && this.dimensiones.length == 0)
             {
-                var cadena = this.valor;
+                var cadena = this.valor.substring(0,this.valor.length - 1);
+
                 var temporal_pos_heap =  "t" + Tabla_Simbolos.getInstance().getTemporal();;
-                var temporal_pos_heap_aux =  "t" + Tabla_Simbolos.getInstance().getTemporal();;
 
                 Middle.getInstance().setOuput("\n");
                 Middle.getInstance().setOuput(temporal_pos_heap + " =  H;");
@@ -228,7 +229,7 @@ class Dato_Primitivo extends Expresion
         catch(Error)
         {
             Middle.getInstance().clear3D();
-            Middle.getInstance().setOuput("Error Dato Primitivo: " + Error.Mesage);
+            Middle.getInstance().setOuput("//Error Dato Primitivo: " + Error.Mesage);
         }
     }
     

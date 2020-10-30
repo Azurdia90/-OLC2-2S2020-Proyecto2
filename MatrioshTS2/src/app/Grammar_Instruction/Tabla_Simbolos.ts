@@ -46,20 +46,22 @@ class Tabla_Simbolos
         this.stack = new Stack();
         this.entorno_global.clear(); 
         this.stack._push(0,0,this.entorno_global);
+
         this.lista_funciones = new Array<Funcion>();
         this.lista_types = new Array<Type_MatrioshTS>();
 
-        this.lista_types = new Array<Type_MatrioshTS>();
+        this.temporal = 51;
+        this.etiqueta = 51;
     }
 
     limpiar_temporal()
     {
-        this.temporal = 100;
+        this.temporal = 51;
     }
 
     limpiar_etiqueta()
     {
-        this.etiqueta = 100;
+        this.etiqueta = 51;
     }
     
     public existFuncion(p_identificador : String)

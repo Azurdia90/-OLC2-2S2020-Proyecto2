@@ -40,6 +40,7 @@ class Sentencia_Declaracion extends Instruction
 
         try
         {
+            //Definir valor asignar
             if(this.valor == undefined && this.valor_ext == undefined)
             {
                 _val_fin = new Simbolo(tipo_rol.valor, new Tipo(tipo_dato.VOID), "");
@@ -57,22 +58,22 @@ class Sentencia_Declaracion extends Instruction
             {
                 _val_fin = this.valor.analizar(entorno_padre, salida);
             }
-            
+            //Verificar que el rol sea un valor
             if (_val_fin.getRol() != tipo_rol.valor && _val_fin.getRol() != tipo_rol.arreglo && _val_fin.getRol() != tipo_rol.type)
             {
                 return _val_fin;
             }
-            
+            //Definir Rol
             if(this.rol == undefined)
             {
                 this.rol = _val_fin.getRol();
             }
-
+            //Definir Tipo
             if(this.tipo == undefined)
             {
                 this.tipo = _val_fin.getTipo();
             }
-            
+            //Verificar Rol y Tipos Sean Validos
             if(this.rol != _val_fin.getRol())
             {
                 if( !( ((this.rol == tipo_rol.valor && (this.tipo.Equals(new Tipo(tipo_dato.NULO)) || this.tipo.Equals(new Tipo(tipo_dato.VOID)))) &&  _val_fin.getRol() == tipo_rol.type) || (this.rol == tipo_rol.type &&  (_val_fin.getRol() == tipo_rol.valor && (_val_fin.getTipo().Equals(new Tipo(tipo_dato.NULO)) || _val_fin.getTipo().Equals(new Tipo(tipo_dato.VOID))))) ) )
@@ -257,7 +258,7 @@ class Sentencia_Declaracion extends Instruction
                     }
                 }
             }
-            
+            //Guardar datos en tabla de Simbolos
             for(var cont : number = 0; cont < this.identificadores.length; cont++)
             {
                 if(entorno_padre.has(this.identificadores[cont]))
@@ -278,7 +279,7 @@ class Sentencia_Declaracion extends Instruction
                     entorno_padre.set_e(this.identificadores[cont],nuevo_simbolo);
                 }   
             }    
-            
+            //Devolver Confirmación
             var simbolo_aceptado : Simbolo = new Simbolo(tipo_rol.aceptado,new Tipo(tipo_dato.CADENA),"10-4"); 
             simbolo_aceptado.setMensaje("Declaración Succesful");
             simbolo_aceptado.setFila(this.fila);
@@ -302,6 +303,7 @@ class Sentencia_Declaracion extends Instruction
 
         try
         {
+            //Definir Valor
             if(this.valor == undefined && this.valor_ext == undefined)
             {
                 _val_fin = new Simbolo(tipo_rol.valor, new Tipo(tipo_dato.VOID), "");
@@ -319,30 +321,28 @@ class Sentencia_Declaracion extends Instruction
             {
                 _val_fin = this.valor.traducir(entorno_padre, salida);
             }
-            
-            if (_val_fin.getRol() != tipo_rol.valor && _val_fin.getRol() != tipo_rol.arreglo && _val_fin.getRol() != tipo_rol.type)
-            {
-                return _val_fin;
-            }
-            
+            //Definir Rol
             if(this.rol == undefined)
             {
                 this.rol = _val_fin.getRol();
             }
-
+            //Definir Tipo
             if(this.tipo == undefined)
             {
                 this.tipo = _val_fin.getTipo();
             }
-               
+            //Asignar Valor
             for(var cont : number = 0; cont < this.identificadores.length; cont++)
             {
                 if(entorno_padre.has(this.identificadores[cont]))
                 {
                     if(entorno_padre.getIdentificador() == "global")
                     {
-                        var pos_stack = "t"+ Tabla_Simbolos.getInstance().getEtiqueta();
-                        var codigo_3d =  pos_stack + " = P + " + _val_fin.getPos_S() + ";\n";
+                        var pos_stack = "t"+ Tabla_Simbolos.getInstance().getTemporal();
+                        var codigo_3d =  "\n";
+
+                        codigo_3d = codigo_3d 
+                                    + pos_stack + " = P + " + _val_fin.getPos_S() + ";\n";
                         
                         codigo_3d = codigo_3d 
                                     +"Stack[(int)" + pos_stack + "] = " + _val_fin.getMensaje() + ";";   
@@ -351,8 +351,11 @@ class Sentencia_Declaracion extends Instruction
                     }
                     else
                     {
-                        var pos_stack = "t"+ Tabla_Simbolos.getInstance().getEtiqueta();
-                        var codigo_3d =  pos_stack + " = P + " + _val_fin.getPos_S() + ";\n";
+                        var pos_stack = "t"+ Tabla_Simbolos.getInstance().getTemporal();
+                        var codigo_3d =  "\n";
+
+                        codigo_3d = codigo_3d
+                                    + pos_stack + " = P + " + _val_fin.getPos_S() + ";\n";
                         
                         codigo_3d = codigo_3d 
                                     +"Stack[(int)" + pos_stack + "] = " + _val_fin.getMensaje() + ";";    
@@ -361,7 +364,7 @@ class Sentencia_Declaracion extends Instruction
                     }
                 }   
             }    
-            
+            //Devolvar Confirmación
             var simbolo_aceptado : Simbolo = new Simbolo(tipo_rol.aceptado,new Tipo(tipo_dato.CADENA),"10-4"); 
             simbolo_aceptado.setMensaje("Declaración Succesful");
             simbolo_aceptado.setFila(this.fila);

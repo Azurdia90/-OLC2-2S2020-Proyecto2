@@ -10,6 +10,7 @@ class Sentencia_Llamada extends Instruction
 {   
     private identificador : String;
     private lista_parametros : Array<Instruction>;
+    private lista_parametros_analizar : Array<Simbolo>;
     private lista_parametros_enviar : Array<Simbolo>;
 
     private global : Boolean;
@@ -21,6 +22,7 @@ class Sentencia_Llamada extends Instruction
 
         this.identificador = p_identificador;
         this.lista_parametros = p_lista_parametros;
+        this.lista_parametros_analizar = new Array<Simbolo>();
         this.lista_parametros_enviar = new Array<Simbolo>();
 
         this.global = true;
@@ -68,16 +70,16 @@ class Sentencia_Llamada extends Instruction
 
                 if(tmp_val.getRol() != tipo_rol.valor && tmp_val.getRol() != tipo_rol.arreglo && tmp_val.getRol() != tipo_rol.type)
                 {
-                    this.lista_parametros_enviar = new Array<Simbolo>();
+                    this.lista_parametros_analizar = new Array<Simbolo>();
                     return tmp_val;
                 }
                 
-                this.lista_parametros_enviar.push(tmp_val);
+                this.lista_parametros_analizar.push(tmp_val);
             }       
 
-            var _result :  Simbolo = funcion_actual.pasarParametros(this.padre,this.lista_parametros_enviar,salida);
+            var _result :  Simbolo = funcion_actual.pasarParametros(this.padre,this.lista_parametros_analizar,salida);
             
-            this.lista_parametros_enviar = new Array<Simbolo>();
+            this.lista_parametros_analizar = new Array<Simbolo>();
             
             if(_result.getRol() != tipo_rol.aceptado)
             {
@@ -106,6 +108,7 @@ class Sentencia_Llamada extends Instruction
         
         try
         {   
+            //Verificar funcion
             if(this.global)
             {
                 funcion_actual = Tabla_Simbolos.getInstance().getFuncion(this.identificador); 
@@ -115,24 +118,18 @@ class Sentencia_Llamada extends Instruction
                 funcion_actual = this.padre.getFuncion(this.identificador);
                 this.global = true;
             }
-
+            //Obtener valores a pasar
             for(var x : number = 0; x < this.lista_parametros.length; x++)
             {
                 var tmp_val : Simbolo = this.lista_parametros[x].traducir(entorno_padre, salida);
-
-                if(tmp_val.getRol() != tipo_rol.valor && tmp_val.getRol() != tipo_rol.arreglo && tmp_val.getRol() != tipo_rol.type)
-                {
-                    this.lista_parametros_enviar = new Array<Simbolo>();
-                    return tmp_val;
-                }
                 
                 this.lista_parametros_enviar.push(tmp_val);
             }       
-
-            var _result :  Simbolo = funcion_actual.pasarParametros(this.padre,this.lista_parametros_enviar,salida);
+            //Paso de parametros
+            funcion_actual.pasarParametros(this.padre,this.lista_parametros_enviar,salida);
             
             this.lista_parametros_enviar = new Array<Simbolo>();
-                                    
+            //Traduccion de la llamada al metodo                      
             _return = funcion_actual.traducir(entorno_padre, salida);
            
             return _return;            

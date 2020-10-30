@@ -24,7 +24,7 @@ class Sentencia_Asignacion extends Instruction
         this.valor = p_valor;
     }
 
-    public ejecutar(entorno_padre : Entorno, salida : Middle)
+    public analizar(entorno_padre : Entorno, salida : Middle)
     {
         let _return : Simbolo;
         let _acceso : Simbolo;
@@ -172,28 +172,65 @@ class Sentencia_Asignacion extends Instruction
                 _return.setColumna(this.columna);
                 return _return;
             }
-            
+            //VERIFICAR QUE EL SIMBOLO A ACCEDER ES UN VALOR, ARREGLO O TYPE
             if(_acceso.getRol() != tipo_rol.valor && _acceso.getRol() != tipo_rol.arreglo && _acceso.getRol() != tipo_rol.type)
             {
                 return _acceso
             }
             //console.log("==========");console.log(_acceso); console.log(this.valor);console.log("==========");
+            //DEFINIR VALOR
             _val_fin = this.valor.analizar(entorno_padre, salida);
             //console.log("++++++++++");console.log(_acceso); console.log(_val_fin);  console.log("++++++++++");
+            //VERIFICAR QUE EL VALOR A ASIGNAR ES UN VALOR, ARREGLO O TYPE
             if(_val_fin.getRol() != tipo_rol.valor && _val_fin.getRol() != tipo_rol.arreglo && _val_fin.getRol() != tipo_rol.type)
             {
                 return _val_fin;
             }
-
+            //SI EL VALOR ES UN ES ARREGLO
             if(_acceso.getRol() != _val_fin.getRol())
             {
-                if(!(_acceso.getRol() == tipo_rol.valor && _acceso.getTipo().Equals(new Tipo(tipo_dato.NULO))))
+                if( !( ((_acceso.getRol() == tipo_rol.valor && (_acceso.getTipo().Equals(new Tipo(tipo_dato.NULO)) || _acceso.getTipo().Equals(new Tipo(tipo_dato.VOID)))) &&  _val_fin.getRol() == tipo_rol.type) || (_acceso.getRol() == tipo_rol.type &&  (_val_fin.getRol() == tipo_rol.valor && (_val_fin.getTipo().Equals(new Tipo(tipo_dato.NULO)) || _val_fin.getTipo().Equals(new Tipo(tipo_dato.VOID))))) ) )
                 {
-                    _return = new Simbolo(tipo_rol.error,new Tipo(tipo_dato.CADENA),"33-12"); 
-                    _return.setMensaje("Sentencia Asignación: El tipo de rol es diferente al valor a asignar.");
-                    _return.setFila(this.fila);
-                    _return.setColumna(this.columna);
-                    return _return;
+                    if(_acceso.getRol() == tipo_rol.valor && _val_fin.getRol() == tipo_rol.arreglo)
+                    {
+                        var nuevo_simbolo : Simbolo = new Simbolo(tipo_rol.error,new Tipo(tipo_dato.CADENA),"33-12"); 
+                        nuevo_simbolo.setMensaje("Sentencia Declaración: No es posible asignar un arreglo a un valor primitivo.");
+                        nuevo_simbolo.setFila(this.fila);
+                        nuevo_simbolo.setColumna(this.columna);
+                        return nuevo_simbolo;
+                    }
+                    else if(_acceso.getRol() == tipo_rol.valor && _val_fin.getRol() == tipo_rol.type)
+                    {
+                        var nuevo_simbolo : Simbolo = new Simbolo(tipo_rol.error,new Tipo(tipo_dato.CADENA),"33-12"); 
+                        nuevo_simbolo.setMensaje("Sentencia Declaración: No es posible asignar un type a un valor primitivo.");
+                        nuevo_simbolo.setFila(this.fila);
+                        nuevo_simbolo.setColumna(this.columna);
+                        return nuevo_simbolo;
+                    }
+                    else if(_acceso.getRol() == tipo_rol.arreglo && _val_fin.getRol() == tipo_rol.valor)
+                    {
+                        var nuevo_simbolo : Simbolo = new Simbolo(tipo_rol.error,new Tipo(tipo_dato.CADENA),"33-12"); 
+                        nuevo_simbolo.setMensaje("Sentencia Declaración: No es posible asignar un valor primitivo a un arreglo.");
+                        nuevo_simbolo.setFila(this.fila);
+                        nuevo_simbolo.setColumna(this.columna);
+                        return nuevo_simbolo;
+                    }
+                    else if(_acceso.getRol() == tipo_rol.arreglo && _val_fin.getRol() == tipo_rol.type)
+                    {
+                        var nuevo_simbolo : Simbolo = new Simbolo(tipo_rol.error,new Tipo(tipo_dato.CADENA),"33-12"); 
+                        nuevo_simbolo.setMensaje("Sentencia Declaración: No es posible asignar un type a un arreglo.");
+                        nuevo_simbolo.setFila(this.fila);
+                        nuevo_simbolo.setColumna(this.columna);
+                        return nuevo_simbolo;
+                    }
+                    else
+                    {
+                        var nuevo_simbolo : Simbolo = new Simbolo(tipo_rol.error,new Tipo(tipo_dato.CADENA),"33-12"); 
+                        nuevo_simbolo.setMensaje("Sentencia Declaración: No se encuentran definidos los roles.");
+                        nuevo_simbolo.setFila(this.fila);
+                        nuevo_simbolo.setColumna(this.columna);
+                        return nuevo_simbolo;
+                    }
                 }
             } 
 
@@ -204,8 +241,8 @@ class Sentencia_Asignacion extends Instruction
                 _return.setFila(this.fila);
                 _return.setColumna(this.columna);
                 return _return;
-            } 
-
+            }
+            
             if(!_acceso.getConstante())
             {
                 _acceso.setTipo(_val_fin.getTipo());
@@ -235,6 +272,181 @@ class Sentencia_Asignacion extends Instruction
             _return.setColumna(this.columna);
             _return.setMensaje("Sentencia Asignación: " + Exception.Message);
             return _return;
+        }
+    }
+
+    public traducir(entorno_padre : Entorno, salida : Middle)
+    {
+        let _return : Simbolo;
+        let _acceso : Simbolo;
+        let _val_fin : Simbolo;
+
+        try
+        {   
+            if(this.tipo == 0)
+            {
+                if(entorno_padre.has(this.acceso0))
+                {                 
+                    _acceso  = entorno_padre.get(this.acceso0);
+                }
+                else
+                {   
+                    _acceso = Tabla_Simbolos.getInstance().getStack().getSimbolo(this.acceso0);                    
+                }   
+            }
+            else if(this.tipo == 1)
+            {
+                var simbolo_tmp : Simbolo;
+
+                if(entorno_padre.has(this.acceso0))
+                {                 
+                    simbolo_tmp = entorno_padre.get(this.acceso0);
+                }
+                else
+                {   
+                    simbolo_tmp = Tabla_Simbolos.getInstance().getStack().getSimbolo(this.acceso0);                    
+                }   
+                
+                if(simbolo_tmp.getRol() == tipo_rol.arreglo)
+                {
+                    var lista_accesos : Array<Number>;
+                    var arreglo_tmp   : Array<Simbolo>;
+                    var lista_tamaños : Array<Number>;
+
+                    lista_accesos = new Array<Number>();
+
+                    for(var x = 0; x < this.acceso1.length; x++)
+                    {
+                        var val_tmp: Simbolo;
+                        val_tmp = this.acceso1[x].analizar(entorno_padre,salida);
+
+                        if(val_tmp.getRol() == tipo_rol.valor && val_tmp.getTipo().getTipo() == tipo_dato.NUMERO)
+                        {
+                            lista_accesos.push(Number(val_tmp.getMensaje()));
+                        }
+                        else if(val_tmp.getRol() == tipo_rol.error && val_tmp.getTipo().getTipo() == tipo_dato.CADENA)
+                        {
+                            return val_tmp;
+                        }
+                        else
+                        {
+                            _return = new Simbolo(tipo_rol.error, new Tipo(tipo_dato.CADENA), "33-12");
+                            _return.setFila(this.fila);
+                            _return.setColumna(this.columna);
+                            _return.setMensaje("Sentencia Asignación: El valor de acceso debe ser tipo númerico.");
+                            return _return;
+                        }
+                    }
+
+                    arreglo_tmp = <Array<Simbolo>> simbolo_tmp.getMensaje();
+                    lista_tamaños = <Array<Number>> simbolo_tmp.getListaDimensiones();
+                   
+                    if(arreglo_tmp.length > 0 && lista_tamaños.length > 0)
+                    {
+                        var pos_rel : Number;
+                        pos_rel = 0;
+
+                        if(lista_tamaños.length == lista_accesos.length)
+                        {
+                            pos_rel =  lista_accesos[0].valueOf();
+
+                            for(var y: number = 1; y < lista_accesos.length; y++)
+                            {
+                                pos_rel = (pos_rel.valueOf() * lista_tamaños[y].valueOf()) + lista_accesos[y].valueOf();
+                            }
+
+                            if(pos_rel < 0)
+                            {
+                                _return = new Simbolo(tipo_rol.error, new Tipo(tipo_dato.CADENA), "33-12");
+                                _return.setFila(this.fila);
+                                _return.setColumna(this.columna);
+                                _return.setMensaje("Sentencia Asignación: Los valores de acceso no deben ser valores negativos.");
+                                return _return;
+                            }
+                            else
+                            {
+                                if(pos_rel < arreglo_tmp.length)
+                                {
+                                    _acceso = arreglo_tmp[pos_rel.valueOf()];
+                                }
+                                else
+                                {
+                                    _return = new Simbolo(tipo_rol.error, new Tipo(tipo_dato.CADENA), "33-12");
+                                    _return.setFila(this.fila);
+                                    _return.setColumna(this.columna);
+                                    _return.setMensaje("Sentencia Asignación: El valor de las posiciones de acceso es mayor al tamaño del arreglo.");
+                                    return _return;
+                                }
+                            }
+                        }
+                        else
+                        {
+                            _return = new Simbolo(tipo_rol.error, new Tipo(tipo_dato.CADENA), "33-12");
+                            _return.setFila(this.fila);
+                            _return.setColumna(this.columna);
+                            _return.setMensaje("Sentencia Asignación: El cantidad de accesos no coincide con las dimensiones del arreglo.");
+                            return _return;
+                        }
+                    }
+                    else
+                    {   
+                        _return = new Simbolo(tipo_rol.error, new Tipo(tipo_dato.CADENA), "33-12");
+                        _return.setFila(this.fila);
+                        _return.setColumna(this.columna);
+                        _return.setMensaje("Sentencia Asignación: El arreglo no a sido instanciado.");
+                        return _return;
+                    }
+                }
+                else if(simbolo_tmp.getRol() == tipo_rol.error)
+                {
+                    _return = simbolo_tmp;
+                    return _return;
+                }
+                else
+                {
+                    _return = new Simbolo(tipo_rol.error, new Tipo(tipo_dato.CADENA), "33-12");
+                    _return.setFila(this.fila);
+                    _return.setColumna(this.columna);
+                    _return.setMensaje("Sentencia Asignación: Se especificaron dimension(es) de acceso para un No arreglo.");
+                    return _return;
+                } 
+            }
+            else if(this.tipo == 2)
+            {
+                _acceso = this.acceso2.traducir(entorno_padre, salida);
+            }
+            else
+            {
+                _return = new Simbolo(tipo_rol.error,new Tipo(tipo_dato.CADENA),"33-12"); 
+                _return.setMensaje("Sentencia Asignación: El tipo de asignación no definido.");
+                _return.setFila(this.fila);
+                _return.setColumna(this.columna);
+                return _return;
+            }
+            
+            //console.log("==========");console.log(_acceso); console.log(this.valor);console.log("==========");
+            _val_fin = this.valor.traducir(entorno_padre, salida);
+            //console.log("++++++++++");console.log(_acceso); console.log(_val_fin);  console.log("++++++++++");
+
+            let temporal_posR =  "t" + Tabla_Simbolos.getInstance().getTemporal();
+            let temporal_posS =  "t" + Tabla_Simbolos.getInstance().getTemporal();
+            let temporal_valor = "t" + Tabla_Simbolos.getInstance().getTemporal();
+
+            Middle.getInstance().setOuput(temporal_posS + " =  P + 0;");
+            Middle.getInstance().setOuput(temporal_posR + " =  " + temporal_posS +  " + " + _val_fin.getPos_S() + ";");
+            Middle.getInstance().setOuput(temporal_valor + " = "  + _val_fin.getMensaje() + ";");
+            Middle.getInstance().setOuput("Stack[(int)" + temporal_posR + "] = " + temporal_valor + ";");
+
+            _return = new Simbolo(tipo_rol.aceptado,new Tipo(tipo_dato.CADENA),"10-4"); 
+            _return.setMensaje("Asignación Succesful");
+            _return.setFila(this.fila);
+            _return.setColumna(this.columna);
+            return _return;
+        }
+        catch(Error)
+        {
+            Middle.getInstance().clear3D();
+            Middle.getInstance().setOuput("Error Asignación: " + Error.Mesage);
         }
     }
 
