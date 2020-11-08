@@ -1,11 +1,10 @@
-import { NumericValueAccessor } from '@ionic/angular';
+import Tabla_Simbolos from './Tabla_Simbolos';
+import Tipo_Acceso from './Tipo_Acceso';
 import Instruction from './Instruction';
+import Entorno from './Entorno';
 import Simbolo from './Simbolo';
 import Middle from './Middle';
 import Tipo from './Tipo';
-import Tipo_Acceso from './Tipo_Acceso';
-import Tabla_Simbolos from './Tabla_Simbolos';
-import Entorno from './Entorno';
 
 class Sentencia_Acceso extends Instruction
 {
@@ -21,7 +20,7 @@ class Sentencia_Acceso extends Instruction
         this.lista_accesos = p_lista_accesos;
     }
 
-    public analizar(entorno_padre : Entorno, salida : Middle) 
+    public analizar(entorno_padre : Entorno, nivel : number) 
     {
         let _return : Simbolo;
         let _acceso : Simbolo;
@@ -30,18 +29,21 @@ class Sentencia_Acceso extends Instruction
         {   
             if(this.dimensiones.length == 0)
             {
-                if(entorno_padre.has(this.identificador))
+                if(entorno_padre.existsSimbolo(this.identificador))
                 {
-                    _acceso = entorno_padre.get(this.identificador);
+                    _acceso = entorno_padre.getSimbolo(this.identificador);
                 }
                 else
                 {
-                    if(Tabla_Simbolos.getInstance().getStack().existsSimbolo(this.identificador))
+                    if(Tabla_Simbolos.getInstance().existsSimbolo_global(this.identificador))
                     {
-                        _acceso = Tabla_Simbolos.getInstance().getStack().getSimbolo(this.identificador);
+                        _acceso = Tabla_Simbolos.getInstance().getSimbolo_global(this.identificador);
                     }
                     else
                     {
+                        this.entorno_padre = entorno_padre;
+                        this.nivel = nivel;
+
                         _return = new Simbolo(tipo_rol.error,new Tipo(tipo_dato.CADENA), "33-12");
                         _return.setFila(this.fila);
                         _return.setColumna(this.columna);
@@ -54,13 +56,13 @@ class Sentencia_Acceso extends Instruction
             {   
                 var simbolo_tmp : Simbolo;
                 
-                if(entorno_padre.has(this.identificador))
+                if(entorno_padre.existsSimbolo(this.identificador))
                 {                 
-                    simbolo_tmp = entorno_padre.get(this.identificador);
+                    simbolo_tmp = entorno_padre.getSimbolo(this.identificador);
                 }
                 else
                 {   
-                    simbolo_tmp = Tabla_Simbolos.getInstance().getStack().getSimbolo(this.identificador);                    
+                    simbolo_tmp = Tabla_Simbolos.getInstance().getSimbolo_global(this.identificador);                    
                 }   
                 
                 if(simbolo_tmp.getRol() == tipo_rol.arreglo)
@@ -74,7 +76,7 @@ class Sentencia_Acceso extends Instruction
                     for(var x = 0; x < this.dimensiones.length; x++)
                     {
                         var val_tmp: Simbolo;
-                        val_tmp = this.dimensiones[x].analizar(entorno_padre,salida);
+                        val_tmp = this.dimensiones[x].analizar(entorno_padre,nivel);
 
                         if(val_tmp.getRol() == tipo_rol.valor && val_tmp.getTipo().getTipo() == tipo_dato.NUMERO)
                         {
@@ -82,10 +84,15 @@ class Sentencia_Acceso extends Instruction
                         }
                         else if(val_tmp.getRol() == tipo_rol.error && val_tmp.getTipo().getTipo() == tipo_dato.CADENA)
                         {
+                            this.entorno_padre = entorno_padre;
+                            this.nivel = nivel;
                             return val_tmp;
                         }
                         else
                         {
+                            this.entorno_padre = entorno_padre;
+                            this.nivel = nivel;
+
                             _return = new Simbolo(tipo_rol.error, new Tipo(tipo_dato.CADENA), "33-12");
                             _return.setFila(this.fila);
                             _return.setColumna(this.columna);
@@ -149,16 +156,24 @@ class Sentencia_Acceso extends Instruction
                         _return.setColumna(this.columna);
                         _return.setMensaje("Sentencia Acceso: El arreglo no a sido instanciado.");
                     }
-                    
+
+                    this.entorno_padre = entorno_padre;
+                    this.nivel = nivel;
                     return _return;
                 }
                 else if(simbolo_tmp.getRol() == tipo_rol.error)
                 {
+                    this.entorno_padre = entorno_padre;
+                    this.nivel = nivel;
+
                     _return = simbolo_tmp;
                     return _return;
                 }
                 else
                 {
+                    this.entorno_padre = entorno_padre;
+                    this.nivel = nivel;
+
                     _return = new Simbolo(tipo_rol.error, new Tipo(tipo_dato.CADENA), "33-12");
                     _return.setFila(this.fila);
                     _return.setColumna(this.columna);
@@ -169,6 +184,9 @@ class Sentencia_Acceso extends Instruction
 
             if(this.lista_accesos.length == 0)
             {
+                this.entorno_padre = entorno_padre;
+                this.nivel = nivel;
+
                 _return = new Simbolo(tipo_rol.error,new Tipo(tipo_dato.CADENA), "33-12");
                 _return.setFila(this.fila);
                 _return.setColumna(this.columna);
@@ -180,6 +198,9 @@ class Sentencia_Acceso extends Instruction
             {
                 if(_acceso.getRol() == tipo_rol.valor)
                 {
+                    this.entorno_padre = entorno_padre;
+                    this.nivel = nivel;
+
                     _return = new Simbolo(tipo_rol.error,new Tipo(tipo_dato.CADENA), "33-12");
                     _return.setFila(this.fila);
                     _return.setColumna(this.columna);
@@ -189,19 +210,25 @@ class Sentencia_Acceso extends Instruction
                 else if(_acceso.getRol() == tipo_rol.arreglo)
                 {
                     this.lista_accesos[cont].setPadre(_acceso);
-                    _acceso = this.lista_accesos[cont].analizar(entorno_padre, salida);
+                    _acceso = this.lista_accesos[cont].analizar(entorno_padre, nivel);
                 }
                 else if(_acceso.getRol() == tipo_rol.type)
                 {
                     this.lista_accesos[cont].setPadre(_acceso);
-                    _acceso = this.lista_accesos[cont].analizar(entorno_padre, salida);
+                    _acceso = this.lista_accesos[cont].analizar(entorno_padre, nivel);
                 }
                 else if(_acceso.getRol() == tipo_rol.error)
                 {
+                    this.entorno_padre = entorno_padre;
+                    this.nivel = nivel;
+
                     return _acceso;
                 }
                 else
                 {
+                    this.entorno_padre = entorno_padre;
+                    this.nivel = nivel;
+
                     _return = new Simbolo(tipo_rol.error,new Tipo(tipo_dato.CADENA), "33-12");
                     _return.setFila(this.fila);
                     _return.setColumna(this.columna);
@@ -210,10 +237,16 @@ class Sentencia_Acceso extends Instruction
                 }
             }
 
+            this.entorno_padre = entorno_padre;
+            this.nivel = nivel;
+
             return _acceso;
         }
         catch(Exception)
         {
+            this.entorno_padre = entorno_padre;
+            this.nivel = nivel;
+            
             _return = new Simbolo(tipo_rol.error,new Tipo(tipo_dato.CADENA), "33-12");
             _return.setFila(this.fila);
             _return.setColumna(this.columna);
@@ -222,7 +255,7 @@ class Sentencia_Acceso extends Instruction
         }
     }
 
-    public traducir(entorno_padre : Entorno, salida : Middle) 
+    public traducir(salida : Middle) 
     {
         let _return : Simbolo;
         let _acceso : Simbolo;
@@ -231,26 +264,26 @@ class Sentencia_Acceso extends Instruction
         {   
             if(this.dimensiones.length == 0)
             {
-                if(entorno_padre.has(this.identificador))
+                if(this.entorno_padre.existsSimbolo(this.identificador))
                 {
-                    _acceso = entorno_padre.get(this.identificador);
+                    _acceso = this.entorno_padre.getSimbolo(this.identificador);
                 }
                 else
                 {
-                    _acceso = Tabla_Simbolos.getInstance().getStack().getSimbolo(this.identificador);
+                    _acceso = Tabla_Simbolos.getInstance().getSimbolo_global(this.identificador);
                 }
             }
             else
             {   
                 var simbolo_tmp : Simbolo;
                 
-                if(entorno_padre.has(this.identificador))
+                if(this.entorno_padre.existsSimbolo(this.identificador))
                 {                 
-                    simbolo_tmp = entorno_padre.get(this.identificador);
+                    simbolo_tmp = this.entorno_padre.getSimbolo(this.identificador);
                 }
                 else
                 {   
-                    simbolo_tmp = Tabla_Simbolos.getInstance().getStack().getSimbolo(this.identificador);                    
+                    simbolo_tmp = Tabla_Simbolos.getInstance().getSimbolo_global(this.identificador);                    
                 }   
                 
                 if(simbolo_tmp.getRol() == tipo_rol.arreglo)
@@ -264,7 +297,7 @@ class Sentencia_Acceso extends Instruction
                     for(var x = 0; x < this.dimensiones.length; x++)
                     {
                         var val_tmp: Simbolo;
-                        val_tmp = this.dimensiones[x].traducir(entorno_padre,salida);
+                        val_tmp = this.dimensiones[x].traducir(salida);
 
                         if(val_tmp.getRol() == tipo_rol.valor && val_tmp.getTipo().getTipo() == tipo_dato.NUMERO)
                         {
@@ -350,12 +383,12 @@ class Sentencia_Acceso extends Instruction
                 else if(_acceso.getRol() == tipo_rol.arreglo)
                 {
                     this.lista_accesos[cont].setPadre(_acceso);
-                    _acceso = this.lista_accesos[cont].traducir(entorno_padre, salida);
+                    _acceso = this.lista_accesos[cont].traducir(salida);
                 }
                 else if(_acceso.getRol() == tipo_rol.type)
                 {    
                     this.lista_accesos[cont].setPadre(_acceso);
-                    _acceso = this.lista_accesos[cont].traducir(entorno_padre, salida);
+                    _acceso = this.lista_accesos[cont].traducir(salida);
                 }
                 else if(_acceso.getRol() == tipo_rol.error)
                 {

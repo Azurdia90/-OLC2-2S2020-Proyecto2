@@ -1,15 +1,19 @@
 import Instruction from './Instruction';
+import SubEntorno from './SubEntorno';
+import SubStack from './SubStack';
 import Simbolo from './Simbolo';
+import Entorno from './Entorno';
 import Middle from './Middle';
 import Tipo from './Tipo';
-import Entorno from './Entorno';
 
 class Funcion extends Instruction
 {
     protected tipo : Tipo;
     protected identificador : String;
     
-    protected entorno_local : Entorno;
+    protected substack : SubStack;
+    protected entorno_local: Entorno;
+    protected subentorno_global: SubEntorno;
     protected lista_valores : Array<Simbolo>;
     protected lista_parametros : Array<Instruction>;
     protected lista_sentencias : Array<Instruction>;  
@@ -50,19 +54,19 @@ class Funcion extends Instruction
         return undefined;       
     }
     
-    public pasarParametros(p_padre: Simbolo, lista_parametros_enviados : Array<Simbolo> , salida : Middle)
+    public pasarParametros(p_padre: Simbolo, lista_parametros_enviados : Array<Simbolo>)
     {
         //To change body of generated methods, choose Tools | Templates.
         return undefined;        
     }
 
-    public analizar(entorno_padre : Entorno, salida : Middle) 
+    public analizar(entorno_padre : Entorno, nivel : number) 
     {
         //To change body of generated methods, choose Tools | Templates.
         return undefined;
     }
     
-    public traducir(entorno_padre : Entorno, salida : Middle) 
+    public traducir(salida : Middle) 
     {
         //To change body of generated methods, choose Tools | Templates.
         return undefined;

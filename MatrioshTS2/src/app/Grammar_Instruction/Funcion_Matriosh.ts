@@ -1,12 +1,14 @@
-import Funcion from "./Funcion";
-import Instruction from './Instruction';
-import Middle from './Middle';
-import Simbolo from './Simbolo';
-import Tipo from './Tipo';
+import Sentencia_Declaracion from './Sentencia_Declaración';
 import Tabla_Simbolos from './Tabla_Simbolos';
 import Tabla_Errores from './Tabla_Errores';
-import Sentencia_Declaracion from './Sentencia_Declaración';
+import Instruction from './Instruction';
+import SubEntorno from './SubEntorno';
+import SubStack from './SubStack';
 import Entorno from './Entorno';
+import Funcion from "./Funcion";
+import Simbolo from './Simbolo';
+import Middle from './Middle';
+import Tipo from './Tipo';
 
 class Funcion_MatrioshTS extends Funcion
 {
@@ -14,6 +16,10 @@ class Funcion_MatrioshTS extends Funcion
     {
         super(p_fila, p_columna, p_id, p_lista_parametros, p_lista_sentencias);
         this.tipo = p_tipo;
+        this.substack = new SubStack(this.identificador);
+        this.entorno_local = new Entorno(this.substack);
+        this.subentorno_global = new SubEntorno(this.identificador + "_global");
+        this.entorno_local._push(this.subentorno_global);
     }
     
     public getFila()
@@ -31,11 +37,10 @@ class Funcion_MatrioshTS extends Funcion
         return this.tipo;
     }
 
-    public pasarParametros(p_padre: Simbolo,lista_parametros_enviados : Array<Simbolo>, salida : Middle)
+    public pasarParametros(p_padre: Simbolo, lista_parametros_enviados : Array<Simbolo>)
     {
         let _return : Simbolo;
         
-        this.entorno_local = new Entorno(this.identificador);
         //if(this.identificador == "SentenciasAnidadas"){console.log(this.lista_parametros);}
         //if(this.identificador == "SentenciasAnidadas"){console.log(lista_parametros_enviados);}
         if(this.lista_parametros.length == lista_parametros_enviados.length)
@@ -49,11 +54,10 @@ class Funcion_MatrioshTS extends Funcion
                     declaracion_actual.setValor_Ext(lista_parametros_enviados[x]);
                 }
 
-                var _result : Simbolo = declaracion_actual.analizar(this.entorno_local, salida);
+                var _result : Simbolo = declaracion_actual.analizar(this.entorno_local, 0);
               
                 if(_result.getRol() != tipo_rol.aceptado)
                 {
-                    this.entorno_local = new Entorno(this.identificador);
                     return _result;
                 }        
             }
@@ -66,8 +70,6 @@ class Funcion_MatrioshTS extends Funcion
         }
         else
         {
-            this.entorno_local = new Entorno(this.identificador);
-
             _return = new Simbolo(tipo_rol.error,new Tipo(tipo_dato.CADENA), "33-12");
             _return.setFila(this.fila);
             _return.setColumna(this.columna);
@@ -76,7 +78,7 @@ class Funcion_MatrioshTS extends Funcion
         }        
     }
 
-    public analizar(entorno_padre : Entorno, salida : Middle) 
+    public analizar(entorno_padre : Entorno, nivel : number) 
     {
         let _return : Simbolo;
 
@@ -84,12 +86,11 @@ class Funcion_MatrioshTS extends Funcion
         {
             var _tmp_return : Simbolo;
             
-            Tabla_Simbolos.getInstance().getStack()._push(this.fila,this.columna,this.entorno_local);
             //consolo.log("Se entro a un metodo cantidad de ambitos: " + Tabla_Simbolos.getInstance().getStack().size());
             
             for(var x = 0; x < this.lista_sentencias.length; x++)            
             {
-                _tmp_return = this.lista_sentencias[x].analizar(this.entorno_local, salida);
+                _tmp_return = this.lista_sentencias[x].analizar(this.entorno_local, nivel);
                 
                 if (_tmp_return.getRol() == tipo_rol.error)
                 {
@@ -125,7 +126,6 @@ class Funcion_MatrioshTS extends Funcion
                 {                                                           
                     _return = <Simbolo> _tmp_return.getMensaje();                 
                     Tabla_Simbolos.getInstance().getStack().pop();
-                    this.entorno_local = new Entorno(this.identificador);
                     //console.log("Se retorno de un metodo cantidad de ambitos: " + Tabla_Simbolos.getInstance().getStack().size());
                     return _return;
                 }
@@ -139,7 +139,6 @@ class Funcion_MatrioshTS extends Funcion
             }
             
             Tabla_Simbolos.getInstance().getStack().pop();
-            this.entorno_local = new Entorno(this.identificador);
           
             return _return;
         }
@@ -153,7 +152,7 @@ class Funcion_MatrioshTS extends Funcion
         }
     } 
 
-    public traducir(entorno_padre : Entorno, salida : Middle) 
+    public traducir(salida : Middle) 
     {
         let _return : Simbolo;
 

@@ -1,8 +1,8 @@
+import Instruction from './Instruction';
 import Entorno from './Entorno';
 import Funcion from './Funcion';
-import Instruction from './Instruction';
-import Middle from './Middle';
 import Simbolo from './Simbolo';
+import Middle from './Middle';
 import Tipo from './Tipo';
 
 class Funcion_Push extends Funcion
@@ -15,7 +15,7 @@ class Funcion_Push extends Funcion
         super(p_fila, p_columna, "push", new Array<Instruction>(), undefined);
     }
 
-    public pasarParametros(p_padre: Simbolo, lista_parametros_enviados : Array<Simbolo>, salida : Middle)
+    public pasarParametros(p_padre: Simbolo, lista_parametros_enviados : Array<Simbolo>)
     {
         let _return : Simbolo;
         
@@ -47,7 +47,7 @@ class Funcion_Push extends Funcion
         }        
     }
     
-    public analizar(entorno_local : Entorno, salida : Middle) 
+    public analizar(entorno_local : Entorno) 
     {
         let _return : Simbolo;
 

@@ -1,10 +1,7 @@
-import { isConstructSignatureDeclaration } from 'typescript';
-import Entorno from './Entorno';
 import Instruction from './Instruction';
+import Entorno from './Entorno';
 import Middle from './Middle';
-import Simbolo from './Simbolo';
 import Tipo from './Tipo';
-
 
 class Type_MatrioshTS extends Instruction
 {
@@ -45,12 +42,12 @@ class Type_MatrioshTS extends Instruction
         return this.lista_tipos;
     }
 
-    public anlizar(entorno_padre : Entorno, salida : Middle)
+    public anlizar(entorno_padre : Entorno, nivel : number)
     {
         return undefined;
     }
 
-    public traducir(entorno_padre : Entorno, salida : Middle)
+    public traducir(salida : Middle)
     {
         return undefined;
     }

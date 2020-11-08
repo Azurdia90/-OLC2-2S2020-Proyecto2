@@ -1,11 +1,15 @@
-import Simbolo from "./Simbolo";
 import Middle from './Middle';
 import Entorno from './Entorno';
+import SubEntorno from './SubEntorno';
 
 class Instruction
 {
     protected fila : number
     protected columna: number
+
+    /*EXCLUSIVOS PARA MEMORIA TRADUCCION*/
+    protected entorno_padre: Entorno;
+    protected nivel: number;
 
     constructor(pfila:number, pcolumna: number)
     {
@@ -13,12 +17,12 @@ class Instruction
         this.columna = pcolumna;
     }
 
-    analizar(entorno_padre : Entorno, salida : Middle)
+    analizar(entorno_padre : Entorno, nivel : number)
     {
         return undefined;
     }
 
-    traducir(entorno_padre : Entorno, salida : Middle)
+    traducir(salida : Middle)
     {
         return undefined;
     }

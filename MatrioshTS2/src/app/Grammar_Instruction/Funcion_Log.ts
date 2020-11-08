@@ -1,9 +1,9 @@
+import Tabla_Simbolos from './Tabla_Simbolos';
+import Instruction from './Instruction';
+import Simbolo from './Simbolo';
 import Entorno from './Entorno';
 import Funcion from "./Funcion";
-import Instruction from './Instruction';
 import Middle from './Middle';
-import Simbolo from './Simbolo';
-import Tabla_Simbolos from './Tabla_Simbolos';
 import Tipo from './Tipo';
 
 class Funcion_Log extends Funcion
@@ -15,7 +15,7 @@ class Funcion_Log extends Funcion
         super(p_fila, p_columna, "log", new Array<Instruction>(), undefined);
     }
 
-    public pasarParametros(padre : Simbolo, lista_parametros_enviados : Array<Simbolo>, salida : Middle)
+    public pasarParametros(padre : Simbolo, lista_parametros_enviados : Array<Simbolo>)
     {
         let _return : Simbolo;
         
@@ -39,7 +39,7 @@ class Funcion_Log extends Funcion
         }      
     }
 
-    public analizar(entorno_local : Entorno, salida : Middle) 
+    public analizar(entorno_local : Entorno, nivel : number) 
     {
         let _return : Simbolo;
 
@@ -53,6 +53,9 @@ class Funcion_Log extends Funcion
                 }
                 else
                 {
+                    this.entorno_local = entorno_local;
+                    this.nivel = nivel;
+
                     _return = new Simbolo(tipo_rol.error,new Tipo(tipo_dato.CADENA), "33-12");
                     _return.setFila(this.fila);
                     _return.setColumna(this.columna);
@@ -60,6 +63,9 @@ class Funcion_Log extends Funcion
                     return _return;
                 }
             }
+
+            this.entorno_local = entorno_local;
+            this.nivel = nivel;
             
             _return = new Simbolo(tipo_rol.aceptado,new Tipo(tipo_dato.CADENA),"10-4");
             _return.setFila(this.fila);
@@ -69,6 +75,9 @@ class Funcion_Log extends Funcion
         }
         catch(Exception)
         {
+            this.entorno_local = entorno_local;
+            this.nivel = nivel;
+
             _return = new Simbolo(tipo_rol.error,new Tipo(tipo_dato.CADENA), "33-12");
             _return.setFila(this.fila);
             _return.setColumna(this.columna);
@@ -77,15 +86,15 @@ class Funcion_Log extends Funcion
         }
     } 
     
-    public traducir(entorno_local : Entorno, salida : Middle) 
+    public traducir(salida : Middle) 
     {
         let _return : Simbolo;
 
         try
         {   
             for(var i = 0; i < this.valores_imprimir.length; i++)
-            {
-                let tam_metodo = entorno_local.getPos_Stack();
+            {   
+                let tam_metodo = this.entorno_local.getSize();
                 let temporal_simulado = "t" + Tabla_Simbolos.getInstance().getTemporal();
                 let temporal_contador = "t" + Tabla_Simbolos.getInstance().getTemporal();
                 

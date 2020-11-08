@@ -1,10 +1,10 @@
-import Expresion from './Expresion';
-import Tipo from './Tipo';
-import Simbolo from './Simbolo';
-import Middle from './Middle';
 import Tabla_Simbolos from './Tabla_Simbolos';
 import Instruction from './Instruction';
+import Expresion from './Expresion';
 import Entorno from './Entorno';
+import Simbolo from './Simbolo';
+import Middle from './Middle';
+import Tipo from './Tipo';
 
 class Dato_Primitivo extends Expresion
 {
@@ -15,70 +15,92 @@ class Dato_Primitivo extends Expresion
         this.dimensiones = p_dimensiones;
     }
 
-    public analizar(entorno_padre : Entorno, salida : Middle)
+    public analizar(entorno_padre : Entorno, nivel : number)
     {
         let _return : Simbolo;
-        let posicion: number
+        let etapa: number
         try
-        {   posicion = 0;
+        {   
             //verificando el tipo de dato a devolver
             if(this.tipo.getTipo() == tipo_dato.NULO && this.dimensiones.length == 0)
-            {
+            {   etapa = 0;
+
+                this.entorno_padre = entorno_padre;
+                this.nivel = nivel;
+
                 _return = new Simbolo(tipo_rol.valor,new Tipo(tipo_dato.NULO),"");
                 _return.setMensaje("null");
+                
                 return _return;
             }
             else if(this.tipo.getTipo() == tipo_dato.BOOLEANO && this.dimensiones.length == 0)
-            {
+            {   etapa = 0;
                 if(this.valor == "true")
                 {
+                    this.entorno_padre = entorno_padre;
+                    this.nivel = nivel;
+
                     _return = new Simbolo(tipo_rol.valor,new Tipo(tipo_dato.BOOLEANO),"");
                     _return.setMensaje("true");
                     return _return;
                 }
                 else
                 {
+                    this.entorno_padre = entorno_padre;
+                    this.nivel = nivel;
+
                     _return = new Simbolo(tipo_rol.valor,new Tipo(tipo_dato.BOOLEANO),"");
                     _return.setMensaje("false");
                     return _return;
                 }
             }
             else if(this.tipo.getTipo() == tipo_dato.NUMERO && this.dimensiones.length == 0)
-            {
+            {   etapa = 0;
+                this.entorno_padre = entorno_padre;
+                this.nivel = nivel;
+
                 _return = new Simbolo(tipo_rol.valor,new Tipo(tipo_dato.NUMERO),"");
                 _return.setMensaje(this.valor);
                 return _return;
             }
             else if(this.tipo.getTipo() == tipo_dato.CADENA && this.dimensiones.length == 0)
-            {
+            {   etapa = 0;
+                this.entorno_padre = entorno_padre;
+                this.nivel = nivel;
+
                 _return = new Simbolo(tipo_rol.valor,new Tipo(tipo_dato.CADENA),"");
                 _return.setMensaje(this.valor.substring(1,this.valor.length - 1));
                 return _return;
             }                
             else if(this.tipo.getTipo() == tipo_dato.IDENTIFICADOR && this.dimensiones.length == 0)
-            {   
-                if(entorno_padre.has(this.valor))
-                {                 
-                    _return = entorno_padre.get(this.valor);
+            {   etapa = 1; 
+                this.entorno_padre = entorno_padre;
+                this.nivel = nivel;
+
+                if(entorno_padre.existsSimbolo(this.valor,nivel))
+                {  
+                    _return = entorno_padre.getSimbolo(this.valor,nivel); 
                 }
                 else
                 {   
-                    _return = Tabla_Simbolos.getInstance().getStack().getSimbolo(this.valor);                    
+                    _return = Tabla_Simbolos.getInstance().getSimbolo_global(this.valor);                   
                 }  
-                return _return; 
+                return  _return;
             }
             else if(this.tipo.getTipo() == tipo_dato.IDENTIFICADOR && this.dimensiones.length > 0)
-            {   
+            {   etapa = 2;
                 var simbolo_tmp : Simbolo;
-                posicion = 2;
 
-                if(entorno_padre.has(this.valor))
+                this.entorno_padre = entorno_padre;
+                this.nivel = nivel;
+
+                if(entorno_padre.existsSimbolo(this.valor, nivel))
                 {                 
-                    simbolo_tmp = entorno_padre.get(this.valor);
+                    simbolo_tmp = entorno_padre.getSimbolo(this.valor, nivel);
                 }
                 else
                 {   
-                    simbolo_tmp = Tabla_Simbolos.getInstance().getStack().getSimbolo(this.valor);                    
+                    simbolo_tmp = Tabla_Simbolos.getInstance().getSimbolo_global(this.valor,);                     
                 }   
                 
                 if(simbolo_tmp.getRol() == tipo_rol.arreglo)
@@ -102,6 +124,9 @@ class Dato_Primitivo extends Expresion
             }                               
             else
             {
+                this.entorno_padre = entorno_padre;
+                this.nivel = nivel;
+
                 _return = new Simbolo(tipo_rol.error, new Tipo(tipo_dato.CADENA), "33-12");
                 _return.setFila(this.fila);
                 _return.setColumna(this.columna);
@@ -111,29 +136,31 @@ class Dato_Primitivo extends Expresion
         }
         catch(Exception)
         {
+            this.entorno_padre = entorno_padre;
+            this.nivel = nivel;
+
             _return = new Simbolo(tipo_rol.error,new Tipo(tipo_dato.CADENA), "33-12");
             _return.setFila(this.fila);
             _return.setColumna(this.columna);
-            _return.setMensaje("Error generación de valor Primitivo: " + posicion + " " + Exception.Message);
+            _return.setMensaje("Error generación de valor Primitivo (a" + etapa + ") :" + Exception.Message);
             return _return;
         }
     }  
 
-    public traducir(entorno_padre : Entorno, salida : Middle)
+    public traducir(salida : Middle)
     {
         let _return : Simbolo;
-        let posicion: number
+        let etapa: number
         try
         {   
-            posicion = 0;
             if(this.tipo.getTipo() == tipo_dato.NULO && this.dimensiones.length == 0)
-            {
+            {   etapa = 0;
                 _return = new Simbolo(tipo_rol.valor,new Tipo(tipo_dato.NULO),"");
                 _return.setMensaje("-27");
                 return _return;
             }
             else if(this.tipo.getTipo() == tipo_dato.BOOLEANO && this.dimensiones.length == 0)
-            {
+            {   etapa = 0;
                 if(this.valor == "true")
                 {
                     _return = new Simbolo(tipo_rol.valor,new Tipo(tipo_dato.BOOLEANO),"");
@@ -148,13 +175,13 @@ class Dato_Primitivo extends Expresion
                 }
             }
             else if(this.tipo.getTipo() == tipo_dato.NUMERO && this.dimensiones.length == 0)
-            {    
+            {   etapa = 0;
                 _return = new Simbolo(tipo_rol.valor,new Tipo(tipo_dato.NUMERO),"");
                 _return.setMensaje(this.valor);
                 return _return;
             }
             else if(this.tipo.getTipo() == tipo_dato.CADENA && this.dimensiones.length == 0)
-            {
+            {   etapa = 0;
                 var cadena = this.valor.substring(0,this.valor.length - 1);
 
                 var temporal_pos_heap =  "t" + Tabla_Simbolos.getInstance().getTemporal();;
@@ -178,32 +205,44 @@ class Dato_Primitivo extends Expresion
                 return _return;
             }                
             else if(this.tipo.getTipo() == tipo_dato.IDENTIFICADOR && this.dimensiones.length == 0)
-            {   
-                let retorno = entorno_padre.get(this.valor);
+            {   etapa = 1; 
+                let retorno : Simbolo;
 
                 var temporal_posicion_stack = "t" + Tabla_Simbolos.getInstance().getTemporal();
                 var temporal_acceso = "t" + Tabla_Simbolos.getInstance().getTemporal();
-                
+
                 Middle.getInstance().setOuput("\n");
-                Middle.getInstance().setOuput(temporal_posicion_stack +  " = P + " + retorno.getPos_S() + ";");
+
+                if(this.entorno_padre.existsSimbolo(this.valor, this.nivel))
+                {      
+                    retorno = this.entorno_padre.getSimbolo(this.valor,this.nivel); 
+                    Middle.getInstance().setOuput(temporal_posicion_stack +  " = P + " + retorno.getPos_S() + ";");
+                }
+                else
+                {   
+                    retorno = Tabla_Simbolos.getInstance().getSimbolo_global(this.valor);   
+                    Middle.getInstance().setOuput(temporal_posicion_stack +  " = 0 + " + retorno.getPos_S() + ";");                
+                }  
+
                 Middle.getInstance().setOuput(temporal_acceso + " = Stack[(int)" + temporal_posicion_stack + "];"); 
 
                 _return = new Simbolo(retorno.getRol(),retorno.getTipo(),"");
+                _return.setPos_S(retorno.getPos_S());
                 _return.setMensaje(temporal_acceso);
                 return _return;
             }
             else if(this.tipo.getTipo() == tipo_dato.IDENTIFICADOR && this.dimensiones.length > 0)
             {   
                 var simbolo_tmp : Simbolo;
-                posicion = 2;
+                etapa = 2;
 
-                if(entorno_padre.has(this.valor))
+                if(this.entorno_padre.existsSimbolo(this.valor))
                 {                 
-                    simbolo_tmp = entorno_padre.get(this.valor);
+                    simbolo_tmp = this.entorno_padre.getSimbolo(this.valor,this.nivel);
                 }
                 else
                 {   
-                    simbolo_tmp = Tabla_Simbolos.getInstance().getStack().getSimbolo(this.valor);                    
+                    simbolo_tmp = Tabla_Simbolos.getInstance().getSimbolo_global(this.valor);                      
                 }   
                 
                 if(simbolo_tmp.getRol() == tipo_rol.arreglo)
@@ -218,7 +257,7 @@ class Dato_Primitivo extends Expresion
                 }
             }                               
             else
-            {
+            {   etapa = 3;
                 _return = new Simbolo(tipo_rol.error, new Tipo(tipo_dato.CADENA), "33-12");
                 _return.setFila(this.fila);
                 _return.setColumna(this.columna);
@@ -229,7 +268,7 @@ class Dato_Primitivo extends Expresion
         catch(Error)
         {
             Middle.getInstance().clear3D();
-            Middle.getInstance().setOuput("//Error Dato Primitivo: " + Error.Mesage);
+            Middle.getInstance().setOuput("//Error Dato Primitivo (t" + etapa + ") : " + Error.Mesage);
         }
     }
     

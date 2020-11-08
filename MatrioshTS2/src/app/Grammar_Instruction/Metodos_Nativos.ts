@@ -28,8 +28,6 @@ class Metodos_Nativos
 
         var proc_cast_boolean_cadena : string;
 
-        var proc_cast_char_cadena : string;
-
         var proc_cast_numero_cadena : string;
 
         var proc_pow_potencia_numero : string;
@@ -38,9 +36,7 @@ class Metodos_Nativos
 
         var proc_cast_cadena_numero : string;
 
-        var proc_begin_array : string;
-
-        var proc_get_length_array : string;
+        var proc_begin_array : string = "";
 
         var all_proc_impresion : string;
 
@@ -269,6 +265,36 @@ class Metodos_Nativos
                                     +"    t31 = P + 1;\n"
                                     +"    t10 = t10 + 1;\n"
                                     +"    Stack[(int)t31] = t8;\n"
+                                    +"}\n";
+
+        proc_cast_cadena_numero  =  "void cast_cadena_numero() \n"
+                                    +"{\n"
+                                    +"    //t0 this, t1 retorno;\n"
+                                    +"    t2 = P + 2;\n"
+                                    +"    t3 = Stack[(int)t2];\n"
+                                    +"    t3 = t3 + 1;\n"
+                                    +"    t4 = 0;"
+                                    +"    t5 = 0;\n"
+                                    +"    t6 = 1;\n"
+                                    +"    L18:\n"
+                                    +"    t7 = Heap[(int)t3];\n"                                
+                                    +"    if(t7 < 32) goto L19;\n"                                
+                                    +"    t8 = t7 - 48;\n"
+                                    +"    if(t5 == 1) goto L20;"
+                                    +"    t4 = t4 + t8;\n"
+                                    +"    t4 = t4 * t6;\n"
+                                    +"    t6 = t6 * 10;\n"
+                                    +"    t3 = t3 + 1;\n"
+                                    +"    t5 = 1;\n"                             
+                                    +"    goto L18;\n"
+                                    +"    L20:"
+                                    +"    t4 = t4 * t6;\n"
+                                    +"    t4 = t4 + t8;\n"                                
+                                    +"    t3 = t3 + 1;\n"                                          
+                                    +"    goto L18;\n"
+                                    +"    L19:\n"                                
+                                    +"    t9 = P + 1;\n"
+                                    +"    Stack[(int)t9] = t4;\n"
                                     +"}\n";
 
         proc_pow_potencia_numero  =  "void potencia_numero()\n"

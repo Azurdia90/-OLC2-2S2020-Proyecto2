@@ -1,4 +1,3 @@
-import { mainModule } from 'process';
 import And from './And';
 import Dato_Primitivo from './Dato_Primitivo';
 import Diferente_Que from './Diferente_Que';
@@ -24,8 +23,12 @@ import Resta from './Resta';
 import Sentencia_Acceso from './Sentencia_Acceso';
 import Sentencia_Asignacion from './Sentencia_Asignacion';
 import Sentencia_Declaracion from './Sentencia_Declaración';
+import Sentencia_Do_While from './Sentencia_Do_While';
+import Sentencia_For from './Sentencia_For';
+import Sentencia_If from './Sentencia_If';
 import Sentencia_Instancia from './Sentencia_Instancia';
 import Sentencia_Llamada from './Sentencia_Llamada';
+import Sentencia_While from './Sentencia_While';
 import Simbolo from './Simbolo';
 import Suma from './Suma';
 import Tabla_Errores from './Tabla_Errores';
@@ -135,7 +138,7 @@ class AST
         {
             if(this.lista_instrucciones[r3] instanceof Sentencia_Declaracion)
             {
-                _result = this.lista_instrucciones[r3].analizar(Tabla_Simbolos.getInstance().getEntorno_global(), Middle.getInstance());
+                _result = this.lista_instrucciones[r3].analizar(Tabla_Simbolos.getInstance().getEntorno_global(),0);
             }
             else
             {
@@ -177,7 +180,14 @@ class AST
         {    
             if(!(this.lista_instrucciones[r4] instanceof Type_MatrioshTS) && !(this.lista_instrucciones[r4] instanceof Funcion_MatrioshTS) && !(this.lista_instrucciones[r4] instanceof Sentencia_Declaracion))
             {   //console.log(this.lista_instrucciones[f]);
-                _result = this.lista_instrucciones[r4].analizar(Tabla_Simbolos.getInstance().getEntorno_global(),Middle.getInstance());
+                if(this.lista_instrucciones[r4] instanceof Sentencia_Asignacion || this.lista_instrucciones[r4] instanceof Sentencia_Acceso || this.lista_instrucciones[r4] instanceof Sentencia_Llamada || this.lista_instrucciones[r4] instanceof Operador_Ternario || this.lista_instrucciones[r4] instanceof Operador_Incremento || this.lista_instrucciones[r4] instanceof Operador_Decremento)
+                {
+                    _result = this.lista_instrucciones[r4].analizar(Tabla_Simbolos.getInstance().getEntorno_global(), Tabla_Simbolos.getInstance().getEntorno_global().getLastNivel());
+                }
+                else
+                {
+                    _result = this.lista_instrucciones[r4].analizar(Tabla_Simbolos.getInstance().getnewEntorno(), Tabla_Simbolos.getInstance().getEntorno_global().getLastNivel());
+                }
             }
             else
             {
@@ -222,7 +232,7 @@ class AST
         {
             if(this.lista_instrucciones[_3D1] instanceof Sentencia_Declaracion)
             {
-                _result = this.lista_instrucciones[_3D1].traducir(Tabla_Simbolos.getInstance().getEntorno_global(), Middle.getInstance());
+                _result = this.lista_instrucciones[_3D1].traducir(Middle.getInstance());
             }
             else
             {
@@ -264,7 +274,7 @@ class AST
         {    
             if(!(this.lista_instrucciones[_3D2] instanceof Type_MatrioshTS) && !(this.lista_instrucciones[_3D2] instanceof Funcion_MatrioshTS) && !(this.lista_instrucciones[_3D2] instanceof Sentencia_Declaracion))
             {   //console.log(this.lista_instrucciones[f]);
-                _result = this.lista_instrucciones[_3D2].traducir(Tabla_Simbolos.getInstance().getEntorno_global(),Middle.getInstance());
+                _result = this.lista_instrucciones[_3D2].traducir(Middle.getInstance());
             }
             else
             {
@@ -369,39 +379,39 @@ class AST
 
             return new Sentencia_Asignacion(instruccion_jason['linea'],instruccion_jason['columna'],instruccion_jason['tipo'],instruccion_jason['acceso0'] == null ? "" : instruccion_jason['acceso0'],lista_dimensiones,instruccion_jason['acceso2'] == null ? undefined : this.fabrica_expresiones(instruccion_jason['acceso2']),this.fabrica_expresiones(instruccion_jason['valor']));
         }
-        // else if(instruccion_jason['etiqueta'] == 'sentencia_if')
-        // {
-        //     let lista_sentencias_if : Array<Instruction>;
-        //     let lista_sentencias_else_if : Array<Instruction>;
-        //     let lista_sentencias_else : Array<Instruction>;
+        else if(instruccion_jason['etiqueta'] == 'sentencia_if')
+        {
+            let lista_sentencias_if : Array<Instruction>;
+            let lista_sentencias_else_if : Array<Instruction>;
+            let lista_sentencias_else : Array<Instruction>;
 
-        //     lista_sentencias_if = new Array<Instruction>();
-        //     lista_sentencias_else_if = new Array<Instruction>();
-        //     lista_sentencias_else = new Array<Instruction>();
+            lista_sentencias_if = new Array<Instruction>();
+            lista_sentencias_else_if = new Array<Instruction>();
+            lista_sentencias_else = new Array<Instruction>();
 
-        //     for(var x = 0; x < instruccion_jason['sentencias1'].length; x++)
-        //     {
-        //         lista_sentencias_if.push(this.fabrica_instrucciones(instruccion_jason['sentencias1'][x]));
-        //     }
+            for(var x = 0; x < instruccion_jason['sentencias1'].length; x++)
+            {
+                lista_sentencias_if.push(this.fabrica_instrucciones(instruccion_jason['sentencias1'][x]));
+            }
             
-        //     if(instruccion_jason['lista_else_if'] != null)
-        //     {
-        //         for(var y = 0; y < instruccion_jason['lista_else_if'].length; y++)
-        //         {
-        //             lista_sentencias_else_if.push(this.fabrica_instrucciones(instruccion_jason['lista_else_if'][y]));
-        //         }
-        //     }
+            if(instruccion_jason['lista_else_if'] != null)
+            {
+                for(var y = 0; y < instruccion_jason['lista_else_if'].length; y++)
+                {
+                    lista_sentencias_else_if.push(this.fabrica_instrucciones(instruccion_jason['lista_else_if'][y]));
+                }
+            }
 
-        //     if(instruccion_jason['sentencias2'] != null)
-        //     {
-        //         for(var z = 0; z < instruccion_jason['sentencias2'].length; z++)
-        //         {
-        //             lista_sentencias_else.push(this.fabrica_instrucciones(instruccion_jason['sentencias2'][z]));
-        //         }
-        //     }
+            if(instruccion_jason['sentencias2'] != null)
+            {
+                for(var z = 0; z < instruccion_jason['sentencias2'].length; z++)
+                {
+                    lista_sentencias_else.push(this.fabrica_instrucciones(instruccion_jason['sentencias2'][z]));
+                }
+            }
 
-        //     return new Sentencia_If(instruccion_jason['linea'],instruccion_jason['columna'],this.fabrica_expresiones(instruccion_jason['condicion']),lista_sentencias_if,lista_sentencias_else_if,lista_sentencias_else);
-        // }
+            return new Sentencia_If(instruccion_jason['linea'],instruccion_jason['columna'],this.fabrica_expresiones(instruccion_jason['condicion']),lista_sentencias_if,lista_sentencias_else_if,lista_sentencias_else);
+        }
         // else if(instruccion_jason['etiqueta'] == 'sentencia_switch')
         // {
         //     let lista_casos : Array<Instruction>;
@@ -428,45 +438,45 @@ class AST
 
         //     return new Sentencia_Caso(instruccion_jason['linea'],instruccion_jason['columna'],instruccion_jason['default'],instruccion_jason['condicion'] == null ? undefined : this.fabrica_expresiones(instruccion_jason['condicion']),lista_sentencias);
         // }
-        // else if(instruccion_jason['etiqueta'] == 'sentencia_while')
-        // {
-        //     let lista_sentencias : Array<Instruction>;
+        else if(instruccion_jason['etiqueta'] == 'sentencia_while')
+        {
+            let lista_sentencias : Array<Instruction>;
 
-        //     lista_sentencias = new Array<Tipo_Acceso>();
+            lista_sentencias = new Array<Tipo_Acceso>();
 
-        //     for(var x = 0; x < instruccion_jason['sentencias'].length; x++)
-        //     {
-        //         lista_sentencias.push(this.fabrica_instrucciones(instruccion_jason['sentencias'][x]));
-        //     }
+            for(var x = 0; x < instruccion_jason['sentencias'].length; x++)
+            {
+                lista_sentencias.push(this.fabrica_instrucciones(instruccion_jason['sentencias'][x]));
+            }
 
-        //     return new Sentencia_While(instruccion_jason['linea'],instruccion_jason['columna'],this.fabrica_expresiones(instruccion_jason['condicion']),lista_sentencias);
-        // }
-        // else if(instruccion_jason['etiqueta'] == 'sentencia_do_while')
-        // {
-        //     let lista_sentencias : Array<Instruction>;
+            return new Sentencia_While(instruccion_jason['linea'],instruccion_jason['columna'],this.fabrica_expresiones(instruccion_jason['condicion']),lista_sentencias);
+        }
+        else if(instruccion_jason['etiqueta'] == 'sentencia_do_while')
+        {
+            let lista_sentencias : Array<Instruction>;
 
-        //     lista_sentencias = new Array<Tipo_Acceso>();
+            lista_sentencias = new Array<Tipo_Acceso>();
 
-        //     for(var x = 0; x < instruccion_jason['sentencias'].length; x++)
-        //     {
-        //         lista_sentencias.push(this.fabrica_instrucciones(instruccion_jason['sentencias'][x]));
-        //     }
+            for(var x = 0; x < instruccion_jason['sentencias'].length; x++)
+            {
+                lista_sentencias.push(this.fabrica_instrucciones(instruccion_jason['sentencias'][x]));
+            }
 
-        //     return new Sentencia_Do_While(instruccion_jason['linea'],instruccion_jason['columna'],this.fabrica_expresiones(instruccion_jason['condicion']),lista_sentencias);
-        // }
-        // else if(instruccion_jason['etiqueta'] == 'sentencia_for')
-        // {
-        //     let lista_sentencias : Array<Instruction>;
+            return new Sentencia_Do_While(instruccion_jason['linea'],instruccion_jason['columna'],this.fabrica_expresiones(instruccion_jason['condicion']),lista_sentencias);
+        }
+        else if(instruccion_jason['etiqueta'] == 'sentencia_for')
+        {
+            let lista_sentencias : Array<Instruction>;
 
-        //     lista_sentencias = new Array<Tipo_Acceso>();
+            lista_sentencias = new Array<Tipo_Acceso>();
 
-        //     for(var x = 0; x < instruccion_jason['lista_sentencias'].length; x++)
-        //     {
-        //         lista_sentencias.push(this.fabrica_instrucciones(instruccion_jason['lista_sentencias'][x]));
-        //     }
+            for(var x = 0; x < instruccion_jason['lista_sentencias'].length; x++)
+            {
+                lista_sentencias.push(this.fabrica_instrucciones(instruccion_jason['lista_sentencias'][x]));
+            }
             
-        //     return new Sentencia_For(instruccion_jason['linea'],instruccion_jason['columna'],this.fabrica_instrucciones(instruccion_jason['sentencia1']), this.fabrica_expresiones(instruccion_jason['sentencia2']), this.fabrica_expresiones(instruccion_jason['sentencia3']),lista_sentencias);
-        // }
+            return new Sentencia_For(instruccion_jason['linea'],instruccion_jason['columna'],this.fabrica_instrucciones(instruccion_jason['sentencia1']), this.fabrica_expresiones(instruccion_jason['sentencia2']), this.fabrica_expresiones(instruccion_jason['sentencia3']),lista_sentencias);
+        }
         // else if(instruccion_jason['etiqueta'] == 'sentencia_for_list')
         // {
         //     let lista_sentencias : Array<Instruction>;
@@ -499,29 +509,29 @@ class AST
         {
             return new Tipo_Acceso(instruccion_jason['fila'], instruccion_jason['columna'], instruccion_jason['tipo'], instruccion_jason['acceso0'] == null ? undefined : this.fabrica_expresiones(instruccion_jason['acceso0']), instruccion_jason['acceso2'] == null ? undefined : this.fabrica_expresiones(instruccion_jason['acceso2']),instruccion_jason['acceso1'] == null ? "": instruccion_jason['acceso1']);
         }
-        // else if(instruccion_jason['etiqueta'] == 'operador_incremento')
-        // {
-        //     return this.fabrica_expresiones(instruccion_jason);
-        // }
-        // else if(instruccion_jason['etiqueta'] == 'operador_decremento')
-        // {
-        //     return this.fabrica_expresiones(instruccion_jason);
-        // }
-        // else if(instruccion_jason['etiqueta'] == 'sentencia_llamada')
-        // {
-        //     let lista_parametros : Array<Expresion>;
-        //     let parametro_jason : JSON;
+        else if(instruccion_jason['etiqueta'] == 'operador_incremento')
+        {
+            return this.fabrica_expresiones(instruccion_jason);
+        }
+        else if(instruccion_jason['etiqueta'] == 'operador_decremento')
+        {
+            return this.fabrica_expresiones(instruccion_jason);
+        }
+        else if(instruccion_jason['etiqueta'] == 'sentencia_llamada')
+        {
+            let lista_parametros : Array<Expresion>;
+            let parametro_jason : JSON;
 
-        //     lista_parametros = new Array<Expresion>();
+            lista_parametros = new Array<Expresion>();
 
-        //     for(var cont = 0; cont < instruccion_jason['parametros'].length; cont++)
-        //     {
-        //         parametro_jason = instruccion_jason['parametros'][cont];
-        //         lista_parametros.push(this.fabrica_expresiones(parametro_jason));
-        //     }
+            for(var cont = 0; cont < instruccion_jason['parametros'].length; cont++)
+            {
+                parametro_jason = instruccion_jason['parametros'][cont];
+                lista_parametros.push(this.fabrica_expresiones(parametro_jason));
+            }
 
-        //     return new Sentencia_Llamada(instruccion_jason['fila'], instruccion_jason['columna'], instruccion_jason['identificador'], lista_parametros);
-        // }
+            return new Sentencia_Llamada(instruccion_jason['fila'], instruccion_jason['columna'], instruccion_jason['identificador'], lista_parametros);
+        }
         // else if(instruccion_jason['etiqueta'] == 'sentencia_break')
         // {
         //     return new Sentencia_Break(instruccion_jason['fila'], instruccion_jason['columna']);

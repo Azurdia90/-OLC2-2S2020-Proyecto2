@@ -1,8 +1,8 @@
+import Instruction from './Instruction';
+import Simbolo from './Simbolo';
 import Entorno from './Entorno';
 import Funcion from './Funcion';
-import Instruction from './Instruction';
 import Middle from './Middle';
-import Simbolo from './Simbolo';
 import Tipo from './Tipo';
 
 class Funcion_Pop extends Funcion
@@ -14,7 +14,7 @@ class Funcion_Pop extends Funcion
         super(p_fila, p_columna, "pop", new Array<Instruction>(), undefined);
     }
 
-    public pasarParametros(p_padre: Simbolo, lista_parametros_enviados : Array<Simbolo>, salida : Middle)
+    public pasarParametros(p_padre: Simbolo, lista_parametros_enviados : Array<Simbolo>)
     {
         let _return : Simbolo;
         
@@ -38,7 +38,7 @@ class Funcion_Pop extends Funcion
         }    
     }
     
-    public analizar(entorno_local : Entorno, salida : Middle) 
+    public analizar(entorno_local : Entorno, nivel: number) 
     {
         let _return : Simbolo;
 

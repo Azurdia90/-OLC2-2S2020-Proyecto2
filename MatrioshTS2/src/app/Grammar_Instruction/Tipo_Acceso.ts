@@ -5,7 +5,6 @@ import Simbolo from './Simbolo';
 import Middle from './Middle';
 import Tipo from './Tipo';
 
-
 class Tipo_Acceso extends Instruction
 {
     private tipo : number;
@@ -26,7 +25,7 @@ class Tipo_Acceso extends Instruction
         this.expresion3 = expresion3;
     }
     
-    public analizar(entorno_padre : Entorno, salida : Middle) 
+    public analizar(entorno_padre : Entorno, nivel: number) 
     {
         let _return : Simbolo;
         
@@ -42,10 +41,16 @@ class Tipo_Acceso extends Instruction
 
                     if(type_rel.has(this.expresion3))
                     {
+                        this.entorno_padre = entorno_padre;
+                        this.nivel = nivel;
+
                         return type_rel.get(this.expresion3);
                     }
                     else
                     {
+                        this.entorno_padre = entorno_padre;
+                        this.nivel = nivel;
+
                         _return = new Simbolo(tipo_rol.error,new Tipo(tipo_dato.CADENA),"33-12");
                         _return.setFila(this.fila);
                         _return.setColumna(this.columna);
@@ -59,6 +64,9 @@ class Tipo_Acceso extends Instruction
                     {
                         var arreglo_tmp: Array<Simbolo>;
                         arreglo_tmp = <Array<Simbolo>> this.padre.getMensaje();
+                        
+                        this.entorno_padre = entorno_padre;
+                        this.nivel = nivel;
 
                         _return = new Simbolo(tipo_rol.valor,new Tipo(tipo_dato.NUMERO),"");
                         _return.setFila(this.fila);
@@ -68,6 +76,9 @@ class Tipo_Acceso extends Instruction
                     }
                     else
                     {
+                        this.entorno_padre = entorno_padre;
+                        this.nivel = nivel;
+
                         _return = new Simbolo(tipo_rol.error,new Tipo(tipo_dato.CADENA), "33-12");
                         _return.setFila(this.fila);
                         _return.setColumna(this.columna);
@@ -77,6 +88,9 @@ class Tipo_Acceso extends Instruction
                 }
                 else
                 {
+                    this.entorno_padre = entorno_padre;
+                    this.nivel = nivel;
+
                     _return = new Simbolo(tipo_rol.error,new Tipo(tipo_dato.CADENA), "33-12");
                     _return.setFila(this.fila);
                     _return.setColumna(this.columna);
@@ -92,8 +106,10 @@ class Tipo_Acceso extends Instruction
 
                     (<Sentencia_Llamada> this.expresion2).setPadre(this.padre);
                     
-                    _return = this.expresion2.analizar(entorno_padre, salida);
-
+                    _return = this.expresion2.analizar(entorno_padre, nivel);
+                    
+                    this.entorno_padre = entorno_padre;
+                    this.nivel = nivel;
                     return _return;
                 }
                 else if(this.padre.getRol() == tipo_rol.arreglo)
@@ -102,12 +118,17 @@ class Tipo_Acceso extends Instruction
 
                     (<Sentencia_Llamada> this.expresion2).setPadre(this.padre);
                     
-                    _return = this.expresion2.analizar(entorno_padre, salida);
+                    _return = this.expresion2.analizar(entorno_padre, nivel);
 
+                    this.entorno_padre = entorno_padre;
+                    this.nivel = nivel;
                     return _return;
                 }
                 else
                 {
+                    this.entorno_padre = entorno_padre;
+                    this.nivel = nivel;
+
                     _return = new Simbolo(tipo_rol.error,new Tipo(tipo_dato.CADENA), "33-12");
                     _return.setFila(this.fila);
                     _return.setColumna(this.columna);
@@ -117,6 +138,9 @@ class Tipo_Acceso extends Instruction
             }      
             else
             {
+                this.entorno_padre = entorno_padre;
+                this.nivel = nivel;
+
                 _return = new Simbolo(tipo_rol.error,new Tipo(tipo_dato.CADENA), "33-12");
                 _return.setFila(this.fila);
                 _return.setColumna(this.columna);
@@ -126,6 +150,9 @@ class Tipo_Acceso extends Instruction
         }
         catch(Exception)
         {
+            this.entorno_padre = entorno_padre;
+            this.nivel = nivel;
+            
             _return = new Simbolo(tipo_rol.error,new Tipo(tipo_dato.CADENA), "33-12");
             _return.setFila(this.fila);
             _return.setColumna(this.columna);
@@ -134,7 +161,7 @@ class Tipo_Acceso extends Instruction
         }        
     }
 
-    public traducir(entorno_padre : Entorno, salida : Middle) 
+    public traducir(salida : Middle) 
     {
         let _return : Simbolo;
         
@@ -190,7 +217,7 @@ class Tipo_Acceso extends Instruction
 
                     (<Sentencia_Llamada> this.expresion2).setPadre(this.padre);
                     
-                    _return = this.expresion2.traducir(entorno_padre, salida);
+                    _return = this.expresion2.traducir(salida);
 
                     return _return;
                 }
@@ -200,7 +227,7 @@ class Tipo_Acceso extends Instruction
 
                     (<Sentencia_Llamada> this.expresion2).setPadre(this.padre);
                     
-                    _return = this.expresion2.traducir(entorno_padre, salida);
+                    _return = this.expresion2.traducir(salida);
 
                     return _return;
                 }

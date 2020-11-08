@@ -1,11 +1,11 @@
-import Instruction from './Instruction';
-import Simbolo from './Simbolo';
-import Middle from './Middle';
-import Tipo from './Tipo';
 import Funcion_Length from './Funcion_Length';
 import Funcion_Push from './Funcion_Push';
 import Funcion_Pop from './Funcion_Pop';
+import Instruction from './Instruction';
 import Entorno from './Entorno';
+import Simbolo from './Simbolo';
+import Middle from './Middle';
+import Tipo from './Tipo';
 
 class Sentencia_Instancia extends Instruction
 {
@@ -23,7 +23,7 @@ class Sentencia_Instancia extends Instruction
         this.lista_valores2 = p_lista_valores2;
     }
 
-    public analizar(entorno_padre : Entorno, salida : Middle) 
+    public analizar(entorno_padre : Entorno, nivel : number) 
     {
         let _return : Simbolo;
         
@@ -40,6 +40,9 @@ class Sentencia_Instancia extends Instruction
                     _return.getListaFunciones().push(new Funcion_Push(this.fila,this.columna));
                     _return.getListaFunciones().push(new Funcion_Pop(this.fila,this.columna));
 
+                    this.entorno_padre = entorno_padre;
+                    this.nivel = nivel;
+
                     return _return;
                 }
                 else
@@ -51,7 +54,7 @@ class Sentencia_Instancia extends Instruction
                     for(var x = 0; x < this.lista_valores1.length; x++)
                     {
                         var val_tmp : Simbolo
-                        val_tmp = this.lista_valores1[x].analizar(entorno_padre, salida);
+                        val_tmp = this.lista_valores1[x].analizar(entorno_padre, nivel);
 
                         if(val_tmp.getRol() == tipo_rol.valor || val_tmp.getRol() == tipo_rol.arreglo || val_tmp.getRol() == tipo_rol.type)
                         {
@@ -59,6 +62,9 @@ class Sentencia_Instancia extends Instruction
                         }  
                         else
                         {
+                            this.entorno_padre = entorno_padre;
+                            this.nivel = nivel;
+
                             return val_tmp;
                         }
                     }
@@ -69,6 +75,9 @@ class Sentencia_Instancia extends Instruction
                     {
                         if(!tipo_arreglo.Equals(arreglo_val[x].getTipo()))
                         {
+                            this.entorno_padre = entorno_padre;
+                            this.nivel = nivel;
+
                             _return = new Simbolo(tipo_rol.error,new Tipo(tipo_dato.CADENA), "33-12");
                             _return.setFila(this.fila);
                             _return.setColumna(this.columna);
@@ -84,6 +93,9 @@ class Sentencia_Instancia extends Instruction
                     _return.getListaFunciones().push(new Funcion_Push(this.fila,this.columna));
                     _return.getListaFunciones().push(new Funcion_Pop(this.fila,this.columna));
                     
+                    this.entorno_padre = entorno_padre;
+                    this.nivel = nivel;
+
                     return _return;
                 }
             }
@@ -98,10 +110,13 @@ class Sentencia_Instancia extends Instruction
                     let simbolo_tmp: Simbolo;
                     let valor_tmp: Simbolo;
 
-                    valor_tmp = this.lista_valores2[t].analizar(entorno_padre, salida);
+                    valor_tmp = this.lista_valores2[t].analizar(entorno_padre, nivel);
 
                     if(valor_tmp.getRol() != tipo_rol.valor && valor_tmp.getRol() != tipo_rol.arreglo && valor_tmp.getRol() != tipo_rol.type)
                     {
+                        this.entorno_padre = entorno_padre;
+                        this.nivel = nivel;
+
                         return valor_tmp;
                     }
 
@@ -116,10 +131,15 @@ class Sentencia_Instancia extends Instruction
                 _return = new Simbolo(tipo_rol.type, new Tipo(tipo_dato.IDENTIFICADOR,""),"");
                 _return.setMensaje(type_tmp);
                
+                this.entorno_padre = entorno_padre;
+                this.nivel = nivel;
                 return _return;
             }
             else
             {
+                this.entorno_padre = entorno_padre;
+                this.nivel = nivel;
+
                 _return = new Simbolo(tipo_rol.error,new Tipo(tipo_dato.CADENA), "33-12");
                 _return.setFila(this.fila);
                 _return.setColumna(this.columna);
@@ -129,6 +149,9 @@ class Sentencia_Instancia extends Instruction
         }
         catch(Exception)
         {
+            this.entorno_padre = entorno_padre;
+            this.nivel = nivel;
+            
             _return = new Simbolo(tipo_rol.error,new Tipo(tipo_dato.CADENA), "33-12");
             _return.setFila(this.fila);
             _return.setColumna(this.columna);

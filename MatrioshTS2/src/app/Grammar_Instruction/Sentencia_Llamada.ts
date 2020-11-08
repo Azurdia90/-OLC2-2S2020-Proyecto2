@@ -1,14 +1,15 @@
+import Tabla_Simbolos from './Tabla_Simbolos';
 import Instruction from './Instruction';
+import Entorno from './Entorno';
 import Simbolo from './Simbolo';
 import Funcion from './Funcion';
-import Tabla_Simbolos from './Tabla_Simbolos';
-import Tipo from './Tipo';
 import Middle from './Middle';
-import Entorno from './Entorno';
+import Tipo from './Tipo';
 
 class Sentencia_Llamada extends Instruction
 {   
     private identificador : String;
+    private funcion_actual : Funcion;
     private lista_parametros : Array<Instruction>;
     private lista_parametros_analizar : Array<Simbolo>;
     private lista_parametros_enviar : Array<Simbolo>;
@@ -29,25 +30,28 @@ class Sentencia_Llamada extends Instruction
         this.padre = undefined;
     }  
     
-    public analizar(entorno_padre : Entorno, salida : Middle) 
+    public analizar(entorno_padre : Entorno, nivel : number) 
     {
-        let funcion_actual : Funcion;
+        let funcion_tmp : Funcion;
         let _return : Simbolo;
         
         try
         {   
             if(this.global)
             {
-                funcion_actual = Tabla_Simbolos.getInstance().getFuncion(this.identificador); 
+                funcion_tmp = Tabla_Simbolos.getInstance().getFuncion(this.identificador); 
             }
             else
             {   
-                funcion_actual = this.padre.getFuncion(this.identificador);
+                funcion_tmp = this.padre.getFuncion(this.identificador);
                 this.global = true;
             }
             //if(this.identificador == "log"){console.log(funcion_actual);}
-            if(funcion_actual == undefined || funcion_actual == null)
+            if(funcion_tmp == undefined || funcion_tmp == null)
             {
+                this.entorno_padre = entorno_padre;
+                this.nivel = nivel;
+
                 _return = new Simbolo(tipo_rol.error,new Tipo(tipo_dato.CADENA), "33-12");
                 _return.setFila(this.fila);
                 _return.setColumna(this.columna);
@@ -57,10 +61,13 @@ class Sentencia_Llamada extends Instruction
              
             for(var x : number = 0; x < this.lista_parametros.length; x++)
             {
-                var tmp_val : Simbolo = this.lista_parametros[x].analizar(entorno_padre, salida);
+                var tmp_val : Simbolo = this.lista_parametros[x].analizar(entorno_padre, nivel);
 
                 if (tmp_val == null)
                 {
+                    this.entorno_padre = entorno_padre;
+                    this.nivel = nivel;
+
                     _return = new Simbolo(tipo_rol.error,new Tipo(tipo_dato.CADENA), "33-12");
                     _return.setFila(this.fila);
                     _return.setColumna(this.columna);
@@ -70,6 +77,9 @@ class Sentencia_Llamada extends Instruction
 
                 if(tmp_val.getRol() != tipo_rol.valor && tmp_val.getRol() != tipo_rol.arreglo && tmp_val.getRol() != tipo_rol.type)
                 {
+                    this.entorno_padre = entorno_padre;
+                    this.nivel = nivel;
+
                     this.lista_parametros_analizar = new Array<Simbolo>();
                     return tmp_val;
                 }
@@ -77,21 +87,31 @@ class Sentencia_Llamada extends Instruction
                 this.lista_parametros_analizar.push(tmp_val);
             }       
 
-            var _result :  Simbolo = funcion_actual.pasarParametros(this.padre,this.lista_parametros_analizar,salida);
+            var _result :  Simbolo = funcion_tmp.pasarParametros(this.padre,this.lista_parametros_analizar);
             
             this.lista_parametros_analizar = new Array<Simbolo>();
             
             if(_result.getRol() != tipo_rol.aceptado)
             {
+                this.entorno_padre = entorno_padre;
+                this.nivel = nivel;
+
                 return _result;
             }
                                     
-            _return = funcion_actual.analizar(entorno_padre, salida);
-           
+            _return = funcion_tmp.analizar(entorno_padre, nivel);
+            
+            this.entorno_padre = entorno_padre;
+            this.funcion_actual = funcion_tmp;
+            this.nivel = nivel;
+
             return _return;            
         }
         catch(Exception)
         {
+            this.entorno_padre = entorno_padre;
+            this.nivel = nivel;
+            
             _return = new Simbolo(tipo_rol.error,new Tipo(tipo_dato.CADENA), "33-12");
             _return.setFila(this.fila);
             _return.setColumna(this.columna);
@@ -101,36 +121,25 @@ class Sentencia_Llamada extends Instruction
        
     }
 
-    public traducir(entorno_padre : Entorno, salida : Middle) 
+    public traducir(salida : Middle) 
     {
-        let funcion_actual : Funcion;
         let _return : Simbolo;
         
         try
         {   
-            //Verificar funcion
-            if(this.global)
-            {
-                funcion_actual = Tabla_Simbolos.getInstance().getFuncion(this.identificador); 
-            }
-            else
-            {   
-                funcion_actual = this.padre.getFuncion(this.identificador);
-                this.global = true;
-            }
             //Obtener valores a pasar
             for(var x : number = 0; x < this.lista_parametros.length; x++)
             {
-                var tmp_val : Simbolo = this.lista_parametros[x].traducir(entorno_padre, salida);
+                var tmp_val : Simbolo = this.lista_parametros[x].traducir(salida);
                 
                 this.lista_parametros_enviar.push(tmp_val);
             }       
             //Paso de parametros
-            funcion_actual.pasarParametros(this.padre,this.lista_parametros_enviar,salida);
+            this.funcion_actual.pasarParametros(this.padre,this.lista_parametros_enviar);
             
             this.lista_parametros_enviar = new Array<Simbolo>();
             //Traduccion de la llamada al metodo                      
-            _return = funcion_actual.traducir(entorno_padre, salida);
+            _return = this.funcion_actual.traducir(salida);
            
             return _return;            
         }

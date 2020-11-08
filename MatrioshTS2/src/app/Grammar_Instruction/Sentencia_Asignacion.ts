@@ -1,9 +1,9 @@
+import Tabla_Simbolos from './Tabla_Simbolos';
 import Instruction from './Instruction';
-import Tipo from './Tipo';
+import Entorno from './Entorno';
 import Simbolo from './Simbolo';
 import Middle from './Middle';
-import Tabla_Simbolos from './Tabla_Simbolos';
-import Entorno from './Entorno';
+import Tipo from './Tipo';
 
 class Sentencia_Asignacion extends Instruction
 {
@@ -24,36 +24,37 @@ class Sentencia_Asignacion extends Instruction
         this.valor = p_valor;
     }
 
-    public analizar(entorno_padre : Entorno, salida : Middle)
+    public analizar(entorno_padre : Entorno, nivel : number)
     {
         let _return : Simbolo;
         let _acceso : Simbolo;
         let _val_fin : Simbolo;
 
         try
-        {   //console.log(this.tipo);
+        {  
+            //ACCESO A IDENTIFICADOR
             if(this.tipo == 0)
-            {
-                if(entorno_padre.has(this.acceso0))
+            {   //console.log(nivel); console.log(entorno_padre.length);
+                if(entorno_padre.existsSimbolo(this.acceso0, nivel))
                 {                 
-                    _acceso  = entorno_padre.get(this.acceso0);
+                    _acceso  = entorno_padre.getSimbolo(this.acceso0, nivel);
                 }
                 else
                 {   
-                    _acceso = Tabla_Simbolos.getInstance().getStack().getSimbolo(this.acceso0);                    
-                }   
-            }
+                    _acceso = Tabla_Simbolos.getInstance().getSimbolo_global(this.acceso0);             
+                }  
+            }//ACCESO A ARREGLO
             else if(this.tipo == 1)
             {
                 var simbolo_tmp : Simbolo;
 
-                if(entorno_padre.has(this.acceso0))
+                if(entorno_padre.existsSimbolo(this.acceso0, nivel))
                 {                 
-                    simbolo_tmp = entorno_padre.get(this.acceso0);
+                    simbolo_tmp = entorno_padre.getSimbolo(this.acceso0,nivel);
                 }
                 else
                 {   
-                    simbolo_tmp = Tabla_Simbolos.getInstance().getStack().getSimbolo(this.acceso0);                    
+                    simbolo_tmp = Tabla_Simbolos.getInstance().getSimbolo_global(this.acceso0);                    
                 }   
                 
                 if(simbolo_tmp.getRol() == tipo_rol.arreglo)
@@ -67,7 +68,7 @@ class Sentencia_Asignacion extends Instruction
                     for(var x = 0; x < this.acceso1.length; x++)
                     {
                         var val_tmp: Simbolo;
-                        val_tmp = this.acceso1[x].analizar(entorno_padre,salida);
+                        val_tmp = this.acceso1[x].analizar(entorno_padre, nivel);
 
                         if(val_tmp.getRol() == tipo_rol.valor && val_tmp.getTipo().getTipo() == tipo_dato.NUMERO)
                         {
@@ -75,10 +76,16 @@ class Sentencia_Asignacion extends Instruction
                         }
                         else if(val_tmp.getRol() == tipo_rol.error && val_tmp.getTipo().getTipo() == tipo_dato.CADENA)
                         {
+                            this.entorno_padre = entorno_padre;
+                            this.nivel = nivel;
+
                             return val_tmp;
                         }
                         else
                         {
+                            this.entorno_padre = entorno_padre;
+                            this.nivel = nivel;
+
                             _return = new Simbolo(tipo_rol.error, new Tipo(tipo_dato.CADENA), "33-12");
                             _return.setFila(this.fila);
                             _return.setColumna(this.columna);
@@ -106,6 +113,9 @@ class Sentencia_Asignacion extends Instruction
 
                             if(pos_rel < 0)
                             {
+                                this.entorno_padre = entorno_padre;
+                                this.nivel = nivel;
+
                                 _return = new Simbolo(tipo_rol.error, new Tipo(tipo_dato.CADENA), "33-12");
                                 _return.setFila(this.fila);
                                 _return.setColumna(this.columna);
@@ -120,6 +130,9 @@ class Sentencia_Asignacion extends Instruction
                                 }
                                 else
                                 {
+                                    this.entorno_padre = entorno_padre;
+                                    this.nivel = nivel;
+
                                     _return = new Simbolo(tipo_rol.error, new Tipo(tipo_dato.CADENA), "33-12");
                                     _return.setFila(this.fila);
                                     _return.setColumna(this.columna);
@@ -130,6 +143,9 @@ class Sentencia_Asignacion extends Instruction
                         }
                         else
                         {
+                            this.entorno_padre = entorno_padre;
+                            this.nivel = nivel;
+
                             _return = new Simbolo(tipo_rol.error, new Tipo(tipo_dato.CADENA), "33-12");
                             _return.setFila(this.fila);
                             _return.setColumna(this.columna);
@@ -139,6 +155,9 @@ class Sentencia_Asignacion extends Instruction
                     }
                     else
                     {   
+                        this.entorno_padre = entorno_padre;
+                        this.nivel = nivel;
+
                         _return = new Simbolo(tipo_rol.error, new Tipo(tipo_dato.CADENA), "33-12");
                         _return.setFila(this.fila);
                         _return.setColumna(this.columna);
@@ -148,42 +167,58 @@ class Sentencia_Asignacion extends Instruction
                 }
                 else if(simbolo_tmp.getRol() == tipo_rol.error)
                 {
+                    this.entorno_padre = entorno_padre;
+                    this.nivel = nivel;
+
                     _return = simbolo_tmp;
                     return _return;
                 }
                 else
                 {
+                    this.entorno_padre = entorno_padre;
+                    this.nivel = nivel;
+
                     _return = new Simbolo(tipo_rol.error, new Tipo(tipo_dato.CADENA), "33-12");
                     _return.setFila(this.fila);
                     _return.setColumna(this.columna);
                     _return.setMensaje("Sentencia Asignación: Se especificaron dimension(es) de acceso para un No arreglo.");
                     return _return;
                 } 
-            }
+            }//ACCESO A TYPE
             else if(this.tipo == 2)
             {
-                _acceso = this.acceso2.analizar(entorno_padre, salida);
-            }
+                _acceso = this.acceso2.analizar(entorno_padre, nivel);
+            }// ACCESO NO DEFINIDO
             else
             {
+                this.entorno_padre = entorno_padre;
+                this.nivel = nivel;
+
                 _return = new Simbolo(tipo_rol.error,new Tipo(tipo_dato.CADENA),"33-12"); 
                 _return.setMensaje("Sentencia Asignación: El tipo de asignación no definido.");
                 _return.setFila(this.fila);
                 _return.setColumna(this.columna);
                 return _return;
             }
+            
             //VERIFICAR QUE EL SIMBOLO A ACCEDER ES UN VALOR, ARREGLO O TYPE
             if(_acceso.getRol() != tipo_rol.valor && _acceso.getRol() != tipo_rol.arreglo && _acceso.getRol() != tipo_rol.type)
             {
+                this.entorno_padre = entorno_padre;
+                this.nivel = nivel;
+
                 return _acceso
             }
             //console.log("==========");console.log(_acceso); console.log(this.valor);console.log("==========");
             //DEFINIR VALOR
-            _val_fin = this.valor.analizar(entorno_padre, salida);
+            _val_fin = this.valor.analizar(entorno_padre, nivel);
             //console.log("++++++++++");console.log(_acceso); console.log(_val_fin);  console.log("++++++++++");
             //VERIFICAR QUE EL VALOR A ASIGNAR ES UN VALOR, ARREGLO O TYPE
             if(_val_fin.getRol() != tipo_rol.valor && _val_fin.getRol() != tipo_rol.arreglo && _val_fin.getRol() != tipo_rol.type)
             {
+                this.entorno_padre = entorno_padre;
+                this.nivel = nivel;
+
                 return _val_fin;
             }
             //SI EL VALOR ES UN ES ARREGLO
@@ -193,6 +228,9 @@ class Sentencia_Asignacion extends Instruction
                 {
                     if(_acceso.getRol() == tipo_rol.valor && _val_fin.getRol() == tipo_rol.arreglo)
                     {
+                        this.entorno_padre = entorno_padre;
+                        this.nivel = nivel;
+
                         var nuevo_simbolo : Simbolo = new Simbolo(tipo_rol.error,new Tipo(tipo_dato.CADENA),"33-12"); 
                         nuevo_simbolo.setMensaje("Sentencia Declaración: No es posible asignar un arreglo a un valor primitivo.");
                         nuevo_simbolo.setFila(this.fila);
@@ -201,6 +239,9 @@ class Sentencia_Asignacion extends Instruction
                     }
                     else if(_acceso.getRol() == tipo_rol.valor && _val_fin.getRol() == tipo_rol.type)
                     {
+                        this.entorno_padre = entorno_padre;
+                        this.nivel = nivel;
+
                         var nuevo_simbolo : Simbolo = new Simbolo(tipo_rol.error,new Tipo(tipo_dato.CADENA),"33-12"); 
                         nuevo_simbolo.setMensaje("Sentencia Declaración: No es posible asignar un type a un valor primitivo.");
                         nuevo_simbolo.setFila(this.fila);
@@ -209,6 +250,9 @@ class Sentencia_Asignacion extends Instruction
                     }
                     else if(_acceso.getRol() == tipo_rol.arreglo && _val_fin.getRol() == tipo_rol.valor)
                     {
+                        this.entorno_padre = entorno_padre;
+                        this.nivel = nivel;
+
                         var nuevo_simbolo : Simbolo = new Simbolo(tipo_rol.error,new Tipo(tipo_dato.CADENA),"33-12"); 
                         nuevo_simbolo.setMensaje("Sentencia Declaración: No es posible asignar un valor primitivo a un arreglo.");
                         nuevo_simbolo.setFila(this.fila);
@@ -217,6 +261,9 @@ class Sentencia_Asignacion extends Instruction
                     }
                     else if(_acceso.getRol() == tipo_rol.arreglo && _val_fin.getRol() == tipo_rol.type)
                     {
+                        this.entorno_padre = entorno_padre;
+                        this.nivel = nivel;
+
                         var nuevo_simbolo : Simbolo = new Simbolo(tipo_rol.error,new Tipo(tipo_dato.CADENA),"33-12"); 
                         nuevo_simbolo.setMensaje("Sentencia Declaración: No es posible asignar un type a un arreglo.");
                         nuevo_simbolo.setFila(this.fila);
@@ -225,6 +272,9 @@ class Sentencia_Asignacion extends Instruction
                     }
                     else
                     {
+                        this.entorno_padre = entorno_padre;
+                        this.nivel = nivel;
+
                         var nuevo_simbolo : Simbolo = new Simbolo(tipo_rol.error,new Tipo(tipo_dato.CADENA),"33-12"); 
                         nuevo_simbolo.setMensaje("Sentencia Declaración: No se encuentran definidos los roles.");
                         nuevo_simbolo.setFila(this.fila);
@@ -236,6 +286,9 @@ class Sentencia_Asignacion extends Instruction
 
             if(!_acceso.getTipo().Equals(_val_fin.getTipo()))
             {
+                this.entorno_padre = entorno_padre;
+                this.nivel = nivel;
+
                 _return = new Simbolo(tipo_rol.error,new Tipo(tipo_dato.CADENA),"33-12"); 
                 _return.setMensaje("Sentencia Asignación: El tipo de la variable es diferente al valor a asignar.");
                 _return.setFila(this.fila);
@@ -252,6 +305,9 @@ class Sentencia_Asignacion extends Instruction
             }
             else
             {
+                this.entorno_padre = entorno_padre;
+                this.nivel = nivel;
+
                 _return = new Simbolo(tipo_rol.error,new Tipo(tipo_dato.CADENA),"33-12"); 
                 _return.setMensaje("Sentencia Asignación: No es posible Asignar un valor a una constante.");
                 _return.setFila(this.fila);
@@ -259,6 +315,9 @@ class Sentencia_Asignacion extends Instruction
                 return _return;
             }
             
+            this.entorno_padre = entorno_padre;
+            this.nivel = nivel;
+
             _return = new Simbolo(tipo_rol.aceptado,new Tipo(tipo_dato.CADENA),"10-4"); 
             _return.setMensaje("Asignación Succesful");
             _return.setFila(this.fila);
@@ -267,6 +326,9 @@ class Sentencia_Asignacion extends Instruction
         }
         catch(Exception)
         {
+            this.entorno_padre = entorno_padre;
+            this.nivel = nivel;
+
             _return = new Simbolo(tipo_rol.error,new Tipo(tipo_dato.CADENA), "33-12");
             _return.setFila(this.fila);
             _return.setColumna(this.columna);
@@ -275,7 +337,7 @@ class Sentencia_Asignacion extends Instruction
         }
     }
 
-    public traducir(entorno_padre : Entorno, salida : Middle)
+    public traducir(salida : Middle)
     {
         let _return : Simbolo;
         let _acceso : Simbolo;
@@ -285,26 +347,26 @@ class Sentencia_Asignacion extends Instruction
         {   
             if(this.tipo == 0)
             {
-                if(entorno_padre.has(this.acceso0))
+                if(this.entorno_padre.existsSimbolo(this.acceso0,this.nivel))
                 {                 
-                    _acceso  = entorno_padre.get(this.acceso0);
+                    _acceso  = this.entorno_padre.getSimbolo(this.acceso0, this.nivel);
                 }
                 else
                 {   
-                    _acceso = Tabla_Simbolos.getInstance().getStack().getSimbolo(this.acceso0);                    
+                    _acceso = Tabla_Simbolos.getInstance().getSimbolo_global(this.acceso0);                    
                 }   
             }
             else if(this.tipo == 1)
             {
                 var simbolo_tmp : Simbolo;
 
-                if(entorno_padre.has(this.acceso0))
+                if(this.entorno_padre.existsSimbolo(this.acceso0,this.nivel))
                 {                 
-                    simbolo_tmp = entorno_padre.get(this.acceso0);
+                    simbolo_tmp = this.entorno_padre.getSimbolo(this.acceso0,this.nivel);
                 }
                 else
                 {   
-                    simbolo_tmp = Tabla_Simbolos.getInstance().getStack().getSimbolo(this.acceso0);                    
+                    simbolo_tmp = Tabla_Simbolos.getInstance().getSimbolo_global(this.acceso0);                    
                 }   
                 
                 if(simbolo_tmp.getRol() == tipo_rol.arreglo)
@@ -318,7 +380,7 @@ class Sentencia_Asignacion extends Instruction
                     for(var x = 0; x < this.acceso1.length; x++)
                     {
                         var val_tmp: Simbolo;
-                        val_tmp = this.acceso1[x].analizar(entorno_padre,salida);
+                        val_tmp = this.acceso1[x].traducir(salida);
 
                         if(val_tmp.getRol() == tipo_rol.valor && val_tmp.getTipo().getTipo() == tipo_dato.NUMERO)
                         {
@@ -413,7 +475,7 @@ class Sentencia_Asignacion extends Instruction
             }
             else if(this.tipo == 2)
             {
-                _acceso = this.acceso2.traducir(entorno_padre, salida);
+                _acceso = this.acceso2.traducir(salida);
             }
             else
             {
@@ -425,7 +487,7 @@ class Sentencia_Asignacion extends Instruction
             }
             
             //console.log("==========");console.log(_acceso); console.log(this.valor);console.log("==========");
-            _val_fin = this.valor.traducir(entorno_padre, salida);
+            _val_fin = this.valor.traducir(salida);
             //console.log("++++++++++");console.log(_acceso); console.log(_val_fin);  console.log("++++++++++");
 
             let temporal_posR =  "t" + Tabla_Simbolos.getInstance().getTemporal();

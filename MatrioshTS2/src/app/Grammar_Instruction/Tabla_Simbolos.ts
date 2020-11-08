@@ -1,7 +1,11 @@
-import Stack from './Stack';
-import Funcion from './Funcion';
-import Entorno from './Entorno';
 import Type_MatrioshTS from './Type_MatrioshTS';
+import SubStack from './SubStack';
+import Entorno from './Entorno';
+import Funcion from './Funcion';
+import Stack from './Stack';
+import SubEntorno from './SubEntorno';
+import Simbolo from './Simbolo';
+import Tipo from './Tipo';
 
 class Tabla_Simbolos
 {
@@ -11,14 +15,14 @@ class Tabla_Simbolos
     private etiqueta : number;
 
     private stack : Stack;
-    private entorno_global : Entorno;
+    private entorno_global : SubStack;
     private lista_funciones : Array<Funcion>;    
     private lista_types : Array<Type_MatrioshTS>;
 
     constructor() 
     {
         this.stack = new Stack();
-        this.entorno_global = new Entorno("global");
+        this.entorno_global = new SubStack("global");
         this.stack._push(0,0,this.entorno_global);
 
         this.lista_funciones = new Array<Funcion>();
@@ -44,7 +48,7 @@ class Tabla_Simbolos
     public clear()
     {
         this.stack = new Stack();
-        this.entorno_global.clear(); 
+        this.entorno_global = new SubStack("global"); 
         this.stack._push(0,0,this.entorno_global);
 
         this.lista_funciones = new Array<Funcion>();
@@ -130,13 +134,48 @@ class Tabla_Simbolos
         
     public getEntorno_global() 
     {
-        return this.entorno_global;
+        
+        return this.entorno_global[0];
     }
 
-    public setEntorno_global(entorno_global : Entorno) 
+    public getnewEntorno() 
     {
-        this.entorno_global = entorno_global;
+        let newEntorno = new Entorno(this.entorno_global);
+        this.entorno_global.push(newEntorno);
+        return newEntorno;
     }
+
+    public existsSimbolo_global(key : String) 
+    {
+        let _return : Boolean = false;
+
+        let entorno_local : Entorno = this.entorno_global[0];
+        let sub_entorno : SubEntorno = entorno_local[0];
+
+        if(sub_entorno.has(key))
+        {
+            return true;
+        }
+
+        return _return;
+    }
+
+    public getSimbolo_global(key : String) 
+    {
+        let _return : Simbolo = new Simbolo(tipo_rol.error,new Tipo(tipo_dato.CADENA), "33-12");
+        _return.setMensaje("El valor \"" + key + "\" no existe en ningun ámbito");
+
+        let entorno_local : Entorno = this.entorno_global[0];
+        let sub_entorno : SubEntorno = entorno_local[0];
+
+        if(sub_entorno.has(key))
+        {
+            return sub_entorno.get(key);
+        }
+        
+        return _return;
+    }
+
 
     public getStack() 
     {

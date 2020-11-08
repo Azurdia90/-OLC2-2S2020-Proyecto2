@@ -1,44 +1,133 @@
+import SubEntorno from './SubEntorno';
+import SubStack from './SubStack';
 import Simbolo from "./Simbolo";
+import Tipo from './Tipo';
 
-class Entorno extends Map<String,Simbolo>
+class Entorno extends Array<SubEntorno>
 {
-    private identificador: String;
-    private pos_Stack: number;
-    private pos_if: number;
-    private pos_for: number;
-    private pos_while: number;
-    private pos_switch: number;
-    private pos_do_while: number;
-    
-    constructor(p_identicador: String)
+    private padre: SubStack;
+    private nivel: number;
+
+    constructor(p_padre: SubStack)
     {
         super();
-        this.identificador = p_identicador;
-        this.pos_Stack = 0;
+        this.padre = p_padre;
+        this.nivel = -1;
     }
 
-    public getIdentificador()
+    public getPadre()
     {
-        return this.identificador;
+        return this.padre;
     }
 
-    public getPos_Stack()
+    public getSize()
     {
-        return this.pos_Stack;
+        return this.padre.getSize();
     }
 
-    public setPos_Stack(value: number)
+    public _push(entorno_actual : SubEntorno)
     {
-        this.pos_Stack = value;
+        this.push(entorno_actual);
+        this.nivel = this.nivel + 1;
     }
-
-    public set_e(key: String,value: Simbolo)
+    
+    public getLastNivel()
     {
-        value.setPos_S(this.pos_Stack);
-        this.set(key,value);
-        this.pos_Stack = this.pos_Stack + 1;
+        return this.nivel;
     }
 
+    public existsSimbolo(key : String, nivel? : number)
+    {
+        let _return : Boolean = false;
+        let entorno_local : SubEntorno;
+
+        if(this.length > 0)
+        {
+            if(nivel == undefined)
+            {
+                for(var x : number = this.length-1; x >= 0; x--)
+                {   //if(key == "hola"){console.log(this[x])}
+                    entorno_local  = this[x];
+                    if(entorno_local.has(key))
+                    {
+                        return true;
+                    }            
+                }  
+            }
+            else
+            {   //if(key == "hola"){console.log(this[nivel])}
+                for(var x : number = nivel; x >= 0; x--)
+                { 
+                    entorno_local  = this[x];
+                    if(entorno_local.has(key))
+                    {
+                        return true;
+                    }
+                } 
+            }
+        }
+ 
+        let ambito_global = this.padre[0];
+        let entorno_global = ambito_global[0];
+        //if(key == "hola"){console.log(entorno_global)}
+        if(entorno_global.has(key))
+        {
+            return true;
+        }          
+
+        return _return;
+    }
+    
+    public getSimbolo(key : String, nivel? : number)
+    {
+        let entorno_local : SubEntorno;
+        let _return : Simbolo = new Simbolo(tipo_rol.error,new Tipo(tipo_dato.CADENA), "33-12");
+        _return.setMensaje("El valor \"" + key + "\" no existe en el ámbito actual");
+
+        if(this.length > 0)
+        {
+            if(nivel == undefined)
+            {
+                for(var x : number = this.length -1; x >= 0; x--)
+                { 
+                    entorno_local = this[x];
+                    if(entorno_local.has(key))
+                    {
+                        return entorno_local.get(key);
+                    }            
+                }  
+            }
+            else
+            {   
+                for(var x : number = nivel; x >= 0; x--)
+                { 
+                    entorno_local = this[x];
+                    if(entorno_local.has(key))
+                    {
+                        return entorno_local.get(key);
+                    }  
+                }
+            }
+        }
+
+        let ambito_global  = this.padre[0];
+        let entorno_global = ambito_global[0];
+
+        if(entorno_global.has(key))
+        {
+            return entorno_global.get(key);
+        }    
+        
+        return _return;
+    }
+
+    public set_e(identificador: String, new_simbol: Simbolo)
+    {
+        let subentorno =  this[this.length -1];
+
+        new_simbol.setPos_S(this.padre.getPos_Stack());
+        subentorno.set(identificador, new_simbol);
+    }   
 }
 
 export default Entorno;
