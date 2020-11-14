@@ -10,7 +10,7 @@ class Funcion extends Instruction
 {
     protected tipo : Tipo;
     protected identificador : String;
-    
+    protected identificador_3D : String;
     protected substack : SubStack;
     protected entorno_local: Entorno;
     protected subentorno_global: SubEntorno;
@@ -22,6 +22,7 @@ class Funcion extends Instruction
     {
         super(p_fila,p_columna);
         this.identificador = p_id;
+        this.identificador_3D = p_id;
         this.lista_parametros = p_lista_parametros;
         this.lista_sentencias = p_lista_sentencias;
         
@@ -48,6 +49,7 @@ class Funcion extends Instruction
         this.lista_parametros = p_lista_parametros;
     }   
     
+    
     public getThis()
     {
         //To change body of generated methods, choose Tools | Templates.
@@ -55,6 +57,12 @@ class Funcion extends Instruction
     }
     
     public pasarParametros(p_padre: Simbolo, lista_parametros_enviados : Array<Simbolo>)
+    {
+        //To change body of generated methods, choose Tools | Templates.
+        return undefined;        
+    }
+
+    public pasarParametrosT(salida: Middle, lista_parametros_enviados : Array<Simbolo>)
     {
         //To change body of generated methods, choose Tools | Templates.
         return undefined;        

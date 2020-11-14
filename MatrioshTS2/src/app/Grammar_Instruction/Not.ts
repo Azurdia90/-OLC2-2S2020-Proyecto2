@@ -4,6 +4,7 @@ import Simbolo from './Simbolo';
 import Entorno from './Entorno';
 import Middle from './Middle';
 import Tipo from './Tipo';
+import Tabla_Simbolos from './Tabla_Simbolos';
 
 class Not extends Expresion
 {
@@ -71,6 +72,42 @@ class Not extends Expresion
             _return.setColumna(this.columna);
             _return.setMensaje("Operacion Not: " + Exception.Message);
             return _return;
+        }
+    }
+
+    public traducir(salida: Middle)
+    {
+        let _return : Simbolo;
+
+        try
+        {
+            let etiqueta_positiva = "l" + Tabla_Simbolos.getInstance().getEtiqueta();
+            let etiqueta_negativa = "l" + Tabla_Simbolos.getInstance().getEtiqueta();
+            let etiqueta_salida = "l" + Tabla_Simbolos.getInstance().getEtiqueta();
+            let temporal_resultado = "t" + Tabla_Simbolos.getInstance().getTemporal();
+
+            let op1 : Simbolo;
+
+            op1 = (this.operador_izq == null) ? null : this.operador_izq.traducir(salida);
+
+            Middle.getInstance().setOuput(temporal_resultado + " == 1;");
+            Middle.getInstance().setOuput("if (" + op1.getMensaje() + ") goto " + etiqueta_positiva + ";");
+            Middle.getInstance().setOuput( "goto " + etiqueta_negativa + ";"); 
+            Middle.getInstance().setOuput(etiqueta_positiva + ":"); 
+            Middle.getInstance().setOuput(temporal_resultado + " = 0;"); 
+            Middle.getInstance().setOuput("goto " + etiqueta_salida + ";"); 
+            Middle.getInstance().setOuput(etiqueta_negativa + ":\n");  
+            Middle.getInstance().setOuput(temporal_resultado + " = 1;"); 
+            Middle.getInstance().setOuput(etiqueta_salida + ":"); 
+
+            _return = new Simbolo(tipo_rol.valor,new Tipo(tipo_dato.BOOLEANO), "");
+            _return.setMensaje(temporal_resultado);
+            return _return;
+        }
+        catch(Error)
+        {
+            Middle.getInstance().clear3D();
+            Middle.getInstance().setOuput("//Error Not: " + Error.Mesage);
         }
     }
     

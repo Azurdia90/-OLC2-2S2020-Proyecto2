@@ -4,6 +4,7 @@ import Entorno from './Entorno';
 import Simbolo from './Simbolo';
 import Middle from './Middle';
 import Tipo from './Tipo';
+import Tabla_Simbolos from './Tabla_Simbolos';
 
 class Tipo_Acceso extends Instruction
 {
@@ -62,12 +63,6 @@ class Tipo_Acceso extends Instruction
                 {   
                     if(this.expresion3 == "length")
                     {
-                        var arreglo_tmp: Array<Simbolo>;
-                        arreglo_tmp = <Array<Simbolo>> this.padre.getMensaje();
-                        
-                        this.entorno_padre = entorno_padre;
-                        this.nivel = nivel;
-
                         _return = new Simbolo(tipo_rol.valor,new Tipo(tipo_dato.NUMERO),"");
                         _return.setFila(this.fila);
                         _return.setColumna(this.columna);
@@ -182,13 +177,29 @@ class Tipo_Acceso extends Instruction
                 {   
                     if(this.expresion3 == "length")
                     {
-                        var arreglo_tmp: Array<Simbolo>;
-                        arreglo_tmp = <Array<Simbolo>> this.padre.getMensaje();
-
-                        _return = new Simbolo(tipo_rol.valor,new Tipo(tipo_dato.NUMERO),"");
+                        console.log(this.entorno_padre);
+                        let tam_metodo = this.entorno_padre.getSize();
+                        console.log(this.padre.getPos_S());
+                        let temporal_simulado    = "t" + Tabla_Simbolos.getInstance().getTemporal();
+                        let temporal_contador    = "t" + Tabla_Simbolos.getInstance().getTemporal();
+                        let temporal_pos_return  = "t" + Tabla_Simbolos.getInstance().getTemporal();
+                        let temporal_retorno     = "t" + Tabla_Simbolos.getInstance().getTemporal();
+                        
+                        Middle.getInstance().setOuput("");
+                        Middle.getInstance().setOuput(temporal_simulado + " = P + " +  tam_metodo + ";");
+                        Middle.getInstance().setOuput(temporal_contador + " = " + temporal_simulado + " +  2;");
+                        Middle.getInstance().setOuput("Stack[(int)" + temporal_contador + "] = " + this.padre.getPos_S() + ";");
+                        Middle.getInstance().setOuput("P = P + " + tam_metodo + ";");                
+                        Middle.getInstance().setOuput("length_array();");
+                        Middle.getInstance().setOuput(temporal_pos_return + " = P + 1;");
+                        Middle.getInstance().setOuput(temporal_retorno + " = Stack[(int)" + temporal_pos_return + "];");
+                        Middle.getInstance().setOuput("P = P - " + tam_metodo + ";");
+                    
+                        _return = new Simbolo(tipo_rol.valor,new Tipo(tipo_dato.NUMERO), "");
                         _return.setFila(this.fila);
                         _return.setColumna(this.columna);
-                        _return.setMensaje("Dimensión de arreglo exitosa");
+                        _return.setMensaje(temporal_retorno);
+                        console.log(_return);
                         return _return;
                     }
                     else

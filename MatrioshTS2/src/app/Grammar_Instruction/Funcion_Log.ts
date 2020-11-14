@@ -39,12 +39,25 @@ class Funcion_Log extends Funcion
         }      
     }
 
-    public analizar(entorno_local : Entorno, nivel : number) 
+    public pasarParametrosT(salida : Middle, lista_parametros_enviados : Array<Simbolo>)
     {
         let _return : Simbolo;
 
+        this.valores_imprimir = lista_parametros_enviados;
+
+        _return = new Simbolo(tipo_rol.aceptado,new Tipo(tipo_dato.CADENA),"10-4");
+        _return.setFila(this.fila);
+        _return.setColumna(this.columna); 
+        _return.setMensaje("Paso de Parametros Succesful");
+        return _return;    
+    }
+
+    public analizar(entorno_local : Entorno, nivel : number) 
+    {
+        let _return : Simbolo;
+        let etapa : number;
         try
-        {   
+        {   etapa = 1;
             for(var i = 0; i < this.valores_imprimir.length; i++)
             {
                 if(this.valores_imprimir[i].getRol() == tipo_rol.valor)
@@ -63,10 +76,10 @@ class Funcion_Log extends Funcion
                     return _return;
                 }
             }
-
+            etapa = 2;
             this.entorno_local = entorno_local;
             this.nivel = nivel;
-            
+            etapa = 3;
             _return = new Simbolo(tipo_rol.aceptado,new Tipo(tipo_dato.CADENA),"10-4");
             _return.setFila(this.fila);
             _return.setColumna(this.columna);
@@ -81,7 +94,7 @@ class Funcion_Log extends Funcion
             _return = new Simbolo(tipo_rol.error,new Tipo(tipo_dato.CADENA), "33-12");
             _return.setFila(this.fila);
             _return.setColumna(this.columna);
-            _return.setMensaje("Error en Sentencia Imprimir: " + Exception);
+            _return.setMensaje("Error en Sentencia Imprimir (a" + etapa + "): " + Exception);
             return _return;
         }
     } 
@@ -97,7 +110,7 @@ class Funcion_Log extends Funcion
                 let tam_metodo = this.entorno_local.getSize();
                 let temporal_simulado = "t" + Tabla_Simbolos.getInstance().getTemporal();
                 let temporal_contador = "t" + Tabla_Simbolos.getInstance().getTemporal();
-                
+                console.log(this.valores_imprimir);
                 if(this.valores_imprimir[i].getTipo().getTipo() == tipo_dato.VOID || this.valores_imprimir[i].getTipo().getTipo() == tipo_dato.NULO)
                 {
                     continue;
@@ -145,7 +158,7 @@ class Funcion_Log extends Funcion
         catch(Error)
         {
             Middle.getInstance().clear3D();
-            Middle.getInstance().setOuput("Error Sentencia Log: " + Error.Mesage);
+            Middle.getInstance().setOuput("//Error Sentencia Log: " + Error.Mesage);
         }
     }    
 

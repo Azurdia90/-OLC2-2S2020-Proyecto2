@@ -40,7 +40,7 @@ class Entorno extends Array<SubEntorno>
     {
         let _return : Boolean = false;
         let entorno_local : SubEntorno;
-
+        //if(key == "let1" && this.padre.getIdentificador() == "Inicio"){console.log(this)}
         if(this.length > 0)
         {
             if(nivel == undefined)
@@ -55,10 +55,10 @@ class Entorno extends Array<SubEntorno>
                 }  
             }
             else
-            {   //if(key == "hola"){console.log(this[nivel])}
+            {   
                 for(var x : number = nivel; x >= 0; x--)
-                { 
-                    entorno_local  = this[x];
+                {  
+                    entorno_local  = this[x]; 
                     if(entorno_local.has(key))
                     {
                         return true;
@@ -69,7 +69,6 @@ class Entorno extends Array<SubEntorno>
  
         let ambito_global = this.padre[0];
         let entorno_global = ambito_global[0];
-        //if(key == "hola"){console.log(entorno_global)}
         if(entorno_global.has(key))
         {
             return true;
@@ -121,10 +120,19 @@ class Entorno extends Array<SubEntorno>
         return _return;
     }
 
-    public set_e(identificador: String, new_simbol: Simbolo)
+    public set_e(identificador: String, new_simbol: Simbolo,nivel? : number)
     {
-        let subentorno =  this[this.length -1];
-
+        let subentorno : SubEntorno;
+        //if(identificador == "let1" && this.padre.getIdentificador() == "Inicio"){console.log(new_simbol);console.log(subentorno)};
+        if(nivel == undefined)
+        {
+            subentorno = this[this.getLastNivel()];
+        }
+        else
+        {
+            subentorno = this[nivel];
+        }
+        
         new_simbol.setPos_S(this.padre.getPos_Stack());
         subentorno.set(identificador, new_simbol);
     }   

@@ -121,36 +121,18 @@ class Potencia extends Expresion
 
             let tipo_modulo :tipo_operacion_resultado;
 
-            if (op1 == null || op2 == null)
-            {
-                _return = new Simbolo(tipo_rol.error,new Tipo(tipo_dato.CADENA),"33-12");
-                _return.setFila(this.fila);
-                _return.setColumna(this.columna);
-                _return.setMensaje("Operador vacio");
-                return _return;
-            }
-
-            if (op1.getRol() != tipo_rol.valor && op1.getRol() != tipo_rol.arreglo)
-            {
-                return op1;
-            }
-
-            if (op2.getRol() != tipo_rol.valor && op2.getRol() != tipo_rol.arreglo)
-            {
-                return op2;
-            }
-
             tipo_modulo = this.matriz_operacion_modulo[op1.getTipo().getTipo()] [op2.getTipo().getTipo()];
 
             switch(tipo_modulo)
             {
                 case tipo_operacion_resultado.potencia_numero:
-                    let tam_metodo = 0;
+                    let tam_metodo = this.entorno_padre.getSize();
                     let temporal_simulado    = "t" + Tabla_Simbolos.getInstance().getTemporal();
                     let temporal_contador    = "t" + Tabla_Simbolos.getInstance().getTemporal();
                     let temporal_pos_return  = "t" + Tabla_Simbolos.getInstance().getTemporal();
                     let temporal_retorno     = "t" + Tabla_Simbolos.getInstance().getTemporal();
-                                                                            
+                                                   
+                    Middle.getInstance().setOuput("");
                     Middle.getInstance().setOuput(temporal_simulado + " = P + " +  tam_metodo + ";");
                     Middle.getInstance().setOuput(temporal_contador + " = " + temporal_simulado + " +  2;");
                     Middle.getInstance().setOuput("Stack[(int)" + temporal_contador + "] = " + op1.getMensaje() + ";");
@@ -162,7 +144,7 @@ class Potencia extends Expresion
                     Middle.getInstance().setOuput(temporal_retorno + " = Stack[(int)" + temporal_pos_return + "];");
                     Middle.getInstance().setOuput("P = P - " + tam_metodo + ";");
                 
-                    _return = new Simbolo(tipo_rol.valor,new Tipo(tipo_dato.CADENA), "");
+                    _return = new Simbolo(tipo_rol.valor,new Tipo(tipo_dato.NUMERO), "");
                     _return.setFila(this.fila);
                     _return.setColumna(this.columna);
                     _return.setMensaje(temporal_retorno);
@@ -175,13 +157,10 @@ class Potencia extends Expresion
                     return _return;
             }
         }
-        catch(Exception)
+        catch(Error)
         {
-            _return = new Simbolo(tipo_rol.error,new Tipo(tipo_dato.CADENA), "33-12");
-            _return.setFila(this.fila);
-            _return.setColumna(this.columna);
-            _return.setMensaje("Operacion Modulo: " + Exception.Message);
-            return _return;
+            Middle.getInstance().clear3D();
+            Middle.getInstance().setOuput("//Error Potencia: " + Error.Mesage);
         }
     }
 

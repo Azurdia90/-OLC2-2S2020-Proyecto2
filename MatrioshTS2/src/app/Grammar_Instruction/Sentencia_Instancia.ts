@@ -6,6 +6,7 @@ import Entorno from './Entorno';
 import Simbolo from './Simbolo';
 import Middle from './Middle';
 import Tipo from './Tipo';
+import Tabla_Simbolos from './Tabla_Simbolos';
 
 class Sentencia_Instancia extends Instruction
 {
@@ -30,76 +31,71 @@ class Sentencia_Instancia extends Instruction
         try
         {   //console.log(this.tipo);
             if(this.tipo == 0)
-            {   //Arreglos
-                if(this.lista_valores1.length == 0)
-                {   //arreglo vacio
-                    _return = new Simbolo(tipo_rol.arreglo, new Tipo(tipo_dato.NULO), "");
-                    _return.setMensaje("Arreglo creado exitosamente");
+            {  
+                //arreglos con valores
+                var tipo_arreglo: Tipo;
 
-                    _return.getListaFunciones().push(new Funcion_Length(this.fila,this.columna));
-                    _return.getListaFunciones().push(new Funcion_Push(this.fila,this.columna));
-                    _return.getListaFunciones().push(new Funcion_Pop(this.fila,this.columna));
+                var arreglo_val = new Array<Simbolo>();
+                
+                for(var x = 0; x < this.lista_valores1.length; x++)
+                {
+                    var val_tmp : Simbolo
+                    val_tmp = this.lista_valores1[x].analizar(entorno_padre, nivel);
 
-                    this.entorno_padre = entorno_padre;
-                    this.nivel = nivel;
-
-                    return _return;
-                }
-                else
-                {   //arreglos con valores
-                    var tipo_arreglo: Tipo;
-
-                    var arreglo_val = new Array<Simbolo>();
-                    
-                    for(var x = 0; x < this.lista_valores1.length; x++)
+                    if(val_tmp.getRol() == tipo_rol.valor || val_tmp.getRol() == tipo_rol.arreglo || val_tmp.getRol() == tipo_rol.type)
                     {
-                        var val_tmp : Simbolo
-                        val_tmp = this.lista_valores1[x].analizar(entorno_padre, nivel);
-
-                        if(val_tmp.getRol() == tipo_rol.valor || val_tmp.getRol() == tipo_rol.arreglo || val_tmp.getRol() == tipo_rol.type)
-                        {
-                            arreglo_val.push(val_tmp);
-                        }  
-                        else
-                        {
-                            this.entorno_padre = entorno_padre;
-                            this.nivel = nivel;
-
-                            return val_tmp;
-                        }
-                    }
-
-                    tipo_arreglo = arreglo_val[0].getTipo();
-
-                    for(var x = 1; x < arreglo_val.length; x++)
+                        arreglo_val.push(val_tmp);
+                    }  
+                    else
                     {
-                        if(!tipo_arreglo.Equals(arreglo_val[x].getTipo()))
-                        {
-                            this.entorno_padre = entorno_padre;
-                            this.nivel = nivel;
+                        this.entorno_padre = entorno_padre;
+                        this.nivel = nivel;
 
-                            _return = new Simbolo(tipo_rol.error,new Tipo(tipo_dato.CADENA), "33-12");
-                            _return.setFila(this.fila);
-                            _return.setColumna(this.columna);
-                            _return.setMensaje("El contenido del arreglo no tiene valores de un solo tipo");
-                            return _return;
-                        }
+                        return val_tmp;
                     }
-                    
-                    _return = new Simbolo(tipo_rol.arreglo, tipo_arreglo, "");
-                    _return.setMensaje("Arreglo creado exitosamente");
-
-                    _return.getListaFunciones().push(new Funcion_Length(this.fila,this.columna));
-                    _return.getListaFunciones().push(new Funcion_Push(this.fila,this.columna));
-                    _return.getListaFunciones().push(new Funcion_Pop(this.fila,this.columna));
-                    
-                    this.entorno_padre = entorno_padre;
-                    this.nivel = nivel;
-
-                    return _return;
                 }
+
+                tipo_arreglo = arreglo_val[0].getTipo();
+
+                for(var x = 1; x < arreglo_val.length; x++)
+                {
+                    if(!tipo_arreglo.Equals(arreglo_val[x].getTipo()))
+                    {
+                        this.entorno_padre = entorno_padre;
+                        this.nivel = nivel;
+
+                        _return = new Simbolo(tipo_rol.error,new Tipo(tipo_dato.CADENA), "33-12");
+                        _return.setFila(this.fila);
+                        _return.setColumna(this.columna);
+                        _return.setMensaje("El contenido del arreglo no tiene valores de un solo tipo");
+                        return _return;
+                    }
+                }
+                
+                _return = new Simbolo(tipo_rol.arreglo, tipo_arreglo, "");
+                _return.setMensaje("Arreglo creado exitosamente");
+                _return.getListaFunciones().push(new Funcion_Length(this.fila,this.columna));
+                _return.getListaFunciones().push(new Funcion_Push(this.fila,this.columna));
+                _return.getListaFunciones().push(new Funcion_Pop(this.fila,this.columna));
+                
+                this.entorno_padre = entorno_padre;
+                this.nivel = nivel;
+
+                return _return;
+                
             }
             else if(this.tipo == 1)
+            {  
+                this.entorno_padre = entorno_padre;
+                this.nivel = nivel;
+
+                _return = new Simbolo(tipo_rol.error,new Tipo(tipo_dato.CADENA), "33-12");
+                _return.setFila(this.fila);
+                _return.setColumna(this.columna);
+                _return.setMensaje("El valor a instanciar no esta definidio.");
+                return _return;
+            }
+            else if(this.tipo == 2)
             {
                 let type_tmp: Map<String,Simbolo>;
 
@@ -157,6 +153,70 @@ class Sentencia_Instancia extends Instruction
             _return.setColumna(this.columna);
             _return.setMensaje("Sentencia Instancia: " + Exception.Message);
             return _return;
+        }
+    }
+
+    public traducir(salida : Middle) 
+    {
+        let _return : Simbolo;
+        
+        try
+        {   //console.log(this.tipo);
+            if(this.tipo == 0)
+            {  
+                //arreglos con valores
+                var tipo_arreglo: Tipo;
+
+                var arreglo_val = new Array<Simbolo>();
+                
+                for(var x = 0; x < this.lista_valores1.length; x++)
+                {
+                    var val_tmp : Simbolo
+                    val_tmp = this.lista_valores1[x].traducir(salida);
+
+                    arreglo_val.push(val_tmp);
+                }
+                
+                let temporal_posH = "t"+ Tabla_Simbolos.getInstance().getTemporal();               
+
+                Middle.getInstance().setOuput("");
+                Middle.getInstance().setOuput(temporal_posH + " = H;"); 
+                Middle.getInstance().setOuput("Heap[H] = " + arreglo_val.length + ";"); 
+                Middle.getInstance().setOuput("H = H + 1;");   
+
+                for(var x = 0; x < arreglo_val.length; x++)
+                {
+                    Middle.getInstance().setOuput("Heap[H] = " + arreglo_val[x].getMensaje() + ";"); 
+                    Middle.getInstance().setOuput("H = H + 1;");  
+                }                
+                 
+                _return = new Simbolo(tipo_rol.arreglo,arreglo_val[0].getTipo(), "");
+                _return.setFila(this.fila);
+                _return.setColumna(this.columna);
+                _return.setMensaje(temporal_posH);
+                return _return;
+                
+            }
+            else if(this.tipo == 1)
+            {  
+                Middle.getInstance().clear3D();
+                Middle.getInstance().setOuput("//Error Sentencia Instancia: El valor a instanciar no esta definidio.");
+            }
+            else if(this.tipo == 2)
+            {
+                Middle.getInstance().clear3D();
+                Middle.getInstance().setOuput("//Error Sentencia Instancia: El valor a instanciar no esta definidio.");
+            }
+            else
+            {
+                Middle.getInstance().clear3D();
+                Middle.getInstance().setOuput("//Error Sentencia Instancia: El valor a instanciar no esta definidio.");
+            }
+        }
+        catch(Error)
+        {
+            Middle.getInstance().clear3D();
+            Middle.getInstance().setOuput("//Error Sentencia Instancia: " + Error.Mesage);
         }
     }
 

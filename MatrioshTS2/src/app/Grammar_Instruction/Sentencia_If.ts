@@ -67,33 +67,20 @@ class Sentencia_If extends Instruction
 
             //ANALISIS DE IF    
             etapa = 1;
+            console.log("y entonces!!!");
+            console.log(this.lista_sentencias_if);
             let entorno_actual: SubEntorno = new SubEntorno(this.identificador1);
             entorno_padre._push(entorno_actual);
-
+            
             let val_sentencia_if: Simbolo;
             
             for(var x = 0; x <  this.lista_sentencias_if.length; x++)
             {                    
                 val_sentencia_if = this.lista_sentencias_if[x].analizar(entorno_padre,entorno_padre.getLastNivel());
-
+                
                 if (val_sentencia_if.getRol() == tipo_rol.error)
                 {                        
                     _return = val_sentencia_if;
-                    return _return;
-                }
-                else if (val_sentencia_if.getRol() == tipo_rol.detener)
-                {                        
-                    _return = val_sentencia_if;
-                    return _return;
-                }
-                else if (val_sentencia_if.getRol() == tipo_rol.continuar)
-                {                        
-                    _return = val_sentencia_if;
-                    return _return;
-                }
-                else if (val_sentencia_if.getRol() == tipo_rol.retornar)
-                {
-                    _return = val_sentencia_if;                      
                     return _return;
                 }
                 else
@@ -115,21 +102,6 @@ class Sentencia_If extends Instruction
                     _return = val_sentencia_else_if;
                     return _return;
                 }
-                else if(val_sentencia_else_if.getRol() == tipo_rol.detener)
-                {                        
-                    _return = val_sentencia_else_if;
-                    return _return;
-                }
-                else if(val_sentencia_else_if.getRol() == tipo_rol.continuar) //CONTINUE
-                {
-                    _return = val_sentencia_else_if;
-                    return _return;
-                }
-                else if(val_sentencia_else_if.getRol() == tipo_rol.retornar) //RETURN
-                {
-                    _return = val_sentencia_else_if;
-                    return _return;
-                }
                 else
                 {
                     continue;
@@ -147,21 +119,6 @@ class Sentencia_If extends Instruction
                 val_sentencia_else = this.lista_sentencias_else[x].analizar(entorno_padre,entorno_padre.getLastNivel());
                 
                 if(val_sentencia_else.getRol() == tipo_rol.error) //ERROR
-                {
-                    _return = val_sentencia_else;
-                    return _return;
-                }
-                else if (val_sentencia_else.getRol() == tipo_rol.detener) //BREAK
-                {
-                    _return = val_sentencia_else;
-                    return _return;
-                }
-                else if (val_sentencia_else.getRol() == tipo_rol.continuar) //CONTINUE
-                {
-                    _return = val_sentencia_else;
-                    return _return;
-                }
-                else if (val_sentencia_else.getRol() == tipo_rol.retornar) //RETURN
                 {
                     _return = val_sentencia_else;
                     return _return;
@@ -211,7 +168,10 @@ class Sentencia_If extends Instruction
             let val_sentencia_if: Simbolo;
         
             for(var x = 0; x <  this.lista_sentencias_if.length; x++)
-            {                    
+            {    
+                this.lista_sentencias_if[x].setEtiquetaContinue(this.etiqueta_continue);
+                this.lista_sentencias_if[x].setEtiquetaBreak(this.etiqueta_break);
+                this.lista_sentencias_if[x].setEtiquetaReturn(this.etiqueta_return);                
                 val_sentencia_if = this.lista_sentencias_if[x].traducir(salida);
             }
 
@@ -228,7 +188,10 @@ class Sentencia_If extends Instruction
             let val_sentencia_else_if : Simbolo;
             
             for(var x= 0; x < this.lista_else_if.length; x++)
-            {                    
+            {   
+                this.lista_else_if[x].setEtiquetaContinue(this.etiqueta_continue);
+                this.lista_else_if[x].setEtiquetaBreak(this.etiqueta_break);
+                this.lista_else_if[x].setEtiquetaReturn(this.etiqueta_return);                 
                 val_sentencia_else_if = this.lista_else_if[x].traducir(salida);
             }    
 
@@ -238,6 +201,9 @@ class Sentencia_If extends Instruction
 
             for(var x = 0; x < this.lista_sentencias_else.length; x++)
             {
+                this.lista_sentencias_else[x].setEtiquetaContinue(this.etiqueta_continue);
+                this.lista_sentencias_else[x].setEtiquetaBreak(this.etiqueta_break);
+                this.lista_sentencias_else[x].setEtiquetaReturn(this.etiqueta_return);
                 val_sentencia_else = this.lista_sentencias_else[x].traducir(salida);
             }       
                 

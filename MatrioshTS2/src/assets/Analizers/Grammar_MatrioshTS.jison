@@ -16,12 +16,13 @@
 
 "public"              return 'r_public'
 "private"             return 'r_private'
-"var"                 return 'r_var'
 "let"                 return 'r_let'
 "const"               return 'r_const'
+"new"                 return 'r_new'
 
 "type"                return 'r_type'
 "function"            return 'r_function'
+"array"               return 'r_array'
 
 "if"                  return 'r_if'
 "else"                return 'r_else'
@@ -205,31 +206,7 @@ LISTA_IDENTIFICADORES
     ;
 
 SENTENCIA_DECLARACION
-    : r_var LISTA_IDENTIFICADORES s_doble_dot TIPO s_asign EXPRESION
-      {
-        var linea = yylineno;
-        var columna = yyleng;
-        $$ = {etiqueta: 'sentencia_declaracion', linea: linea, columna: columna, constante: false, identificador: $2, tipo: $4, valor: $6};
-      }
-    | r_var LISTA_IDENTIFICADORES s_doble_dot TIPO
-      {
-        var linea = yylineno;
-        var columna = yyleng;
-        $$ = {etiqueta: 'sentencia_declaracion', linea: linea, columna: columna, constante: false, identificador: $2, tipo: $4, valor: null};      
-      }
-    | r_var LISTA_IDENTIFICADORES s_asign EXPRESION
-      {
-        var linea = yylineno;
-        var columna = yyleng;
-        $$ = {etiqueta: 'sentencia_declaracion', linea: linea, columna: columna, constante: false, identificador: $2, tipo: null, valor: $4};
-      }
-    | r_var LISTA_IDENTIFICADORES 
-      {
-        var linea = yylineno;
-        var columna = yyleng;
-        $$ = {etiqueta: 'sentencia_declaracion', linea: linea, columna: columna, constante: false, identificador: $2, tipo: null, valor: null};
-      }
-    | r_let LISTA_IDENTIFICADORES s_doble_dot TIPO s_asign EXPRESION
+    : r_let LISTA_IDENTIFICADORES s_doble_dot TIPO s_asign EXPRESION
       {
         var linea = yylineno;
         var columna = yyleng;
@@ -259,12 +236,24 @@ SENTENCIA_DECLARACION
         var columna = yyleng;
         $$ = {etiqueta: 'sentencia_declaracion', linea: linea, columna: columna, constante: true, identificador: $2, tipo: $4, valor: $6};      
       }  
+    | r_const LISTA_IDENTIFICADORES s_doble_dot TIPO
+      {
+        var linea = yylineno;
+        var columna = yyleng;
+        $$ = {etiqueta: 'sentencia_declaracion', linea: linea, columna: columna, constante: true, identificador: $2, tipo: $4, valor: null};
+      }
     | r_const LISTA_IDENTIFICADORES s_asign EXPRESION
       {
         var linea = yylineno;
         var columna = yyleng;
         $$ = {etiqueta: 'sentencia_declaracion', linea: linea, columna: columna, constante: true, identificador: $2, tipo: null, valor: $4};      
       }
+    | r_const LISTA_IDENTIFICADORES
+    {
+      var linea = yylineno;
+      var columna = yyleng;
+      $$ = {etiqueta: 'sentencia_declaracion', linea: linea, columna: columna, constante:  true, identificador: $2, tipo: null, valor: null};
+    }
     ;
 
 SENTENCIA_ASIGNACION 
@@ -580,7 +569,7 @@ TIPO
       {$$ = {etiqueta: "tipo", tipo: 3, valor: $1, rol: 1, dimensiones: $2};} 
     | identificador LISTA_DIMENSIONES
       {
-        if($1.toLowerCase() == "String")
+        if($1.toLowerCase() == "string")
         {
           $$ = {etiqueta: "tipo", tipo: 4, valor: $1, rol: 1, dimensiones: $2};
         }
@@ -599,7 +588,7 @@ TIPO
       {$$ = {etiqueta: 'tipo', tipo: 3, valor: $1, rol: 0};}
     | identificador
       {
-        if($1.toLowerCase() == "String")
+        if($1.toLowerCase() == "string")
         {
           $$ = {etiqueta: 'tipo', tipo: 4, valor: $1, rol: 0};
         }
@@ -795,23 +784,23 @@ OPERADOR_TERNARIO
 
 
 SENTENCIA_INSTANCIA
-  : s_cor_open  s_cor_close
-    {
-      var linea = yylineno;
-      var columna = yyleng;
-      $$ = {etiqueta: "sentencia_instancia", linea: linea, columna: columna, tipo: 0, valor1: [], valor2: null};
-    }
-  | s_cor_open LISTA_EXPRESIONES s_cor_close
+  : s_cor_open LISTA_EXPRESIONES s_cor_close
     {
       var linea = yylineno;
       var columna = yyleng;
       $$ = {etiqueta: "sentencia_instancia", linea: linea, columna: columna, tipo: 0, valor1: $2, valor2: null};
     }
+  | r_new r_array s_par_open EXPRESION s_par_close
+    {
+      var linea = yylineno;
+      var columna = yyleng;
+      $$ = {etiqueta: "sentencia_instancia", linea: linea, columna: columna, tipo: 1, valor1: null, valor2: $4};
+    }
   | s_key_open LISTA_ATRIBUTOS2 s_key_close
     {
       var linea = yylineno;
       var columna = yyleng;
-      $$ = {etiqueta: "sentencia_instancia", linea: linea, columna: columna, tipo: 1, valor1: null, valor2: $2};
+      $$ = {etiqueta: "sentencia_instancia", linea: linea, columna: columna, tipo: 2, valor1: null, valor2: $2};
     }
   ;
 

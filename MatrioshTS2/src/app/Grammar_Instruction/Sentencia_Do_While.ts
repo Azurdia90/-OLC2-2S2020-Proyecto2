@@ -22,10 +22,10 @@ class Sentencia_Do_While extends Instruction
     }
 
     public analizar(entorno_padre : Entorno, nivel: number)
-    {   let cont_do_while : number, etapa : number;
+    {   let cont_do_while : number
         let _return : Simbolo;
         let tmp_val : Simbolo;
-
+        let  etapa : number;
         try
         {   etapa = 0;
             cont_do_while = entorno_padre.getPadre().getPos_do_while();  
@@ -71,36 +71,12 @@ class Sentencia_Do_While extends Instruction
                     _return = val_sentencia;
                     return _return;
                 }
-                else if (val_sentencia.getRol() == tipo_rol.detener)
-                {     
-                    _return = val_sentencia;                    
-                    break;
-                }
-                else if (val_sentencia.getRol() == tipo_rol.continuar)
-                {   
-                    _return = val_sentencia;                     
-                    break;
-                }
-                else if (val_sentencia.getRol() == tipo_rol.retornar)
-                {
-                    _return = val_sentencia;                     
-                    return _return;
-                }
                 else
                 {     
                     _return = val_sentencia;
                     continue;
                 }       
-            }  
-
-            if(_return.getRol() == tipo_rol.detener)
-            {
-                _return = new Simbolo(tipo_rol.aceptado,new Tipo(tipo_dato.CADENA), "10-4");
-                _return.setFila(this.fila);
-                _return.setColumna(this.columna);
-                _return.setMensaje("Sentencia Do While Ejecutada correctamente");  
-                return _return;
-            }    
+            }     
                        
             _return = new Simbolo(tipo_rol.aceptado,new Tipo(tipo_dato.CADENA), "10-4");
             _return.setFila(this.fila);
@@ -119,10 +95,10 @@ class Sentencia_Do_While extends Instruction
     }
 
     public traducir(salida: Middle)
-    {   let etapa : number;
+    {   
         let _return : Simbolo;
         let tmp_val : Simbolo;
-
+        let etapa : number;
         try
         {   etapa = 0;
             let etiqueta_positiva = "l" + Tabla_Simbolos.getInstance().getEtiqueta();
@@ -133,8 +109,13 @@ class Sentencia_Do_While extends Instruction
             var val_sentencia: Simbolo;
             
             for(var x = 0; x <  this.lista_sentencias.length; x++)
-            {                    
+            {  
+                this.lista_sentencias[x].setEtiquetaContinue(etiqueta_positiva);
+                this.lista_sentencias[x].setEtiquetaBreak(etiqueta_negativa);
+                this.lista_sentencias[x].setEtiquetaReturn(this.etiqueta_return);
+                
                 val_sentencia = this.lista_sentencias[x].traducir(salida)
+                //console.log(this.lista_sentencias[x]); console.log(val_sentencia);
                 if (val_sentencia.getRol() == tipo_rol.error)
                 {                        
                     _return = val_sentencia;

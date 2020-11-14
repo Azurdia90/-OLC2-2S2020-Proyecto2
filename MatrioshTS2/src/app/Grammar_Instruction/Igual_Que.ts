@@ -201,7 +201,7 @@ class Igual_Que extends Expresion
                     Middle.getInstance().setOuput(temporal_retorno + " = Stack[(int)" + temporal_pos_return + "];");
                     Middle.getInstance().setOuput("P = P - " + tam_metodo + ";");
 
-                    etiqueta_actual = temporal_retorno + " != " + op2.getMensaje().toString(); 
+                    etiqueta_actual = temporal_retorno + " == " + op2.getMensaje().toString(); 
                     _return = new Simbolo(tipo_rol.valor,new Tipo(tipo_dato.BOOLEANO), "");
                     _return.setMensaje(etiqueta_actual);
                     return _return;
@@ -221,7 +221,7 @@ class Igual_Que extends Expresion
                     Middle.getInstance().setOuput(temporal_retorno + " = Stack[(int)" + temporal_pos_return + "];");
                     Middle.getInstance().setOuput("P = P - " + tam_metodo + ";");
 
-                    etiqueta_actual = op1.getMensaje().toString() + " != " + temporal_retorno; 
+                    etiqueta_actual = op1.getMensaje().toString() + " == " + temporal_retorno; 
 
                     _return = new Simbolo(tipo_rol.valor,new Tipo(tipo_dato.BOOLEANO), "");
                     _return.setMensaje(etiqueta_actual);
@@ -247,7 +247,7 @@ class Igual_Que extends Expresion
                     Middle.getInstance().setOuput(temporal_pos_return + " = P + 1;");
                     Middle.getInstance().setOuput(temporal_retorno + " = Stack[(int)" + temporal_pos_return + "];");
                     Middle.getInstance().setOuput("P = P - " + tam_metodo + ";");
-
+                    Middle.getInstance().setOuput("");
                     Middle.getInstance().setOuput(temporal_simulado2 + " = P + " +  tam_metodo + ";");
                     Middle.getInstance().setOuput(temporal_contador2 + " = " + temporal_simulado2 + " +  2;");
                     Middle.getInstance().setOuput("Stack[(int)" + temporal_contador2 + "] = " + op2.getMensaje() + ";");
@@ -257,7 +257,7 @@ class Igual_Que extends Expresion
                     Middle.getInstance().setOuput(temporal_retorno2 + " = Stack[(int)" + temporal_pos_return2 + "];");
                     Middle.getInstance().setOuput("P = P - " + tam_metodo + ";");
 
-                    etiqueta_actual = temporal_retorno + " != " + temporal_retorno2; 
+                    etiqueta_actual = temporal_retorno + " == " + temporal_retorno2; 
 
                     _return = new Simbolo(tipo_rol.valor,new Tipo(tipo_dato.BOOLEANO), "");
                     _return.setMensaje(etiqueta_actual);
@@ -273,7 +273,7 @@ class Igual_Que extends Expresion
         catch(Error)
         {
             Middle.getInstance().clear3D();
-            Middle.getInstance().setOuput("Error Igual Que: " + Error.Mesage);
+            Middle.getInstance().setOuput("//Error Igual Que: " + Error.Mesage);
         }
     }
 

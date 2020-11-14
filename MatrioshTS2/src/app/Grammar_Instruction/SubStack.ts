@@ -18,7 +18,7 @@ class SubStack extends Array<Entorno>
         this.pos_if = 0;
         this.pos_for = 0;
         this.pos_while = 0;
-        this.pos_Stack = 0;
+        this.pos_Stack = 2;  //0 this 1//return
         this.pos_switch = 0;
         this.pos_do_while = 0;
     }

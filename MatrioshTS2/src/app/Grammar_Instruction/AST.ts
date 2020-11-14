@@ -8,6 +8,7 @@ import Igual_Que from './Igual_Que';
 import Instruction from './Instruction';
 import Mayor_Igual_Que from './Mayor_Igual_Que';
 import Mayor_Que from './Mayor_Que';
+import Menor_Igual_Que from './Menor_Igual_Que';
 import Menor_Que from './Menor_Que';
 import Middle from './Middle';
 import Modulo from './Modulo';
@@ -22,12 +23,17 @@ import Potencia from './Potencia';
 import Resta from './Resta';
 import Sentencia_Acceso from './Sentencia_Acceso';
 import Sentencia_Asignacion from './Sentencia_Asignacion';
+import Sentencia_Break from './Sentencia_Break';
+import Sentencia_Caso from './Sentencia_Caso';
+import Sentencia_Continue from './Sentencia_Continue';
 import Sentencia_Declaracion from './Sentencia_Declaración';
 import Sentencia_Do_While from './Sentencia_Do_While';
 import Sentencia_For from './Sentencia_For';
 import Sentencia_If from './Sentencia_If';
 import Sentencia_Instancia from './Sentencia_Instancia';
 import Sentencia_Llamada from './Sentencia_Llamada';
+import Sentencia_Return from './Sentencia_Return';
+import Sentencia_Switch from './Sentencia_Switch';
 import Sentencia_While from './Sentencia_While';
 import Simbolo from './Simbolo';
 import Suma from './Suma';
@@ -70,10 +76,10 @@ class AST
         this.recorrido1();
         this.recorrido2();
         this.recorrido3();
+        this.recorrido31();
         this.recorrido4();
         this.traducir_3D_1();
         this.traducir_3D_2();
-        this.traducir_3D_3();
     }
 
     public recorrido1()
@@ -105,40 +111,13 @@ class AST
 
     public recorrido2()
     {
-        var _funcion : Funcion_MatrioshTS;
+        let _result : Simbolo;
 
         for(var r2 = 0; r2 < this.lista_instrucciones.length; r2++)
         {
-            if(this.lista_instrucciones[r2] instanceof Funcion_MatrioshTS)
+            if(this.lista_instrucciones[r2] instanceof Sentencia_Declaracion)
             {
-                _funcion = <Funcion_MatrioshTS> this.lista_instrucciones[r2];
-
-                if(!Tabla_Simbolos.getInstance().existFuncion(_funcion.getIdentificador()))
-                {
-                    Tabla_Simbolos.getInstance().getLista_funciones().push(_funcion);
-                }
-                else
-                {
-                    var  error_encontrado = { tipo: "Análisis Síntactico MatrioshTS", fila: _funcion.getFila() == undefined ? "0" : _funcion.getFila().toString(), columna: _funcion.getColumna() == undefined  ? "0" : _funcion.getColumna().toString(), identificador: _funcion.getIdentificador(), descripcion: "Función ya existente."};
-                    Tabla_Errores.getInstance().push(error_encontrado);  
-                }
-            }
-            else
-            {
-                continue;
-            }
-        }
-    }
-
-    public recorrido3()
-    {
-        let _result : Simbolo;
-
-        for(var r3 = 0; r3 < this.lista_instrucciones.length; r3++)
-        {
-            if(this.lista_instrucciones[r3] instanceof Sentencia_Declaracion)
-            {
-                _result = this.lista_instrucciones[r3].analizar(Tabla_Simbolos.getInstance().getEntorno_global(),0);
+                _result = this.lista_instrucciones[r2].analizar(Tabla_Simbolos.getInstance().getEntorno_global(),0);
             }
             else
             {
@@ -170,6 +149,51 @@ class AST
                 continue;
             }
         }
+    }
+
+    public recorrido3()
+    {
+        var _funcion : Funcion_MatrioshTS;
+
+        for(var r3 = 0; r3 < this.lista_instrucciones.length; r3++)
+        {
+            if(this.lista_instrucciones[r3] instanceof Funcion_MatrioshTS)
+            {
+                _funcion = <Funcion_MatrioshTS> this.lista_instrucciones[r3];
+
+                if(!Tabla_Simbolos.getInstance().existFuncion(_funcion.getIdentificador()))
+                {
+                    Tabla_Simbolos.getInstance().getLista_funciones().push(_funcion);
+                }
+                else
+                {
+                    var  error_encontrado = { tipo: "Análisis Síntactico MatrioshTS", fila: _funcion.getFila() == undefined ? "0" : _funcion.getFila().toString(), columna: _funcion.getColumna() == undefined  ? "0" : _funcion.getColumna().toString(), identificador: _funcion.getIdentificador(), descripcion: "Función ya existente."};
+                    Tabla_Errores.getInstance().push(error_encontrado);  
+                }
+            }
+            else
+            {
+                continue;
+            }
+        }        
+    }
+
+    public recorrido31()
+    {
+        let _funcion : Funcion_MatrioshTS;
+        let _result  : Simbolo;
+
+        for(var r31 = 0; r31 < Tabla_Simbolos.getInstance().getLista_funciones().length; r31++)
+        {
+            _funcion = <Funcion_MatrioshTS> Tabla_Simbolos.getInstance().getLista_funciones()[r31];
+            _result = _funcion.analizar(null,0);
+
+            if(_result.getRol() == tipo_rol.error)
+            {
+                let  error_encontrado = { tipo: "Análisis Semántico MatrioshTS", fila: _result.getFila() == undefined ? "0" : _result.getFila().toString(), columna: _result.getColumna() == undefined  ? "0" : _result.getColumna().toString(), identificador: "global", descripcion: "NO se permite la sentencia Detener."};
+                Tabla_Errores.getInstance().push(error_encontrado); 
+            }
+        }        
     }
 
     public recorrido4()
@@ -224,13 +248,10 @@ class AST
     public traducir_3D_1()
     {
         var _result : Simbolo;
-        
-        Middle.getInstance().setOuput("void main()");
-        Middle.getInstance().setOuput("{\n");
 
         for(var _3D1 = 0; _3D1 < this.lista_instrucciones.length; _3D1++)
         {
-            if(this.lista_instrucciones[_3D1] instanceof Sentencia_Declaracion)
+            if(this.lista_instrucciones[_3D1] instanceof Funcion_MatrioshTS)
             {
                 _result = this.lista_instrucciones[_3D1].traducir(Middle.getInstance());
             }
@@ -269,21 +290,24 @@ class AST
     public traducir_3D_2()
     {
         var _result : Simbolo;
+        
+        Middle.getInstance().setOuput("void main()");
+        Middle.getInstance().setOuput("{\n");
 
-        for(var _3D2 = 0; _3D2 < this.lista_instrucciones.length; _3D2++)
-        {    
-            if(!(this.lista_instrucciones[_3D2] instanceof Type_MatrioshTS) && !(this.lista_instrucciones[_3D2] instanceof Funcion_MatrioshTS) && !(this.lista_instrucciones[_3D2] instanceof Sentencia_Declaracion))
-            {   //console.log(this.lista_instrucciones[f]);
-                _result = this.lista_instrucciones[_3D2].traducir(Middle.getInstance());
+        for(var _3D1 = 0; _3D1 < this.lista_instrucciones.length; _3D1++)
+        {
+            if(!(this.lista_instrucciones[_3D1] instanceof Type_MatrioshTS) && !(this.lista_instrucciones[_3D1] instanceof Funcion_MatrioshTS))
+            {
+                _result = this.lista_instrucciones[_3D1].traducir(Middle.getInstance());
             }
             else
             {
                 continue;
             }
-            //console.log(_result);
+
             if(_result != undefined && _result.getRol() == tipo_rol.error)
             {
-                let error_encontrado = { tipo: "Análisis Semántico MatrioshTS", fila: _result.getFila() == undefined ? "0" : _result.getFila().toString(), columna: _result.getColumna() == undefined  ? "0" : _result.getColumna().toString(), identificador: "global", descripcion: _result.getMensaje().toString()};
+                let  error_encontrado = { tipo: "Análisis Semántico MatrioshTS", fila: _result.getFila() == undefined ? "0" : _result.getFila().toString(), columna: _result.getColumna() == undefined  ? "0" : _result.getColumna().toString(), identificador: "global", descripcion: _result.getMensaje().toString()};
                 Tabla_Errores.getInstance().push(error_encontrado);  
             }
             else if(_result != undefined && _result.getRol() == tipo_rol.detener)
@@ -308,11 +332,6 @@ class AST
         }
 
         Middle.getInstance().setOuput("\n}");
-    }
-
-    public traducir_3D_3()
-    {
-    
     }
 
     private fabrica_instrucciones(instruccion_jason : JSON)
@@ -412,32 +431,32 @@ class AST
 
             return new Sentencia_If(instruccion_jason['linea'],instruccion_jason['columna'],this.fabrica_expresiones(instruccion_jason['condicion']),lista_sentencias_if,lista_sentencias_else_if,lista_sentencias_else);
         }
-        // else if(instruccion_jason['etiqueta'] == 'sentencia_switch')
-        // {
-        //     let lista_casos : Array<Instruction>;
+        else if(instruccion_jason['etiqueta'] == 'sentencia_switch')
+        {
+            let lista_casos : Array<Instruction>;
 
-        //     lista_casos = new Array<Tipo_Acceso>();
+            lista_casos = new Array<Tipo_Acceso>();
 
-        //     for(var x = 0; x < instruccion_jason['lista_casos'].length; x++)
-        //     {
-        //         lista_casos.push(this.fabrica_instrucciones(instruccion_jason['lista_casos'][x]));
-        //     }
+            for(var x = 0; x < instruccion_jason['lista_casos'].length; x++)
+            {
+                lista_casos.push(this.fabrica_instrucciones(instruccion_jason['lista_casos'][x]));
+            }
 
-        //     return new Sentencia_Switch(instruccion_jason['linea'],instruccion_jason['columna'],this.fabrica_expresiones(instruccion_jason['condicion']),lista_casos);
-        // }
-        // else if(instruccion_jason['etiqueta'] == 'sentencia_caso')
-        // {
-        //     let lista_sentencias : Array<Instruction>;
+            return new Sentencia_Switch(instruccion_jason['linea'],instruccion_jason['columna'],this.fabrica_expresiones(instruccion_jason['condicion']),lista_casos);
+        }
+        else if(instruccion_jason['etiqueta'] == 'sentencia_caso')
+        {
+            let lista_sentencias : Array<Instruction>;
 
-        //     lista_sentencias = new Array<Tipo_Acceso>();
+            lista_sentencias = new Array<Tipo_Acceso>();
 
-        //     for(var x = 0; x < instruccion_jason['lista_sentencias'].length; x++)
-        //     {
-        //         lista_sentencias.push(this.fabrica_instrucciones(instruccion_jason['lista_sentencias'][x]));
-        //     }
+            for(var x = 0; x < instruccion_jason['lista_sentencias'].length; x++)
+            {
+                lista_sentencias.push(this.fabrica_instrucciones(instruccion_jason['lista_sentencias'][x]));
+            }
 
-        //     return new Sentencia_Caso(instruccion_jason['linea'],instruccion_jason['columna'],instruccion_jason['default'],instruccion_jason['condicion'] == null ? undefined : this.fabrica_expresiones(instruccion_jason['condicion']),lista_sentencias);
-        // }
+            return new Sentencia_Caso(instruccion_jason['linea'],instruccion_jason['columna'],instruccion_jason['default'],instruccion_jason['condicion'] == null ? undefined : this.fabrica_expresiones(instruccion_jason['condicion']),lista_sentencias);
+        }
         else if(instruccion_jason['etiqueta'] == 'sentencia_while')
         {
             let lista_sentencias : Array<Instruction>;
@@ -532,18 +551,18 @@ class AST
 
             return new Sentencia_Llamada(instruccion_jason['fila'], instruccion_jason['columna'], instruccion_jason['identificador'], lista_parametros);
         }
-        // else if(instruccion_jason['etiqueta'] == 'sentencia_break')
-        // {
-        //     return new Sentencia_Break(instruccion_jason['fila'], instruccion_jason['columna']);
-        // }
-        // else if(instruccion_jason['etiqueta'] == 'sentencia_continue')
-        // {
-        //     return new Sentencia_Continue(instruccion_jason['fila'], instruccion_jason['columna']);
-        // }
-        // else if(instruccion_jason['etiqueta'] == 'sentencia_return')
-        // {
-        //     return new Sentencia_Return(instruccion_jason['fila'], instruccion_jason['columna'], instruccion_jason['valor'] == null ? undefined : this.fabrica_expresiones(instruccion_jason['valor']));
-        // }
+        else if(instruccion_jason['etiqueta'] == 'sentencia_break')
+        {
+            return new Sentencia_Break(instruccion_jason['fila'], instruccion_jason['columna']);
+        }
+        else if(instruccion_jason['etiqueta'] == 'sentencia_continue')
+        {
+            return new Sentencia_Continue(instruccion_jason['fila'], instruccion_jason['columna']);
+        }
+        else if(instruccion_jason['etiqueta'] == 'sentencia_return')
+        {
+            return new Sentencia_Return(instruccion_jason['fila'], instruccion_jason['columna'], instruccion_jason['valor'] == null ? undefined : this.fabrica_expresiones(instruccion_jason['valor']));
+        }
         else
         {
             return undefined;
@@ -590,7 +609,7 @@ class AST
         }
         else if(expresion_jason['etiqueta'] == 'menor_igual_que')
         {
-            return new Mayor_Igual_Que(expresion_jason['fila'], expresion_jason['columna'], this.fabrica_expresiones(expresion_jason['expresion1']), this.fabrica_expresiones(expresion_jason['expresion2']));
+            return new Menor_Igual_Que(expresion_jason['fila'], expresion_jason['columna'], this.fabrica_expresiones(expresion_jason['expresion1']), this.fabrica_expresiones(expresion_jason['expresion2']));
         }
         else if(expresion_jason['etiqueta'] == 'igual_que')
         {

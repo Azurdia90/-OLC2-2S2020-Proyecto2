@@ -232,7 +232,7 @@ class Menor_Que extends Expresion
                     Middle.getInstance().setOuput(temporal_retorno2 + " = Stack[(int)" + temporal_pos_return2 + "];");
                     Middle.getInstance().setOuput("P = P - " + tam_metodo + ";");
 
-                    etiqueta_actual = temporal_retorno + " <= " + temporal_retorno2;
+                    etiqueta_actual = temporal_retorno + " < " + temporal_retorno2;
 
                     _return = new Simbolo(tipo_rol.valor,new Tipo(tipo_dato.BOOLEANO), "");
                     _return.setMensaje(etiqueta_actual);

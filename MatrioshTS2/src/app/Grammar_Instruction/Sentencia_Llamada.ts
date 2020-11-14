@@ -34,9 +34,9 @@ class Sentencia_Llamada extends Instruction
     {
         let funcion_tmp : Funcion;
         let _return : Simbolo;
-        
+        let etapa   : number;
         try
-        {   
+        {   etapa = 1;
             if(this.global)
             {
                 funcion_tmp = Tabla_Simbolos.getInstance().getFuncion(this.identificador); 
@@ -46,6 +46,7 @@ class Sentencia_Llamada extends Instruction
                 funcion_tmp = this.padre.getFuncion(this.identificador);
                 this.global = true;
             }
+            etapa = 2;
             //if(this.identificador == "log"){console.log(funcion_actual);}
             if(funcion_tmp == undefined || funcion_tmp == null)
             {
@@ -86,7 +87,7 @@ class Sentencia_Llamada extends Instruction
                 
                 this.lista_parametros_analizar.push(tmp_val);
             }       
-
+            etapa = 3;
             var _result :  Simbolo = funcion_tmp.pasarParametros(this.padre,this.lista_parametros_analizar);
             
             this.lista_parametros_analizar = new Array<Simbolo>();
@@ -98,8 +99,12 @@ class Sentencia_Llamada extends Instruction
 
                 return _result;
             }
-                                    
-            _return = funcion_tmp.analizar(entorno_padre, nivel);
+            etapa = 4;        
+
+            if(this.identificador == "log" || this.identificador == "length" || this.identificador == "push" || this.identificador == "pop")
+            {
+                _return = funcion_tmp.analizar(entorno_padre, nivel);
+            }
             
             this.entorno_padre = entorno_padre;
             this.funcion_actual = funcion_tmp;
@@ -115,7 +120,7 @@ class Sentencia_Llamada extends Instruction
             _return = new Simbolo(tipo_rol.error,new Tipo(tipo_dato.CADENA), "33-12");
             _return.setFila(this.fila);
             _return.setColumna(this.columna);
-            _return.setMensaje("Error Sentencia Llamada: " + Exception.Message);
+            _return.setMensaje("Error Sentencia Llamada (a" + etapa + "): " + Exception.Message);
             return _return;
         } 
        
@@ -124,29 +129,65 @@ class Sentencia_Llamada extends Instruction
     public traducir(salida : Middle) 
     {
         let _return : Simbolo;
-        
+        let etapa : number;
         try
-        {   
+        {   etapa = 1; 
             //Obtener valores a pasar
             for(var x : number = 0; x < this.lista_parametros.length; x++)
             {
                 var tmp_val : Simbolo = this.lista_parametros[x].traducir(salida);
-                
+                //if(this.identificador == 'figura1'){console.log(tmp_val)};
                 this.lista_parametros_enviar.push(tmp_val);
-            }       
-            //Paso de parametros
-            this.funcion_actual.pasarParametros(this.padre,this.lista_parametros_enviar);
-            
+            }   
+            //if(this.identificador == 'figura1'){console.log(this.funcion_actual);console.log(this.lista_parametros_enviar)};  
+            ////Paso de parametros
+            this.funcion_actual.pasarParametrosT(salida,this.lista_parametros_enviar);
+            etapa = 2; 
+            //Traduccion de la llamada al metodo     
+            if(this.identificador == "log" || this.identificador == "length" || this.identificador == "push" || this.identificador == "pop")
+            {
+                _return = this.funcion_actual.traducir(salida);
+            }                 
+            else
+            {
+                let tamaño_ambito_actual = this.entorno_padre.getSize();
+                let temporal_simulado    = "t" + Tabla_Simbolos.getInstance().getTemporal();
+                let temporal_contador    = "t" + Tabla_Simbolos.getInstance().getTemporal();
+                let temporal_retorno     = "t" + Tabla_Simbolos.getInstance().getTemporal();
+                
+                Middle.getInstance().setOuput(temporal_contador + " = P + " +  tamaño_ambito_actual + ";");
+                Middle.getInstance().setOuput(temporal_simulado + " = " + temporal_contador + " + 0;");
+                Middle.getInstance().setOuput("Stack[(int)" + temporal_simulado + "] = -1;");
+                Middle.getInstance().setOuput(temporal_simulado + " = " + temporal_contador + " + 1;");
+                Middle.getInstance().setOuput("Stack[(int)" + temporal_simulado + "] = -1;");   
+
+                for(var p = 0; p < this.lista_parametros.length; p++)
+                {
+                    Middle.getInstance().setOuput(temporal_simulado + " = " + temporal_contador + " + " + (2+p) + ";");
+                    Middle.getInstance().setOuput("Stack[(int)" + temporal_simulado + "] = " + this.lista_parametros_enviar[p].getMensaje() + ";");
+                }                
+
+                Middle.getInstance().setOuput("P = P + " + tamaño_ambito_actual + ";");
+                Middle.getInstance().setOuput(this.funcion_actual.getIdentificador() + "();");
+                Middle.getInstance().setOuput(temporal_contador + " = P + 0;");
+                Middle.getInstance().setOuput(temporal_simulado + " = " + temporal_contador + " + 1;");
+                Middle.getInstance().setOuput(temporal_retorno + " = Stack[(int)" + temporal_simulado + "];");
+                Middle.getInstance().setOuput("P = P - " + tamaño_ambito_actual + ";");
+
+                _return = new Simbolo(tipo_rol.aceptado,new Tipo(tipo_dato.CADENA),"10-4"); 
+                _return.setMensaje("Sentencia Llamada Succesful");
+                _return.setFila(this.fila);
+                _return.setColumna(this.columna);
+            }
+            etapa = 3;
             this.lista_parametros_enviar = new Array<Simbolo>();
-            //Traduccion de la llamada al metodo                      
-            _return = this.funcion_actual.traducir(salida);
-           
+
             return _return;            
         }
         catch(Error)
         {
             Middle.getInstance().clear3D();
-            Middle.getInstance().setOuput("Error Sentencia Llamada: " + Error.Mesage);  
+            Middle.getInstance().setOuput("//Error Sentencia Llamada (t"+ etapa +"): " + Error.Mesage);  
         } 
        
     }

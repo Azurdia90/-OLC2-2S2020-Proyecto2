@@ -339,10 +339,10 @@ class Sentencia_Asignacion extends Instruction
 
     public traducir(salida : Middle)
     {
-        let _return : Simbolo;
-        let _acceso : Simbolo;
+        let _return  : Simbolo;
+        let _acceso  : Simbolo;
         let _val_fin : Simbolo;
-
+        let _global  : Boolean;
         try
         {   
             if(this.tipo == 0)
@@ -350,10 +350,12 @@ class Sentencia_Asignacion extends Instruction
                 if(this.entorno_padre.existsSimbolo(this.acceso0,this.nivel))
                 {                 
                     _acceso  = this.entorno_padre.getSimbolo(this.acceso0, this.nivel);
+                    _global = false;
                 }
                 else
                 {   
-                    _acceso = Tabla_Simbolos.getInstance().getSimbolo_global(this.acceso0);                    
+                    _acceso = Tabla_Simbolos.getInstance().getSimbolo_global(this.acceso0); 
+                    _global = true;                   
                 }   
             }
             else if(this.tipo == 1)
@@ -363,10 +365,12 @@ class Sentencia_Asignacion extends Instruction
                 if(this.entorno_padre.existsSimbolo(this.acceso0,this.nivel))
                 {                 
                     simbolo_tmp = this.entorno_padre.getSimbolo(this.acceso0,this.nivel);
+                    _global = false;
                 }
                 else
                 {   
-                    simbolo_tmp = Tabla_Simbolos.getInstance().getSimbolo_global(this.acceso0);                    
+                    simbolo_tmp = Tabla_Simbolos.getInstance().getSimbolo_global(this.acceso0);         
+                    _global = true;           
                 }   
                 
                 if(simbolo_tmp.getRol() == tipo_rol.arreglo)
@@ -494,8 +498,16 @@ class Sentencia_Asignacion extends Instruction
             let temporal_posS =  "t" + Tabla_Simbolos.getInstance().getTemporal();
             let temporal_valor = "t" + Tabla_Simbolos.getInstance().getTemporal();
 
-            Middle.getInstance().setOuput(temporal_posS + " =  P + 0;");
-            Middle.getInstance().setOuput(temporal_posR + " =  " + temporal_posS +  " + " + _val_fin.getPos_S() + ";");
+            Middle.getInstance().setOuput("//Asignacion ");
+            if(!_global)
+            {
+                Middle.getInstance().setOuput(temporal_posS + " =  P + 0;");
+            }
+            else
+            {
+                Middle.getInstance().setOuput(temporal_posS + " =  0 + 0;");
+            }
+            Middle.getInstance().setOuput(temporal_posR + " =  " + temporal_posS +  " + " + _acceso.getPos_S() + ";");
             Middle.getInstance().setOuput(temporal_valor + " = "  + _val_fin.getMensaje() + ";");
             Middle.getInstance().setOuput("Stack[(int)" + temporal_posR + "] = " + temporal_valor + ";");
 

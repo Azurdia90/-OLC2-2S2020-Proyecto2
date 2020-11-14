@@ -186,7 +186,10 @@ class Sentencia_For extends Instruction
             var val_sentencia: Simbolo;
             
             for(var x = 0; x <  this.lista_sentencias.length; x++)
-            {                    
+            { 
+                this.lista_sentencias[x].setEtiquetaContinue(etiqueta_siguiente);
+                this.lista_sentencias[x].setEtiquetaBreak(etiqueta_negativa);
+                this.lista_sentencias[x].setEtiquetaReturn(this.etiqueta_return);                  
                 val_sentencia = this.lista_sentencias[x].traducir(salida);
                 
                 if (val_sentencia.getRol() == tipo_rol.error)

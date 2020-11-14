@@ -36,7 +36,7 @@ class Metodos_Nativos
 
         var proc_cast_cadena_numero : string;
 
-        var proc_begin_array : string = "";
+        var proc_length_array : string;
 
         var all_proc_impresion : string;
 
@@ -80,7 +80,7 @@ class Metodos_Nativos
                                     +"    t3 = 13;\n"
                                     +"    t4 = P + 2;\n"
                                     +"    t5 = Stack[(int)t4];\n"
-                                    +"    printf(\"%d\",(int)t5);\n"
+                                    +"    printf(\"%f\",t5);\n"
                                     +"    printf(\"%c\",(int)t2);\n"
                                     +"    printf(\"%c\",(int)t3);\n"
                                     +"}\n";
@@ -319,13 +319,22 @@ class Metodos_Nativos
                                     +"    t8 = P + 1;\n"
                                     +"    Stack[(int)t8] = t6;\n"
                                     +"}\n";  
-        
+
+        proc_length_array  = "void length_array()\n"
+                            +"{"
+                            +"    //t0 this, t1 retorno;\n"
+                            +"    t1 = P + 2;\n"
+                            +"    t2 = Stack[(int)t1];\n"
+                            +"    t3 = Heap[(int)t2];\n"
+                            +"    t4 = P + 1;\n"
+                            +"    Stack[(int)t4] = t3;\n"
+                            +"}\n";  
 
         all_proc_impresion = "\n"+proc_impresion_booleano+"\n"+proc_impresion_numero+"\n"+"\n"+proc_impresion_cadena+"\n"
                              +proc_pow_potencia_numero+"\n"+proc_concatenacion_cadena+"\n"
                              +proc_cast_boolean_cadena+"\n"+proc_cast_numero_cadena+"\n"
                              +proc_cast_cadena_numero+"\n"
-                             +proc_begin_array;
+                             +proc_length_array;
 
         return all_proc_impresion;
     }

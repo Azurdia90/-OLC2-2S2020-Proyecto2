@@ -64,26 +64,11 @@ class Sentencia_While extends Instruction
             
             for(var x = 0; x <  this.lista_sentencias.length; x++)
             {                    
-                val_sentencia = this.lista_sentencias[x].analizar(entorno_padre, nivel);
+                val_sentencia = this.lista_sentencias[x].analizar(entorno_padre, entorno_padre.getLastNivel());
 
                 if (val_sentencia.getRol() == tipo_rol.error)
                 {                        
                     _return = val_sentencia;
-                    return _return;
-                }
-                else if (val_sentencia.getRol() == tipo_rol.detener)
-                {     
-                    _return = val_sentencia;                    
-                    break;
-                }
-                else if (val_sentencia.getRol() == tipo_rol.continuar)
-                {   
-                    _return = val_sentencia;                     
-                    break;
-                }
-                else if (val_sentencia.getRol() == tipo_rol.retornar)
-                {
-                    _return = val_sentencia;                     
                     return _return;
                 }
                 else
@@ -101,9 +86,6 @@ class Sentencia_While extends Instruction
                 _return.setMensaje("Sentencia While Ejecutada correctamente");  
                 return _return;
             }    
-
-            etapa = 1;
-            tmp_val = (this.sentencia_comparacion == null) ? null : this.sentencia_comparacion.analizar(entorno_padre,nivel);
                        
             _return = new Simbolo(tipo_rol.aceptado,new Tipo(tipo_dato.CADENA), "10-4");
             _return.setFila(this.fila);
@@ -137,6 +119,7 @@ class Sentencia_While extends Instruction
             tmp_val = (this.sentencia_comparacion == null) ? null : this.sentencia_comparacion.traducir(salida);
             
             etapa = 1;
+            Middle.getInstance().setOuput("//sentencia While");
             Middle.getInstance().setOuput("if(" + tmp_val.getMensaje() + ") goto " + etiqueta_positiva + ";");
             Middle.getInstance().setOuput("goto " + etiqueta_negativa + ";"); 
             Middle.getInstance().setOuput(etiqueta_positiva + ":"); 
@@ -144,7 +127,11 @@ class Sentencia_While extends Instruction
             var val_sentencia: Simbolo;
             
             for(var x = 0; x <  this.lista_sentencias.length; x++)
-            {                    
+            {      
+                this.lista_sentencias[x].setEtiquetaContinue(etiqueta_inicio);
+                this.lista_sentencias[x].setEtiquetaBreak(etiqueta_negativa);
+                this.lista_sentencias[x].setEtiquetaReturn(this.etiqueta_return);
+
                 val_sentencia = this.lista_sentencias[x].traducir(salida)
                 if (val_sentencia.getRol() == tipo_rol.error)
                 {                        

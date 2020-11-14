@@ -5,7 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { IonicModule } from '@ionic/angular';
 
 import { TablaSimbolosPageRoutingModule } from './tabla-simbolos-routing.module';
-
+import { ComponentsModule } from '../../Components/components.module';
 import { TablaSimbolosPage } from './tabla-simbolos.page';
 
 @NgModule({
@@ -13,6 +13,7 @@ import { TablaSimbolosPage } from './tabla-simbolos.page';
     CommonModule,
     FormsModule,
     IonicModule,
+    ComponentsModule,
     TablaSimbolosPageRoutingModule
   ],
   declarations: [TablaSimbolosPage]

@@ -16,8 +16,6 @@ class Sentencia_Declaracion extends Instruction
     protected valor :  Instruction;
 
     protected valor_ext : Simbolo;
-
-    protected entorno_padre;
    
     constructor(p_fila: number, p_columna: number, p_const : Boolean, p_lista_id : String[], p_tipo? : Tipo, p_rol? : tipo_rol, p_dimensiones? : number, p_valor? : Instruction)
     {
@@ -44,6 +42,15 @@ class Sentencia_Declaracion extends Instruction
         try
         {
             etapa = 1//Definir valor asignar
+            if((this.const) && (this.valor == undefined && this.valor_ext == undefined))
+            {
+                var nuevo_simbolo : Simbolo = new Simbolo(tipo_rol.error,new Tipo(tipo_dato.CADENA),"33-12"); 
+                nuevo_simbolo.setMensaje("Sentencia Declaración: No es posible declarar sin valor una constante.");
+                nuevo_simbolo.setFila(this.fila);
+                nuevo_simbolo.setColumna(this.columna);
+                return nuevo_simbolo;
+            }
+
             if(this.valor == undefined && this.valor_ext == undefined)
             {
                 _val_fin = new Simbolo(tipo_rol.valor, new Tipo(tipo_dato.VOID), "");
@@ -248,7 +255,7 @@ class Sentencia_Declaracion extends Instruction
                         }
                     }
                     else if(this.rol == tipo_rol.arreglo)
-                    {
+                    {   
                         if(!this.tipo.Equals(_val_fin.getTipo()))
                         {   
                             this.entorno_padre = entorno_padre;
@@ -292,9 +299,10 @@ class Sentencia_Declaracion extends Instruction
                 }
             }
             etapa = 5//Guardar datos en tabla de Simbolos
+
             for(var cont : number = 0; cont < this.identificadores.length; cont++)
             {
-                if(entorno_padre.existsSimbolo(this.identificadores[cont]))
+                if(entorno_padre.existsSimbolo(this.identificadores[cont],nivel))
                 {
                     this.entorno_padre = entorno_padre;
                     this.nivel = nivel;
@@ -306,13 +314,13 @@ class Sentencia_Declaracion extends Instruction
                     return nuevo_simbolo;
                 }
                 else
-                {
+                {   //if(entorno_padre.getPadre().getIdentificador() == "Inicio"){console.log(this.entorno_padre);console.log(this.identificadores); console.log(_val_fin);}
                     var nuevo_simbolo : Simbolo = new Simbolo(this.rol,this.tipo,this.identificadores[cont]); 
-                    nuevo_simbolo.setConstante(this.const);
+                    nuevo_simbolo.setConstante(this.const); 
                     nuevo_simbolo.setMensaje(_val_fin.getMensaje());
                     nuevo_simbolo.setListaDimensiones(_val_fin.getListaDimensiones());
                     nuevo_simbolo.setListaFunciones(_val_fin.getListaFunciones());
-                    entorno_padre.set_e(this.identificadores[cont],nuevo_simbolo);
+                    entorno_padre.set_e(this.identificadores[cont],nuevo_simbolo,nivel);             
                 }   
             }    
 
@@ -373,17 +381,19 @@ class Sentencia_Declaracion extends Instruction
             {
                 this.tipo = _val_fin.getTipo();
             }
+            //console.log(_val_fin);
             //Asignar Valor
             for(var cont : number = 0; cont < this.identificadores.length; cont++)
             {
                 if(this.entorno_padre.existsSimbolo(this.identificadores[cont], this.nivel))
                 {
-
+                    var simbolo_actual = this.entorno_padre.getSimbolo(this.identificadores[cont], this.nivel);
                     var pos_stack = "t"+ Tabla_Simbolos.getInstance().getTemporal();
+
                     var codigo_3d =  "\n";
 
                     codigo_3d = codigo_3d
-                                + pos_stack + " = P + " + _val_fin.getPos_S() + ";\n";
+                                + pos_stack + " = P + " + simbolo_actual.getPos_S() + ";\n";
                     
                     codigo_3d = codigo_3d 
                                 +"Stack[(int)" + pos_stack + "] = " + _val_fin.getMensaje() + ";";    

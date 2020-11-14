@@ -133,16 +133,6 @@ class Suma extends Expresion
             
             let tipo_suma :tipo_operacion_resultado;
 
-            if (op1.getRol() != tipo_rol.valor && op1.getRol() != tipo_rol.arreglo)
-            {
-                return op1;
-            }
-
-            if (op2.getRol() != tipo_rol.valor && op2.getRol() != tipo_rol.arreglo)
-            {
-                return op2;
-            }
-
             tipo_suma = this.matriz_operacion_suma[op1.getTipo().getTipo()] [op2.getTipo().getTipo()];
 
             switch(tipo_suma)
@@ -165,7 +155,8 @@ class Suma extends Expresion
                         let temporal_contador    = "t" + Tabla_Simbolos.getInstance().getTemporal();
                         let temporal_pos_return  = "t" + Tabla_Simbolos.getInstance().getTemporal();
                         let temporal_retorno     = "t" + Tabla_Simbolos.getInstance().getTemporal();
-                                                                                
+                        
+                        Middle.getInstance().setOuput("");
                         Middle.getInstance().setOuput(temporal_simulado + " = P + " +  tam_metodo + ";");
                         Middle.getInstance().setOuput(temporal_contador + " = " + temporal_simulado + " +  2;");
                         Middle.getInstance().setOuput("Stack[(int)" + temporal_contador + "] = " + op1.getMensaje() + ";");
@@ -190,7 +181,8 @@ class Suma extends Expresion
                         let temporal_contador    = "t" + Tabla_Simbolos.getInstance().getTemporal();
                         let temporal_pos_return  = "t" + Tabla_Simbolos.getInstance().getTemporal();
                         let temporal_retorno     = "t" + Tabla_Simbolos.getInstance().getTemporal();
-                                                                                
+                       
+                        Middle.getInstance().setOuput("");
                         Middle.getInstance().setOuput(temporal_simulado + " = P + " +  tam_metodo + ";");
                         Middle.getInstance().setOuput(temporal_contador + " = " + temporal_simulado + " +  2;");
                         Middle.getInstance().setOuput("Stack[(int)" + temporal_contador + "] = " + op1.getMensaje() + ";");                        
@@ -199,7 +191,7 @@ class Suma extends Expresion
                         Middle.getInstance().setOuput(temporal_pos_return + " = P + 1;");
                         Middle.getInstance().setOuput(temporal_retorno + " = Stack[(int)" + temporal_pos_return + "];");
                         Middle.getInstance().setOuput("P = P - " + tam_metodo + ";");
-                        
+                        Middle.getInstance().setOuput("");
                         Middle.getInstance().setOuput(temporal_simulado + " = P + " +  tam_metodo + ";");
                         Middle.getInstance().setOuput(temporal_contador + " = " + temporal_simulado + " +  2;");
                         Middle.getInstance().setOuput("Stack[(int)" + temporal_contador + "] = " + temporal_retorno + ";");
@@ -224,7 +216,8 @@ class Suma extends Expresion
                         let temporal_contador    = "t" + Tabla_Simbolos.getInstance().getTemporal();
                         let temporal_pos_return  = "t" + Tabla_Simbolos.getInstance().getTemporal();
                         let temporal_retorno     = "t" + Tabla_Simbolos.getInstance().getTemporal();
-                                                                                
+                         
+                        Middle.getInstance().setOuput("");
                         Middle.getInstance().setOuput(temporal_simulado + " = P + " +  tam_metodo + ";");
                         Middle.getInstance().setOuput(temporal_contador + " = " + temporal_simulado + " +  2;");
                         Middle.getInstance().setOuput("Stack[(int)" + temporal_contador + "] = " + op2.getMensaje() + ";");                        
@@ -233,7 +226,7 @@ class Suma extends Expresion
                         Middle.getInstance().setOuput(temporal_pos_return + " = P + 1;");
                         Middle.getInstance().setOuput(temporal_retorno + " = Stack[(int)" + temporal_pos_return + "];");
                         Middle.getInstance().setOuput("P = P - " + tam_metodo + ";");
-                        
+                        Middle.getInstance().setOuput("");
                         Middle.getInstance().setOuput(temporal_simulado + " = P + " +  tam_metodo + ";");
                         Middle.getInstance().setOuput(temporal_contador + " = " + temporal_simulado + " +  2;");
                         Middle.getInstance().setOuput("Stack[(int)" + temporal_contador + "] = " + op1.getMensaje() + ";");
@@ -258,7 +251,8 @@ class Suma extends Expresion
                         let temporal_contador    = "t" + Tabla_Simbolos.getInstance().getTemporal();
                         let temporal_pos_return  = "t" + Tabla_Simbolos.getInstance().getTemporal();
                         let temporal_retorno     = "t" + Tabla_Simbolos.getInstance().getTemporal();
-                                                                                
+                        
+                        Middle.getInstance().setOuput("");
                         Middle.getInstance().setOuput(temporal_simulado + " = P + " +  tam_metodo + ";");
                         Middle.getInstance().setOuput(temporal_contador + " = " + temporal_simulado + " +  2;");
                         Middle.getInstance().setOuput("Stack[(int)" + temporal_contador + "] = " + op1.getMensaje() + ";");                        
@@ -267,7 +261,7 @@ class Suma extends Expresion
                         Middle.getInstance().setOuput(temporal_pos_return + " = P + 1;");
                         Middle.getInstance().setOuput(temporal_retorno + " = Stack[(int)" + temporal_pos_return + "];");
                         Middle.getInstance().setOuput("P = P - " + tam_metodo + ";");
-                        
+                        Middle.getInstance().setOuput("");
                         Middle.getInstance().setOuput(temporal_simulado + " = P + " +  tam_metodo + ";");
                         Middle.getInstance().setOuput(temporal_contador + " = " + temporal_simulado + " +  2;");
                         Middle.getInstance().setOuput("Stack[(int)" + temporal_contador + "] = " + temporal_retorno + ";");
@@ -292,7 +286,8 @@ class Suma extends Expresion
                         let temporal_contador    = "t" + Tabla_Simbolos.getInstance().getTemporal();
                         let temporal_pos_return  = "t" + Tabla_Simbolos.getInstance().getTemporal();
                         let temporal_retorno     = "t" + Tabla_Simbolos.getInstance().getTemporal();
-                                                                                
+                        
+                        Middle.getInstance().setOuput("");
                         Middle.getInstance().setOuput(temporal_simulado + " = P + " +  tam_metodo + ";");
                         Middle.getInstance().setOuput(temporal_contador + " = " + temporal_simulado + " +  2;");
                         Middle.getInstance().setOuput("Stack[(int)" + temporal_contador + "] = " + op2.getMensaje() + ";");                        
@@ -301,7 +296,7 @@ class Suma extends Expresion
                         Middle.getInstance().setOuput(temporal_pos_return + " = P + 1;");
                         Middle.getInstance().setOuput(temporal_retorno + " = Stack[(int)" + temporal_pos_return + "];");
                         Middle.getInstance().setOuput("P = P - " + tam_metodo + ";");
-                        
+                        Middle.getInstance().setOuput("");
                         Middle.getInstance().setOuput(temporal_simulado + " = P + " +  tam_metodo + ";");
                         Middle.getInstance().setOuput(temporal_contador + " = " + temporal_simulado + " +  2;");
                         Middle.getInstance().setOuput("Stack[(int)" + temporal_contador + "] = " + op1.getMensaje() + ";");

@@ -34,6 +34,11 @@ class Stack extends Array<SubStack>
         subEntorno_global.set("console",object_console);   
     }
 
+    public getLast()
+    {
+        return this[this.length -1];
+    }
+
 }
 
 export default Stack;

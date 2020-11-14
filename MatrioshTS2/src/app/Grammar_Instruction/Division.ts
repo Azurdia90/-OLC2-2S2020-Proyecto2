@@ -121,18 +121,8 @@ class Division extends Expresion
 
             let tipo_division :tipo_operacion_resultado;
 
-            if (op1.getRol() != tipo_rol.valor && op1.getRol() != tipo_rol.arreglo)
-            {
-                return op1;
-            }
-
-            if (op2.getRol() != tipo_rol.valor && op2.getRol() != tipo_rol.arreglo)
-            {
-                return op2;
-            }
-
             tipo_division = this.matriz_operacion_division[op1.getTipo().getTipo()] [op2.getTipo().getTipo()];
-
+            
             switch(tipo_division)
             {
                 case tipo_operacion_resultado.division_numero:
@@ -155,7 +145,7 @@ class Division extends Expresion
         catch(Error)
         {
             Middle.getInstance().clear3D();
-            Middle.getInstance().setOuput("Error Dvisión: " + Error.Mesage);
+            Middle.getInstance().setOuput("//Error División: " + Error.Mesage);
         }
     }
 

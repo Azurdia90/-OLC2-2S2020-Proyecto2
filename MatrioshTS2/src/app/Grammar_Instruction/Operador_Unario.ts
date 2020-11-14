@@ -81,19 +81,14 @@ class Operador_Unario extends Expresion
 
         try
         {
-            let temporal_pos   = "t" + Tabla_Simbolos.getInstance().getTemporal();
             let temporal_valor = "t" + Tabla_Simbolos.getInstance().getTemporal();
 
             let op1 : Simbolo = (this.operador_izq == null) ? null : this.operador_izq.traducir(salida);
 
-            Middle.getInstance().setOuput(temporal_pos + " =  P + 0;");
-            Middle.getInstance().setOuput(temporal_pos + " = " + temporal_pos +" + " + op1.getPos_S() + ";"); 
-            Middle.getInstance().setOuput(temporal_valor    + " = Stack[(int)" + temporal_pos + "];");
-            Middle.getInstance().setOuput(temporal_valor  + " = " +  temporal_valor + " * -1;");
-            Middle.getInstance().setOuput("Stack[(int)" + temporal_pos + "]"  + " = " +  temporal_valor + ";");
+            Middle.getInstance().setOuput(temporal_valor  + " = " +  op1.getMensaje() + " * -1;");
 
             _return = new Simbolo(tipo_rol.valor,new Tipo(tipo_dato.NUMERO),"");                
-            _return.setMensaje("Sentencia Operador Unario");
+            _return.setMensaje(temporal_valor);
             return _return;
 
         }

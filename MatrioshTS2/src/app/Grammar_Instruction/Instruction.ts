@@ -11,10 +11,18 @@ class Instruction
     protected entorno_padre: Entorno;
     protected nivel: number;
 
+    protected etiqueta_continue : String;
+    protected etiqueta_break    : String;
+    protected etiqueta_return   : String;
+
     constructor(pfila:number, pcolumna: number)
     {
         this.fila = pfila;
         this.columna = pcolumna;
+
+        this.etiqueta_continue = "";
+        this.etiqueta_break    = "";
+        this.etiqueta_return   = ""; 
     }
 
     analizar(entorno_padre : Entorno, nivel : number)
@@ -55,6 +63,21 @@ class Instruction
     set Columna(p_columna : number)
     {
         this.columna = p_columna;
+    }
+
+    setEtiquetaContinue(p_etiqueta_continue)
+    {
+        this.etiqueta_continue = p_etiqueta_continue;
+    }
+
+    setEtiquetaBreak(p_etiqueta_break)
+    {
+        this.etiqueta_break = p_etiqueta_break;
+    }
+
+    setEtiquetaReturn(p_etiqueta_return)
+    {
+        this.etiqueta_return = p_etiqueta_return;
     }
 }
 

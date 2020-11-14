@@ -121,16 +121,6 @@ class Multiplicacion extends Expresion
 
             let tipo_multiplicacion :tipo_operacion_resultado;
 
-            if (op1.getRol() != tipo_rol.valor && op1.getRol() != tipo_rol.arreglo)
-            {
-                return op1;
-            }
-
-            if (op2.getRol() != tipo_rol.valor && op2.getRol() != tipo_rol.arreglo)
-            {
-                return op2;
-            }
-
             tipo_multiplicacion = this.matriz_operacion_multiplicacion[op1.getTipo().getTipo()] [op2.getTipo().getTipo()];
 
             switch(tipo_multiplicacion)

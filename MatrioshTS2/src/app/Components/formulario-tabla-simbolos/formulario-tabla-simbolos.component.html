@@ -1,3 +1,14 @@
-<p>
-  formulario-tabla-simbolos works!
-</p>
+<ion-item>
+  <h1>Tabla de Simbolos</h1>
+</ion-item>
+<ion-item>
+  <ngx-datatable [rows] = "lista">
+    <ngx-datatable-column name = 'Ambito' width = "300"> </ngx-datatable-column>
+    <ngx-datatable-column name = 'Subambito' width = "300"> </ngx-datatable-column>
+    <ngx-datatable-column name = 'Rol' width = "75"> </ngx-datatable-column>
+    <ngx-datatable-column name = 'Constante' width = "100"> </ngx-datatable-column>
+    <ngx-datatable-column name = 'Tipo'width = "100"> </ngx-datatable-column>
+    <ngx-datatable-column name = 'Identificador'width = "350"> </ngx-datatable-column>
+    <ngx-datatable-column name = 'posicion_s'width = "100"> </ngx-datatable-column>
+  </ngx-datatable>
+</ion-item>
