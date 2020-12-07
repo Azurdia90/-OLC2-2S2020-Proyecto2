@@ -93,7 +93,7 @@ class Operador_Decremento extends Expresion
             Middle.getInstance().setOuput("Stack[(int)" + temporal_pos + "]"  + " = " +  temporal_valor + ";");
 
             _return = new Simbolo(tipo_rol.valor,new Tipo(tipo_dato.NUMERO),"");                
-            _return.setMensaje("Sentencia Decremento Exitosa");
+            _return.setMensaje(temporal_valor);
             return _return;
 
         }

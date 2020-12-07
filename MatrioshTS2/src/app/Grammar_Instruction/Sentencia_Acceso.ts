@@ -52,6 +52,7 @@ class Sentencia_Acceso extends Instruction
                         return _return;
                     }
                 }
+                this.acceso_tmp = _acceso;
             }
             else
             {   
@@ -63,14 +64,27 @@ class Sentencia_Acceso extends Instruction
                 }
                 else
                 {   
-                    simbolo_tmp = Tabla_Simbolos.getInstance().getSimbolo_global(this.identificador);                    
-                }   
+                    if(Tabla_Simbolos.getInstance().existsSimbolo_global(this.identificador))
+                    {
+                        simbolo_tmp = Tabla_Simbolos.getInstance().getSimbolo_global(this.identificador);                    
+                    }
+                    else
+                    {
+                        this.entorno_padre = entorno_padre;
+                        this.nivel = nivel;
+
+                        _return = new Simbolo(tipo_rol.error,new Tipo(tipo_dato.CADENA), "33-12");
+                        _return.setFila(this.fila);
+                        _return.setColumna(this.columna);
+                        _return.setMensaje("La variable: \"" + this.identificador + "\" NO se encuentra en el entorno local.");
+                        return _return;
+                    }
+                } 
                 
                 if(simbolo_tmp.getRol() == tipo_rol.arreglo)
                 {
+                    this.acceso_tmp = simbolo_tmp;
                     var lista_accesos : Array<Number>;
-                    var arreglo_tmp   : Array<Simbolo>;
-                    var lista_tamaños : Array<Number>;
 
                     lista_accesos = new Array<Number>();
 
@@ -102,64 +116,13 @@ class Sentencia_Acceso extends Instruction
                         }
                     }
 
-                    arreglo_tmp = <Array<Simbolo>> simbolo_tmp.getMensaje();
-                    lista_tamaños = <Array<Number>> simbolo_tmp.getListaDimensiones();
-
-                    if(arreglo_tmp.length > 0 && lista_tamaños.length > 0)
-                    {
-                        var pos_rel : Number;
-                        pos_rel = 0;
-
-                        if(lista_tamaños.length == lista_accesos.length)
-                        {
-                            pos_rel =  lista_accesos[0].valueOf();
-
-                            for(var y: number = 1; y < lista_accesos.length; y++)
-                            {
-                                pos_rel = (pos_rel.valueOf() * lista_tamaños[y].valueOf()) + lista_accesos[y].valueOf();
-                            }
-
-                            if(pos_rel < 0)
-                            {
-                                _return = new Simbolo(tipo_rol.error, new Tipo(tipo_dato.CADENA), "33-12");
-                                _return.setFila(this.fila);
-                                _return.setColumna(this.columna);
-                                _return.setMensaje("Sentencia Acceso: Los valores de acceso no deben ser valores negativos.");
-                            }
-                            else
-                            {
-                                if(pos_rel < arreglo_tmp.length)
-                                {
-                                    _return = arreglo_tmp[pos_rel.valueOf()];
-                                    _acceso = _return;
-                                }
-                                else
-                                {
-                                    _return = new Simbolo(tipo_rol.error, new Tipo(tipo_dato.CADENA), "33-12");
-                                    _return.setFila(this.fila);
-                                    _return.setColumna(this.columna);
-                                    _return.setMensaje("Sentencia Acceso: El valor de las posiciones de acceso es mayor al tamaño del arreglo.");
-                                }
-                            }
-                        }
-                        else
-                        {
-                            _return = new Simbolo(tipo_rol.error, new Tipo(tipo_dato.CADENA), "33-12");
-                            _return.setFila(this.fila);
-                            _return.setColumna(this.columna);
-                            _return.setMensaje("Sentencia Acceso: El cantidad de accesos no coincide con las dimensiones del arreglo.");
-                        }
-                    }
-                    else
-                    {   
-                        _return = new Simbolo(tipo_rol.error, new Tipo(tipo_dato.CADENA), "33-12");
-                        _return.setFila(this.fila);
-                        _return.setColumna(this.columna);
-                        _return.setMensaje("Sentencia Acceso: El arreglo no a sido instanciado.");
-                    }
-
                     this.entorno_padre = entorno_padre;
                     this.nivel = nivel;
+
+                    _return = new Simbolo(tipo_rol.valor, simbolo_tmp.getTipo(), "");
+                    _return.setFila(this.fila);
+                    _return.setColumna(this.columna);
+                    _return.setMensaje("Sentencia Acceso [] succesful");
                     return _return;
                 }
                 else if(simbolo_tmp.getRol() == tipo_rol.error)
@@ -194,20 +157,27 @@ class Sentencia_Acceso extends Instruction
                 _return.setMensaje("Operador Acceso: No existen accesos definidos.");
                 return _return;
             }
-            this.acceso_tmp = _acceso;
             
             for(var cont = 0; cont < this.lista_accesos.length; cont++)
             {
                 if(_acceso.getRol() == tipo_rol.valor)
                 {
-                    this.entorno_padre = entorno_padre;
-                    this.nivel = nivel;
-
-                    _return = new Simbolo(tipo_rol.error,new Tipo(tipo_dato.CADENA), "33-12");
-                    _return.setFila(this.fila);
-                    _return.setColumna(this.columna);
-                    _return.setMensaje("Operador Acceso: No existen accesos definidos para un valor primitivo.");
-                    return _return;
+                    if(_acceso.getTipo().Equals(new Tipo(tipo_dato.CADENA)))
+                    {
+                        this.lista_accesos[cont].setPadre(_acceso);
+                        _acceso = this.lista_accesos[cont].analizar(entorno_padre, nivel);
+                    }
+                    else
+                    {
+                        this.entorno_padre = entorno_padre;
+                        this.nivel = nivel;
+                        
+                        _return = new Simbolo(tipo_rol.error,new Tipo(tipo_dato.CADENA), "33-12");
+                        _return.setFila(this.fila);
+                        _return.setColumna(this.columna);
+                        _return.setMensaje("Operador Acceso: No existen accesos definidos para un valor primitivo.");
+                        return _return;
+                    }
                 }
                 else if(_acceso.getRol() == tipo_rol.arreglo)
                 {
@@ -215,7 +185,7 @@ class Sentencia_Acceso extends Instruction
                     _acceso = this.lista_accesos[cont].analizar(entorno_padre, nivel);
                 }
                 else if(_acceso.getRol() == tipo_rol.type)
-                {
+                {   
                     this.lista_accesos[cont].setPadre(_acceso);
                     _acceso = this.lista_accesos[cont].analizar(entorno_padre, nivel);
                 }
@@ -258,51 +228,109 @@ class Sentencia_Acceso extends Instruction
     }
 
     public traducir(salida : Middle) 
-    {
+    {   let etapa   : number;
         let _return : Simbolo;
-        
         try
-        {   
-            for(var cont = 0; cont < this.lista_accesos.length; cont++)
-            {
-                if(this.acceso_tmp.getRol() == tipo_rol.valor)
-                {
-                    _return = new Simbolo(tipo_rol.error,new Tipo(tipo_dato.CADENA), "33-12");
-                    _return.setFila(this.fila);
-                    _return.setColumna(this.columna);
-                    _return.setMensaje("Operador Acceso: No existen accesos definidos para un valor primitivo.");
-                    return _return;
+        {   etapa = 0
+            if(this.dimensiones.length == 0)
+            {   etapa = 1; 
+                for(var cont = 0; cont < this.lista_accesos.length; cont++)
+                {   etapa = 2;
+                    if(this.acceso_tmp.getRol() == tipo_rol.valor)
+                    {   etapa = 3;
+                        if(this.acceso_tmp.getTipo().Equals(new Tipo(tipo_dato.CADENA)))
+                        {   etapa = 4;
+                            this.lista_accesos[cont].setPadre(this.acceso_tmp);
+                            this.acceso_tmp = this.lista_accesos[cont].traducir(salida);  
+                        }
+                        else
+                        {
+                            _return = new Simbolo(tipo_rol.error,new Tipo(tipo_dato.CADENA), "33-12");
+                            _return.setFila(this.fila);
+                            _return.setColumna(this.columna);
+                            _return.setMensaje("Operador Acceso: No existen accesos definidos para un valor primitivo.");
+                            return _return;
+                        }
+                    }
+                    else if(this.acceso_tmp.getRol() == tipo_rol.arreglo)
+                    {
+                        this.lista_accesos[cont].setPadre(this.acceso_tmp);
+                        this.acceso_tmp = this.lista_accesos[cont].traducir(salida);   
+                    }
+                    else if(this.acceso_tmp.getRol() == tipo_rol.type)
+                    {    
+                        this.lista_accesos[cont].setPadre(this.acceso_tmp);
+                        this.acceso_tmp = this.lista_accesos[cont].traducir(salida);
+                    }
+                    else if(this.acceso_tmp.getRol() == tipo_rol.error)
+                    {
+                        return this.acceso_tmp;
+                    }
+                    else
+                    {
+                        _return = new Simbolo(tipo_rol.error,new Tipo(tipo_dato.CADENA), "33-12");
+                        _return.setFila(this.fila);
+                        _return.setColumna(this.columna);
+                        _return.setMensaje("Operador Acceso: No existen accesos definidos.");
+                        return _return;
+                    }
                 }
-                else if(this.acceso_tmp.getRol() == tipo_rol.arreglo)
-                {
-                    this.lista_accesos[cont].setPadre(this.acceso_tmp);
-                    this.acceso_tmp = this.lista_accesos[cont].traducir(salida);   
-                }
-                else if(this.acceso_tmp.getRol() == tipo_rol.type)
-                {    
-                    this.lista_accesos[cont].setPadre(this.acceso_tmp);
-                    this.acceso_tmp = this.lista_accesos[cont].traducir(salida);
-                }
-                else if(this.acceso_tmp.getRol() == tipo_rol.error)
-                {
-                    return this.acceso_tmp;
-                }
-                else
-                {
-                    _return = new Simbolo(tipo_rol.error,new Tipo(tipo_dato.CADENA), "33-12");
-                    _return.setFila(this.fila);
-                    _return.setColumna(this.columna);
-                    _return.setMensaje("Operador Acceso: No existen accesos definidos.");
-                    return _return;
-                }
+                etapa = 5;
+                return this.acceso_tmp;
             }
-            console.log(this.acceso_tmp);
-            return this.acceso_tmp;
+            else
+            {   etapa = 1;        
+                var lista_accesos : Array<Simbolo>;
+
+                lista_accesos = new Array<Simbolo>();
+
+                for(var x = 0; x < this.dimensiones.length; x++)
+                {  etapa = 2;
+                    var val_tmp: Simbolo;
+                    val_tmp = this.dimensiones[x].traducir(salida);
+                    lista_accesos.push(val_tmp);
+                }
+                etapa = 3;
+                let etiqueta_posicion_stack_array = "t" + Tabla_Simbolos.getInstance().getTemporal();                          
+                let etiqueta_posicion_heap_array = "t" + Tabla_Simbolos.getInstance().getTemporal();
+                let etiqueta_posicion_length_array = "t" + Tabla_Simbolos.getInstance().getTemporal();
+                let etiqueta_length_array = "t" + Tabla_Simbolos.getInstance().getTemporal();
+                let etiqueta_length_total_array = "t" + Tabla_Simbolos.getInstance().getTemporal();
+                let etiqueta_pos_especifica_array = "t" + Tabla_Simbolos.getInstance().getTemporal();
+                let etiqueta_valor_array = "t" + Tabla_Simbolos.getInstance().getTemporal();
+
+                Middle.getInstance().setOuput("");
+                Middle.getInstance().setOuput("//Acceso a Arreglo");
+                Middle.getInstance().setOuput(etiqueta_posicion_stack_array + " = P + " +  this.acceso_tmp.getPos_S() + ";");
+                Middle.getInstance().setOuput(etiqueta_posicion_length_array + " = Stack[(int)" + etiqueta_posicion_stack_array + "];");
+                Middle.getInstance().setOuput(etiqueta_posicion_heap_array + " = " + etiqueta_posicion_length_array + " + 1;");
+                Middle.getInstance().setOuput(etiqueta_length_array + " = Heap[(int)" + etiqueta_posicion_length_array + "];");
+                Middle.getInstance().setOuput(etiqueta_length_total_array + " = " + etiqueta_posicion_heap_array + " + " + etiqueta_length_array +  ";");
+
+                for(var i = 0; i < lista_accesos.length; i++)
+                {   etapa = 4;
+                    var tam_dim :Simbolo;
+            
+                    if(i==0)
+                    {
+                        Middle.getInstance().setOuput(etiqueta_pos_especifica_array + " = " + etiqueta_posicion_heap_array  + " + " + lista_accesos[i].getMensaje() + ";"); 
+                    }                                                                                                                   
+                }
+    
+                Middle.getInstance().setOuput(etiqueta_valor_array+ " = Heap[(int)" + etiqueta_pos_especifica_array + "];");
+                
+                etapa = 5;
+                _return = new Simbolo(tipo_rol.valor, this.acceso_tmp.getTipo(), "");
+                _return.setFila(this.fila);
+                _return.setColumna(this.columna);
+                _return.setMensaje(etiqueta_valor_array);
+                return _return;
+            }
         }
         catch(Error)
         {
             Middle.getInstance().clear3D();
-            Middle.getInstance().setOuput("Error Sentencia Acceso: " + Error.Mesage);
+            Middle.getInstance().setOuput("//Error Sentencia Acceso (" + etapa + "): " + Error.Mesage);
         }
     }
 

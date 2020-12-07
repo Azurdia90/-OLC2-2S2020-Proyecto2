@@ -1,0 +1,25 @@
+<form [formGroup] = "formulario_optimizar" (ngSubmit)="ejecutar($event)">
+  <ion-item>
+      <ion-label position="stacked" >Ingrese su código:</ion-label>
+      <ion-textarea type = "text" 
+                    rows = "25" 
+                    formControlName = "textarea">
+      </ion-textarea>
+      <ion-button expand="full" fill="outline" color = "success" type = "submit">Optimizar</ion-button>
+        <ngx-datatable
+        [rows] = "lista"
+    class='bootstrap material'
+    style="height: 200px; overflow-y:auto">
+        <ngx-datatable-column name = 'Linea' width = "75"> </ngx-datatable-column>
+        <ngx-datatable-column name = 'Columna' width = "75"> </ngx-datatable-column>
+        <ngx-datatable-column name = 'Tipo' width = "75"> </ngx-datatable-column>
+        <ngx-datatable-column name = 'Mensaje' width = "450"> </ngx-datatable-column>
+      </ngx-datatable>
+  </ion-item>
+</form>
+
+<!-- [columnMode]="'force'"
+    [headerHeight]="50"
+    [footerHeight]="50"
+    [rowHeight]="'auto'"
+    [limit]="100" -->

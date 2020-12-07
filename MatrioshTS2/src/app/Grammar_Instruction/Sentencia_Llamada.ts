@@ -47,7 +47,7 @@ class Sentencia_Llamada extends Instruction
                 this.global = true;
             }
             etapa = 2;
-            //if(this.identificador == "log"){console.log(funcion_actual);}
+            //if(this.identificador == "sentencias"){console.log(funcion_tmp);}
             if(funcion_tmp == undefined || funcion_tmp == null)
             {
                 this.entorno_padre = entorno_padre;
@@ -91,7 +91,7 @@ class Sentencia_Llamada extends Instruction
             var _result :  Simbolo = funcion_tmp.pasarParametros(this.padre,this.lista_parametros_analizar);
             
             this.lista_parametros_analizar = new Array<Simbolo>();
-            
+            //console.log(_result);
             if(_result.getRol() != tipo_rol.aceptado)
             {
                 this.entorno_padre = entorno_padre;
@@ -104,6 +104,20 @@ class Sentencia_Llamada extends Instruction
             if(this.identificador == "log" || this.identificador == "length" || this.identificador == "push" || this.identificador == "pop")
             {
                 _return = funcion_tmp.analizar(entorno_padre, nivel);
+            }
+            else
+            {
+                if(funcion_tmp.getTipo() == undefined)
+                {
+                    _return = new Simbolo(tipo_rol.valor,new Tipo(tipo_dato.VOID), "");
+                }
+                else
+                {
+                    _return = new Simbolo(tipo_rol.valor,funcion_tmp.getTipo(), "");
+                }
+                _return.setFila(this.fila);
+                _return.setColumna(this.columna);
+                _return.setMensaje("Sentencia Llamada succesful");  
             }
             
             this.entorno_padre = entorno_padre;
@@ -132,13 +146,49 @@ class Sentencia_Llamada extends Instruction
         let etapa : number;
         try
         {   etapa = 1; 
+            let lista_parametros1 = new Array<Simbolo>();
+            let lista_parametros2 = new Array<Simbolo>();
+
             //Obtener valores a pasar
+
+            for(var y : number = 0; y < this.lista_parametros.length; y++)
+            {
+                if(this.lista_parametros[y] instanceof Sentencia_Llamada)
+                {
+                    var tmp_val : Simbolo = this.lista_parametros[y].traducir(salida);
+                    //if(this.identificador == 'log'){console.log(tmp_val)};
+                    lista_parametros2.push(tmp_val);
+                }
+            }
+
             for(var x : number = 0; x < this.lista_parametros.length; x++)
             {
-                var tmp_val : Simbolo = this.lista_parametros[x].traducir(salida);
-                //if(this.identificador == 'figura1'){console.log(tmp_val)};
-                this.lista_parametros_enviar.push(tmp_val);
+                if(!(this.lista_parametros[x] instanceof Sentencia_Llamada))
+                {
+                    var tmp_val : Simbolo = this.lista_parametros[x].traducir(salida);
+                    //if(this.identificador == 'figura1'){console.log(tmp_val)};
+                    lista_parametros1.push(tmp_val);
+                }
+                
             }   
+
+            let cont1 = 0;
+            let cont2 = 0;
+          
+            for(var p = 0; p < this.lista_parametros.length; p++)
+            {
+                if(!(this.lista_parametros[p] instanceof Sentencia_Llamada))
+                {
+                    this.lista_parametros_enviar.push(lista_parametros1[cont1]);
+                    cont1 = cont1 + 1;
+                }    
+                else
+                {
+                    this.lista_parametros_enviar.push(lista_parametros2[cont2]);
+                    cont2 = cont2 + 1;
+                }                    
+            }
+
             //if(this.identificador == 'figura1'){console.log(this.funcion_actual);console.log(this.lista_parametros_enviar)};  
             ////Paso de parametros
             this.funcion_actual.pasarParametrosT(salida,this.lista_parametros_enviar);
@@ -161,7 +211,7 @@ class Sentencia_Llamada extends Instruction
                 Middle.getInstance().setOuput(temporal_simulado + " = " + temporal_contador + " + 1;");
                 Middle.getInstance().setOuput("Stack[(int)" + temporal_simulado + "] = -1;");   
 
-                for(var p = 0; p < this.lista_parametros.length; p++)
+                for(var p = 0; p < this.lista_parametros_enviar.length; p++)
                 {
                     Middle.getInstance().setOuput(temporal_simulado + " = " + temporal_contador + " + " + (2+p) + ";");
                     Middle.getInstance().setOuput("Stack[(int)" + temporal_simulado + "] = " + this.lista_parametros_enviar[p].getMensaje() + ";");
@@ -173,11 +223,11 @@ class Sentencia_Llamada extends Instruction
                 Middle.getInstance().setOuput(temporal_simulado + " = " + temporal_contador + " + 1;");
                 Middle.getInstance().setOuput(temporal_retorno + " = Stack[(int)" + temporal_simulado + "];");
                 Middle.getInstance().setOuput("P = P - " + tamaño_ambito_actual + ";");
-
-                _return = new Simbolo(tipo_rol.aceptado,new Tipo(tipo_dato.CADENA),"10-4"); 
-                _return.setMensaje("Sentencia Llamada Succesful");
-                _return.setFila(this.fila);
+                
+                _return = new Simbolo(tipo_rol.valor,this.funcion_actual.getTipo(),"10-4"); 
                 _return.setColumna(this.columna);
+                _return.setFila(this.fila);
+                _return.setMensaje(temporal_retorno);
             }
             etapa = 3;
             this.lista_parametros_enviar = new Array<Simbolo>();
@@ -200,6 +250,11 @@ class Sentencia_Llamada extends Instruction
     public setPadre(padre : Simbolo)
     {
         this.padre = padre;
+    }
+
+    public getIdentificador()
+    {
+        return this.identificador;
     }
 
     public getThis() 

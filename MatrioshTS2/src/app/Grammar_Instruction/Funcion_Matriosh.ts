@@ -2,20 +2,19 @@ import Sentencia_Declaracion from './Sentencia_Declaración';
 import Tabla_Simbolos from './Tabla_Simbolos';
 import Tabla_Errores from './Tabla_Errores';
 import Instruction from './Instruction';
-import SubEntorno from './SubEntorno';
 import SubStack from './SubStack';
 import Entorno from './Entorno';
 import Funcion from "./Funcion";
 import Simbolo from './Simbolo';
 import Middle from './Middle';
 import Tipo from './Tipo';
-import Funcion_Log from './Funcion_Log';
 
 class Funcion_MatrioshTS extends Funcion
 {
-    constructor(p_fila : number, p_columna : number, p_id : String, p_lista_parametros : Array<Instruction>, p_lista_sentencias : Array<Instruction>, p_tipo? : Tipo)
+    constructor(p_fila : number, p_columna : number, p_id : String, p_lista_parametros : Array<Instruction>, p_lista_sentencias : Array<Instruction>, p_tipo? : Tipo, p_rol? : tipo_rol)
     {
         super(p_fila, p_columna, p_id, p_lista_parametros, p_lista_sentencias);
+        this.rol  = p_rol;
         this.tipo = p_tipo;
         this.substack = new SubStack(this.identificador);
         Tabla_Simbolos.getInstance().getStack()._push(this.fila,this.columna,this.substack,this.identificador);       
@@ -83,8 +82,8 @@ class Funcion_MatrioshTS extends Funcion
                     return _result;
                 } 
             }
-            //console.log("Se analizara una funcion con ambito global: " + this.entorno_local);
-            //console.log(this.entorno_local);
+            //console.log("Se analizara ambito global de una funcion";
+            //console.log(this.entorno_padre);
             //ANALISIS DE DECLARACION VARIABLES GLOBALES
             for(var y = 0; y < this.lista_sentencias.length; y++)            
             {
@@ -102,32 +101,23 @@ class Funcion_MatrioshTS extends Funcion
                     let error_encontrado = { tipo: "Análisis Semántico MatrioshTS", fila: _tmp_return.getFila() == undefined ? "0" : _tmp_return.getFila().toString(), columna: _tmp_return.getColumna() == undefined  ? "0" : _tmp_return.getColumna().toString(), identificador: this.identificador, descripcion: _tmp_return.getMensaje().toString()};
                     Tabla_Errores.getInstance().push(error_encontrado);    
                                  
-                    _return = new Simbolo(tipo_rol.valor,new Tipo(tipo_dato.NULO), "");
-                    _return.setFila(this.fila);
-                    _return.setColumna(this.columna);
-                    _return.setMensaje("null");  
-                }
-                else
-                {      
-                    _return = new Simbolo(tipo_rol.valor,new Tipo(tipo_dato.NULO), "");
-                    _return.setFila(this.fila);
-                    _return.setColumna(this.columna);
-                    _return.setMensaje("null");   
-                }                
+                    return _return; 
+                }              
             }
-
+            //console.log("Se analizara ambito global de una funcion";
+            //console.log(this.entorno_padre);
             //ANALISIS DEL RESTO DE CODIGO
             for(var z = 0; z < this.lista_sentencias.length; z++)            
             {
-                if(!(this.lista_sentencias [z] instanceof Sentencia_Declaracion))
-                {
+                if(!(this.lista_sentencias[z] instanceof Sentencia_Declaracion))
+                {   //if(this.identificador == "sentencias"){console.log(this.lista_sentencias[z]);} 
                     _tmp_return = this.lista_sentencias[z].analizar(this.entorno_padre, this.entorno_padre.getLastNivel());
                 }
                 else
                 {
                     continue
                 }
-                if(_tmp_return == undefined && this.identificador == "figura1"){console.log(this.lista_sentencias[y])}
+                //if(_tmp_return == undefined && this.identificador == "sentencias"){console.log(this.lista_sentencias[y]); console.log(_tmp_return);}
                 if (_tmp_return.getRol() == tipo_rol.error)
                 {
                     let error_encontrado = { tipo: "Análisis Semántico MatrioshTS", fila: _tmp_return.getFila() == undefined ? "0" : _tmp_return.getFila().toString(), columna: _tmp_return.getColumna() == undefined  ? "0" : _tmp_return.getColumna().toString(), identificador: this.identificador, descripcion: _tmp_return.getMensaje().toString()};
@@ -145,21 +135,18 @@ class Funcion_MatrioshTS extends Funcion
                 }
                 else if(_tmp_return.getRol() == tipo_rol.retornar) 
                 {                                                           
-                    _return = <Simbolo> _tmp_return.getMensaje();              
-                    if(this.tipo == undefined)
-                    {
-                        this.tipo = _return.getTipo();
-                    }
+                    _return =  _tmp_return; 
                 }
                 else
                 {      
-                    _return = new Simbolo(tipo_rol.valor,this.tipo, "");
-                    _return.setFila(this.fila);
-                    _return.setColumna(this.columna);
-                    _return.setMensaje("Ejecucion Funcion succesful");   
+                    _return = _tmp_return;   
                 }                
             }
-          
+
+            _return = new Simbolo(this.rol == undefined ? tipo_rol.valor : this.rol,this.tipo == undefined ? new Tipo(tipo_dato.VOID) : this.tipo, "");
+            _return.setFila(this.fila);
+            _return.setColumna(this.columna);
+            _return.setMensaje("0");
             return _return;
         }
         catch(Exception)
@@ -189,6 +176,11 @@ class Funcion_MatrioshTS extends Funcion
                 if(this.lista_sentencias [x] instanceof Sentencia_Declaracion)
                 {
                     _tmp_return = this.lista_sentencias[x].traducir(salida);
+                    if(_tmp_return == undefined)
+                    {
+                        console.log("función donde muere: " + this.identificador);
+                        console.log(this.lista_sentencias[x]);
+                    }
                 }
                 else
                 {
@@ -201,26 +193,38 @@ class Funcion_MatrioshTS extends Funcion
                     Middle.getInstance().setOuput( "// Error en función " + this.identificador + ", tipo:Análisis Semántico MatrioshTS, fila:" + _tmp_return.getFila() == undefined ? "0" : _tmp_return.getFila().toString() + ", columna: " + _tmp_return.getColumna() == undefined  ? "0" : _tmp_return.getColumna().toString() + ", descripcion: " + _tmp_return.getMensaje().toString());   
                 }                
             }
-            etapa = 2;
             //ANALISIS DEL RESTO DE CODIGO
+            this.etiqueta_return = "l" + Tabla_Simbolos.getInstance().getEtiqueta(); 
+
+            etapa = 2;
             for(var y = 0; y < this.lista_sentencias.length; y++)            
             {
                 if(!(this.lista_sentencias[y] instanceof Sentencia_Declaracion))
                 {
+                    this.lista_sentencias[y].setEtiquetaContinue(this.etiqueta_continue);
+                    this.lista_sentencias[y].setEtiquetaBreak(this.etiqueta_break);
+                    this.lista_sentencias[y].setEtiquetaReturn(this.etiqueta_return);
                     _tmp_return = this.lista_sentencias[y].traducir(salida);
+                    if(_tmp_return == undefined)
+                    {
+                        console.log("función donde muere: " + this.identificador);
+                        console.log(this.lista_sentencias[y]);
+                    }  
                 }
                 else
                 {
                     continue
                 }
-                if(_tmp_return == undefined && this.identificador == "figura1"){console.log(this.lista_sentencias[y])}
+                //if(_tmp_return == undefined && this.identificador == "sentencias"){console.log(this.lista_sentencias[y])}
                 if (_tmp_return.getRol() == tipo_rol.error)
                 {
                     Middle.getInstance().clear3D();
                     Middle.getInstance().setOuput( "// Error en función " + this.identificador + ", tipo:Análisis Semántico MatrioshTS, fila:" + _tmp_return.getFila() == undefined ? "0" : _tmp_return.getFila().toString() + ", columna: " + _tmp_return.getColumna() == undefined  ? "0" : _tmp_return.getColumna().toString() + ", descripcion: " + _tmp_return.getMensaje().toString());   
                 }               
             }
-            
+
+            Middle.getInstance().setOuput(this.etiqueta_return + ":");
+            Middle.getInstance().setOuput("P = P + 0;");            
             etapa = 3;
             Middle.getInstance().setOuput("}\n");
 
@@ -252,7 +256,7 @@ class Funcion_MatrioshTS extends Funcion
             clon_lista_sentencias.push(this.lista_sentencias[y].getThis());
         }
         
-        return new Funcion_MatrioshTS(this.fila,this.columna,this.identificador,clon_lista_parametros,clon_lista_sentencias);
+        return new Funcion_MatrioshTS(this.fila,this.columna,this.identificador,clon_lista_parametros,clon_lista_sentencias,this.tipo);
     }
 }
 

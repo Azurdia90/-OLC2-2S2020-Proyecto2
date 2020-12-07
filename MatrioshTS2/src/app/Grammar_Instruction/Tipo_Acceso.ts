@@ -63,10 +63,38 @@ class Tipo_Acceso extends Instruction
                 {   
                     if(this.expresion3 == "length")
                     {
+                        this.entorno_padre = entorno_padre;
+                        this.nivel = nivel;
+
                         _return = new Simbolo(tipo_rol.valor,new Tipo(tipo_dato.NUMERO),"");
                         _return.setFila(this.fila);
                         _return.setColumna(this.columna);
                         _return.setMensaje("Dimensión de arreglo exitosa");
+                        return _return;
+                    }
+                    else
+                    {
+                        this.entorno_padre = entorno_padre;
+                        this.nivel = nivel;
+
+                        _return = new Simbolo(tipo_rol.error,new Tipo(tipo_dato.CADENA), "33-12");
+                        _return.setFila(this.fila);
+                        _return.setColumna(this.columna);
+                        _return.setMensaje("Error Operador Acceso: El atributo " + this.expresion3 + " no existe aún.");
+                        return _return;
+                    }
+                }
+                else if(this.padre.getRol() == tipo_rol.valor)
+                {
+                    if(this.expresion3 == "length")
+                    {
+                        this.entorno_padre = entorno_padre;
+                        this.nivel = nivel;
+
+                        _return = new Simbolo(tipo_rol.valor,new Tipo(tipo_dato.NUMERO),"");
+                        _return.setFila(this.fila);
+                        _return.setColumna(this.columna);
+                        _return.setMensaje("Dimensión de cadena exitosa");
                         return _return;
                     }
                     else
@@ -118,6 +146,58 @@ class Tipo_Acceso extends Instruction
                     this.entorno_padre = entorno_padre;
                     this.nivel = nivel;
                     return _return;
+                }
+                else if(this.padre.getRol() == tipo_rol.valor)
+                {
+                    if(this.padre.getTipo().Equals(new Tipo(tipo_dato.CADENA)))
+                    {
+                        let llamada_aux = <Sentencia_Llamada> this.expresion2;
+                        console.log(llamada_aux.getIdentificador());
+                        if(llamada_aux.getIdentificador() == "toLowerCase")
+                        {
+                            this.entorno_padre = entorno_padre;
+                            this.nivel = nivel;
+
+                            _return = new Simbolo(tipo_rol.valor,new Tipo(tipo_dato.CADENA),"");
+                            _return.setFila(this.fila);
+                            _return.setColumna(this.columna);
+                            _return.setMensaje("Metodo de cadena exitosa");
+                            return _return;
+                        }
+                        if(llamada_aux.getIdentificador() == "toUpperCase")
+                        {
+                            this.entorno_padre = entorno_padre;
+                            this.nivel = nivel;
+
+                            _return = new Simbolo(tipo_rol.valor,new Tipo(tipo_dato.CADENA),"");
+                            _return.setFila(this.fila);
+                            _return.setColumna(this.columna);
+                            _return.setMensaje("Metodo de cadena exitosa");
+                            return _return;
+                        }
+                        else
+                        {
+                            this.entorno_padre = entorno_padre;
+                            this.nivel = nivel;
+
+                            _return = new Simbolo(tipo_rol.error,new Tipo(tipo_dato.CADENA), "33-12");
+                            _return.setFila(this.fila);
+                            _return.setColumna(this.columna);
+                            _return.setMensaje("Error Operador Acceso: La función " + llamada_aux.getIdentificador() + " no existe aún.");
+                            return _return;
+                        }    
+                    }
+                    else
+                    {
+                        this.entorno_padre = entorno_padre;
+                        this.nivel = nivel;
+
+                        _return = new Simbolo(tipo_rol.error,new Tipo(tipo_dato.CADENA), "33-12");
+                        _return.setFila(this.fila);
+                        _return.setColumna(this.columna);
+                        _return.setMensaje("Error Operador Acceso: Este tipo de acceso es válido unicamente para Types y Arreglos.");
+                        return _return;
+                    }
                 }
                 else
                 {
@@ -177,18 +257,22 @@ class Tipo_Acceso extends Instruction
                 {   
                     if(this.expresion3 == "length")
                     {
-                        console.log(this.entorno_padre);
                         let tam_metodo = this.entorno_padre.getSize();
-                        console.log(this.padre.getPos_S());
+
+                        let temporal_pos_stack    = "t" + Tabla_Simbolos.getInstance().getTemporal();
+                        let temporal_pos_heap    = "t" + Tabla_Simbolos.getInstance().getTemporal();
+
                         let temporal_simulado    = "t" + Tabla_Simbolos.getInstance().getTemporal();
                         let temporal_contador    = "t" + Tabla_Simbolos.getInstance().getTemporal();
                         let temporal_pos_return  = "t" + Tabla_Simbolos.getInstance().getTemporal();
                         let temporal_retorno     = "t" + Tabla_Simbolos.getInstance().getTemporal();
                         
                         Middle.getInstance().setOuput("");
+                        Middle.getInstance().setOuput(temporal_pos_stack + " = P + " +  this.padre.getPos_S() + ";");
+                        Middle.getInstance().setOuput(temporal_pos_heap + " = Stack[(int)" +  temporal_pos_stack + "];");
                         Middle.getInstance().setOuput(temporal_simulado + " = P + " +  tam_metodo + ";");
                         Middle.getInstance().setOuput(temporal_contador + " = " + temporal_simulado + " +  2;");
-                        Middle.getInstance().setOuput("Stack[(int)" + temporal_contador + "] = " + this.padre.getPos_S() + ";");
+                        Middle.getInstance().setOuput("Stack[(int)" + temporal_contador + "] = " + temporal_pos_heap + ";");
                         Middle.getInstance().setOuput("P = P + " + tam_metodo + ";");                
                         Middle.getInstance().setOuput("length_array();");
                         Middle.getInstance().setOuput(temporal_pos_return + " = P + 1;");
@@ -199,7 +283,47 @@ class Tipo_Acceso extends Instruction
                         _return.setFila(this.fila);
                         _return.setColumna(this.columna);
                         _return.setMensaje(temporal_retorno);
-                        console.log(_return);
+                        return _return;
+                    }
+                    else
+                    {
+                        _return = new Simbolo(tipo_rol.error,new Tipo(tipo_dato.CADENA), "33-12");
+                        _return.setFila(this.fila);
+                        _return.setColumna(this.columna);
+                        _return.setMensaje("Error Operador Acceso: El atributo " + this.expresion3 + " no existe aún.");
+                        return _return;
+                    }
+                }
+                else if(this.padre.getRol() == tipo_rol.valor)
+                {   
+                    if(this.expresion3 == "length")
+                    {
+                        let tam_metodo = this.entorno_padre.getSize();
+
+                        let temporal_pos_stack    = "t" + Tabla_Simbolos.getInstance().getTemporal();
+                        let temporal_pos_heap    = "t" + Tabla_Simbolos.getInstance().getTemporal();
+
+                        let temporal_simulado    = "t" + Tabla_Simbolos.getInstance().getTemporal();
+                        let temporal_contador    = "t" + Tabla_Simbolos.getInstance().getTemporal();
+                        let temporal_pos_return  = "t" + Tabla_Simbolos.getInstance().getTemporal();
+                        let temporal_retorno     = "t" + Tabla_Simbolos.getInstance().getTemporal();
+                        
+                        Middle.getInstance().setOuput("");
+                        Middle.getInstance().setOuput(temporal_pos_stack + " = P + " +  this.padre.getPos_S() + ";");
+                        Middle.getInstance().setOuput(temporal_pos_heap + " = Stack[(int)" +  temporal_pos_stack + "];");
+                        Middle.getInstance().setOuput(temporal_simulado + " = P + " +  tam_metodo + ";");
+                        Middle.getInstance().setOuput(temporal_contador + " = " + temporal_simulado + " +  2;");
+                        Middle.getInstance().setOuput("Stack[(int)" + temporal_contador + "] = " + temporal_pos_heap + ";");
+                        Middle.getInstance().setOuput("P = P + " + tam_metodo + ";");                
+                        Middle.getInstance().setOuput("length_string();");
+                        Middle.getInstance().setOuput(temporal_pos_return + " = P + 1;");
+                        Middle.getInstance().setOuput(temporal_retorno + " = Stack[(int)" + temporal_pos_return + "];");
+                        Middle.getInstance().setOuput("P = P - " + tam_metodo + ";");
+                    
+                        _return = new Simbolo(tipo_rol.valor,new Tipo(tipo_dato.NUMERO), "");
+                        _return.setFila(this.fila);
+                        _return.setColumna(this.columna);
+                        _return.setMensaje(temporal_retorno);
                         return _return;
                     }
                     else
@@ -241,6 +365,80 @@ class Tipo_Acceso extends Instruction
                     _return = this.expresion2.traducir(salida);
 
                     return _return;
+                }
+                else if(this.padre.getRol() == tipo_rol.valor)
+                {   
+                    if(this.padre.getTipo().Equals(new Tipo(tipo_dato.CADENA)))
+                    {
+                        let llamada_aux = <Sentencia_Llamada>this.expresion2;
+                        console.log(llamada_aux.getIdentificador());
+                        if(llamada_aux.getIdentificador() == "toLowerCase")
+                        {   
+                            let tam_metodo = this.entorno_padre.getSize();
+                            let temporal_pos_stack    = "t" + Tabla_Simbolos.getInstance().getTemporal();
+                            let temporal_pos_heap    = "t" + Tabla_Simbolos.getInstance().getTemporal();
+
+                            let temporal_simulado    = "t" + Tabla_Simbolos.getInstance().getTemporal();
+                            let temporal_contador    = "t" + Tabla_Simbolos.getInstance().getTemporal();
+                            let temporal_pos_return  = "t" + Tabla_Simbolos.getInstance().getTemporal();
+                            let temporal_retorno     = "t" + Tabla_Simbolos.getInstance().getTemporal();
+                            
+                            Middle.getInstance().setOuput("");
+                            Middle.getInstance().setOuput(temporal_pos_stack + " = P + " +  this.padre.getPos_S() + ";");
+                            Middle.getInstance().setOuput(temporal_pos_heap + " = Stack[(int)" +  temporal_pos_stack + "];");
+                            Middle.getInstance().setOuput(temporal_simulado + " = P + " + tam_metodo + ";");
+                            Middle.getInstance().setOuput(temporal_contador + " = " + temporal_simulado + " +  2;");
+                            Middle.getInstance().setOuput("Stack[(int)" + temporal_contador + "] = " + temporal_pos_heap + ";");
+                            Middle.getInstance().setOuput("P = P + " + tam_metodo + ";");                
+                            Middle.getInstance().setOuput("toLowerCase_String();");
+                            Middle.getInstance().setOuput(temporal_pos_return + " = P + 1;");
+                            Middle.getInstance().setOuput(temporal_retorno + " = Stack[(int)" + temporal_pos_return + "];");
+                            Middle.getInstance().setOuput("P = P - " + tam_metodo + ";");
+                
+                            _return = new Simbolo(tipo_rol.valor,new Tipo(tipo_dato.CADENA),"");
+                            _return.setFila(this.fila);
+                            _return.setColumna(this.columna);
+                            _return.setMensaje(temporal_retorno);
+                            return _return;
+                        }
+                        else if(llamada_aux.getIdentificador() == "toUpperCase")
+                        {
+                            let tam_metodo = this.entorno_padre.getSize();
+                            let temporal_pos_stack    = "t" + Tabla_Simbolos.getInstance().getTemporal();
+                            let temporal_pos_heap    = "t" + Tabla_Simbolos.getInstance().getTemporal();
+
+                            let temporal_simulado    = "t" + Tabla_Simbolos.getInstance().getTemporal();
+                            let temporal_contador    = "t" + Tabla_Simbolos.getInstance().getTemporal();
+                            let temporal_pos_return  = "t" + Tabla_Simbolos.getInstance().getTemporal();
+                            let temporal_retorno     = "t" + Tabla_Simbolos.getInstance().getTemporal();
+                            
+                            Middle.getInstance().setOuput("");
+                            Middle.getInstance().setOuput(temporal_pos_stack + " = P + " +  this.padre.getPos_S() + ";");
+                            Middle.getInstance().setOuput(temporal_pos_heap + " = Stack[(int)" +  temporal_pos_stack + "];");
+                            Middle.getInstance().setOuput(temporal_simulado + " = P + " + tam_metodo + ";");
+                            Middle.getInstance().setOuput(temporal_contador + " = " + temporal_simulado + " +  2;");
+                            Middle.getInstance().setOuput("Stack[(int)" + temporal_contador + "] = " + temporal_pos_heap + ";");
+                            Middle.getInstance().setOuput("P = P + " + tam_metodo + ";");                
+                            Middle.getInstance().setOuput("toUpperCase_String();");
+                            Middle.getInstance().setOuput(temporal_pos_return + " = P + 1;");
+                            Middle.getInstance().setOuput(temporal_retorno + " = Stack[(int)" + temporal_pos_return + "];");
+                            Middle.getInstance().setOuput("P = P - " + tam_metodo + ";");
+                
+                            _return = new Simbolo(tipo_rol.valor,new Tipo(tipo_dato.CADENA),"");
+                            _return.setFila(this.fila);
+                            _return.setColumna(this.columna);
+                            _return.setMensaje(temporal_retorno);
+                            return _return;
+                        }
+                    }
+                    else
+                    {
+                        _return = new Simbolo(tipo_rol.error,new Tipo(tipo_dato.CADENA), "33-12");
+                        _return.setFila(this.fila);
+                        _return.setColumna(this.columna);
+                        _return.setMensaje("Error Operador Acceso: Este tipo de acceso es válido unicamente para Types y Arreglos.");
+                        return _return;
+                    }
                 }
                 else
                 {

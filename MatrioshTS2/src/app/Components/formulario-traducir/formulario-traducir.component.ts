@@ -27,7 +27,7 @@ export class FormularioTraducirComponent implements OnInit
   private buildForm() 
   {
     this.formulario_traducir = this.formBuilder.group({
-      textarea: ['var hola = 10; \nhola = 50;\nconsole.log(hola);',  [Validators.required]],
+      textarea: ['let hola = 10; \nhola = 50;\nconsole.log(hola);',  [Validators.required]],
       consola: ['...',  [Validators.required]],
     });
     //this.salida = "..."

@@ -25,7 +25,7 @@ class Sentencia_Asignacion extends Instruction
     }
 
     public analizar(entorno_padre : Entorno, nivel : number)
-    {
+    {   let etapa = 0;
         let _return : Simbolo;
         let _acceso : Simbolo;
         let _val_fin : Simbolo;
@@ -45,30 +45,45 @@ class Sentencia_Asignacion extends Instruction
                 }  
             }//ACCESO A ARREGLO
             else if(this.tipo == 1)
-            {
-                var simbolo_tmp : Simbolo;
+            {   etapa = 2;
+                this.entorno_padre = entorno_padre;
+                this.nivel = nivel;
 
+                var simbolo_tmp : Simbolo;
+                
                 if(entorno_padre.existsSimbolo(this.acceso0, nivel))
                 {                 
-                    simbolo_tmp = entorno_padre.getSimbolo(this.acceso0,nivel);
+                    simbolo_tmp = entorno_padre.getSimbolo(this.acceso0, nivel);
                 }
                 else
                 {   
-                    simbolo_tmp = Tabla_Simbolos.getInstance().getSimbolo_global(this.acceso0);                    
-                }   
+                    if(Tabla_Simbolos.getInstance().existsSimbolo_global(this.acceso0))
+                    {
+                        simbolo_tmp = Tabla_Simbolos.getInstance().getSimbolo_global(this.acceso0);                    
+                    }
+                    else
+                    {
+                        _return = new Simbolo(tipo_rol.error,new Tipo(tipo_dato.CADENA), "33-12");
+                        _return.setFila(this.fila);
+                        _return.setColumna(this.columna);
+                        _return.setMensaje("El arreglo: \"" + this.valor+ "\" NO se encuentra en el entorno local.");
+                        return _return;
+                    }
+                } 
                 
                 if(simbolo_tmp.getRol() == tipo_rol.arreglo)
                 {
+                    this.entorno_padre = entorno_padre;
+                    this.nivel = nivel;
+
                     var lista_accesos : Array<Number>;
-                    var arreglo_tmp   : Array<Simbolo>;
-                    var lista_tamaños : Array<Number>;
 
                     lista_accesos = new Array<Number>();
-
+                    
                     for(var x = 0; x < this.acceso1.length; x++)
                     {
                         var val_tmp: Simbolo;
-                        val_tmp = this.acceso1[x].analizar(entorno_padre, nivel);
+                        val_tmp = this.acceso1[x].analizar(entorno_padre,nivel);
 
                         if(val_tmp.getRol() == tipo_rol.valor && val_tmp.getTipo().getTipo() == tipo_dato.NUMERO)
                         {
@@ -78,7 +93,6 @@ class Sentencia_Asignacion extends Instruction
                         {
                             this.entorno_padre = entorno_padre;
                             this.nivel = nivel;
-
                             return val_tmp;
                         }
                         else
@@ -89,81 +103,18 @@ class Sentencia_Asignacion extends Instruction
                             _return = new Simbolo(tipo_rol.error, new Tipo(tipo_dato.CADENA), "33-12");
                             _return.setFila(this.fila);
                             _return.setColumna(this.columna);
-                            _return.setMensaje("Sentencia Asignación: El valor de acceso debe ser tipo númerico.");
+                            _return.setMensaje("Sentencia Acceso: El valor de acceso debe ser tipo númerico.");
                             return _return;
                         }
                     }
+                    
+                    this.entorno_padre = entorno_padre;
+                    this.nivel = nivel;
 
-                    arreglo_tmp = <Array<Simbolo>> simbolo_tmp.getMensaje();
-                    lista_tamaños = <Array<Number>> simbolo_tmp.getListaDimensiones();
-                   
-                    if(arreglo_tmp.length > 0 && lista_tamaños.length > 0)
-                    {
-                        var pos_rel : Number;
-                        pos_rel = 0;
-
-                        if(lista_tamaños.length == lista_accesos.length)
-                        {
-                            pos_rel =  lista_accesos[0].valueOf();
-
-                            for(var y: number = 1; y < lista_accesos.length; y++)
-                            {
-                                pos_rel = (pos_rel.valueOf() * lista_tamaños[y].valueOf()) + lista_accesos[y].valueOf();
-                            }
-
-                            if(pos_rel < 0)
-                            {
-                                this.entorno_padre = entorno_padre;
-                                this.nivel = nivel;
-
-                                _return = new Simbolo(tipo_rol.error, new Tipo(tipo_dato.CADENA), "33-12");
-                                _return.setFila(this.fila);
-                                _return.setColumna(this.columna);
-                                _return.setMensaje("Sentencia Asignación: Los valores de acceso no deben ser valores negativos.");
-                                return _return;
-                            }
-                            else
-                            {
-                                if(pos_rel < arreglo_tmp.length)
-                                {
-                                    _acceso = arreglo_tmp[pos_rel.valueOf()];
-                                }
-                                else
-                                {
-                                    this.entorno_padre = entorno_padre;
-                                    this.nivel = nivel;
-
-                                    _return = new Simbolo(tipo_rol.error, new Tipo(tipo_dato.CADENA), "33-12");
-                                    _return.setFila(this.fila);
-                                    _return.setColumna(this.columna);
-                                    _return.setMensaje("Sentencia Asignación: El valor de las posiciones de acceso es mayor al tamaño del arreglo.");
-                                    return _return;
-                                }
-                            }
-                        }
-                        else
-                        {
-                            this.entorno_padre = entorno_padre;
-                            this.nivel = nivel;
-
-                            _return = new Simbolo(tipo_rol.error, new Tipo(tipo_dato.CADENA), "33-12");
-                            _return.setFila(this.fila);
-                            _return.setColumna(this.columna);
-                            _return.setMensaje("Sentencia Asignación: El cantidad de accesos no coincide con las dimensiones del arreglo.");
-                            return _return;
-                        }
-                    }
-                    else
-                    {   
-                        this.entorno_padre = entorno_padre;
-                        this.nivel = nivel;
-
-                        _return = new Simbolo(tipo_rol.error, new Tipo(tipo_dato.CADENA), "33-12");
-                        _return.setFila(this.fila);
-                        _return.setColumna(this.columna);
-                        _return.setMensaje("Sentencia Asignación: El arreglo no a sido instanciado.");
-                        return _return;
-                    }
+                    _acceso = new Simbolo(tipo_rol.valor, simbolo_tmp.getTipo(), "");
+                    _acceso.setFila(this.fila);
+                    _acceso.setColumna(this.columna);
+                    _acceso.setMensaje("Sentencia Acceso [] succesful");
                 }
                 else if(simbolo_tmp.getRol() == tipo_rol.error)
                 {
@@ -187,6 +138,9 @@ class Sentencia_Asignacion extends Instruction
             }//ACCESO A TYPE
             else if(this.tipo == 2)
             {
+                this.entorno_padre = entorno_padre;
+                this.nivel = nivel;
+
                 _acceso = this.acceso2.analizar(entorno_padre, nivel);
             }// ACCESO NO DEFINIDO
             else
@@ -298,6 +252,9 @@ class Sentencia_Asignacion extends Instruction
             
             if(!_acceso.getConstante())
             {
+                this.entorno_padre = entorno_padre;
+                this.nivel = nivel;
+
                 _acceso.setTipo(_val_fin.getTipo());
                 _acceso.setMensaje(_val_fin.getMensaje());
                 _acceso.setListaDimensiones(_val_fin.getListaDimensiones());
@@ -338,15 +295,18 @@ class Sentencia_Asignacion extends Instruction
     }
 
     public traducir(salida : Middle)
-    {
+    {   let etapa = 0;
         let _return  : Simbolo;
         let _acceso  : Simbolo;
         let _val_fin : Simbolo;
         let _global  : Boolean;
+        let _arreglo : Boolean;
+        let _type    : Boolean;
         try
         {   
             if(this.tipo == 0)
-            {
+            {   _arreglo = false;
+                _type    = false;
                 if(this.entorno_padre.existsSimbolo(this.acceso0,this.nivel))
                 {                 
                     _acceso  = this.entorno_padre.getSimbolo(this.acceso0, this.nivel);
@@ -359,126 +319,75 @@ class Sentencia_Asignacion extends Instruction
                 }   
             }
             else if(this.tipo == 1)
-            {
+            {   etapa = 2;
+                _arreglo = true;
+                _type    = false;
                 var simbolo_tmp : Simbolo;
 
-                if(this.entorno_padre.existsSimbolo(this.acceso0,this.nivel))
+                if(this.entorno_padre.existsSimbolo(this.acceso0))
                 {                 
                     simbolo_tmp = this.entorno_padre.getSimbolo(this.acceso0,this.nivel);
                     _global = false;
                 }
                 else
                 {   
-                    simbolo_tmp = Tabla_Simbolos.getInstance().getSimbolo_global(this.acceso0);         
-                    _global = true;           
+                    simbolo_tmp = Tabla_Simbolos.getInstance().getSimbolo_global(this.acceso0);  
+                    _global = true;                    
                 }   
                 
-                if(simbolo_tmp.getRol() == tipo_rol.arreglo)
+                var lista_accesos : Array<Simbolo>;
+
+                lista_accesos = new Array<Simbolo>();
+
+                for(var x = 0; x < this.acceso1.length; x++)
                 {
-                    var lista_accesos : Array<Number>;
-                    var arreglo_tmp   : Array<Simbolo>;
-                    var lista_tamaños : Array<Number>;
-
-                    lista_accesos = new Array<Number>();
-
-                    for(var x = 0; x < this.acceso1.length; x++)
-                    {
-                        var val_tmp: Simbolo;
-                        val_tmp = this.acceso1[x].traducir(salida);
-
-                        if(val_tmp.getRol() == tipo_rol.valor && val_tmp.getTipo().getTipo() == tipo_dato.NUMERO)
-                        {
-                            lista_accesos.push(Number(val_tmp.getMensaje()));
-                        }
-                        else if(val_tmp.getRol() == tipo_rol.error && val_tmp.getTipo().getTipo() == tipo_dato.CADENA)
-                        {
-                            return val_tmp;
-                        }
-                        else
-                        {
-                            _return = new Simbolo(tipo_rol.error, new Tipo(tipo_dato.CADENA), "33-12");
-                            _return.setFila(this.fila);
-                            _return.setColumna(this.columna);
-                            _return.setMensaje("Sentencia Asignación: El valor de acceso debe ser tipo númerico.");
-                            return _return;
-                        }
-                    }
-
-                    arreglo_tmp = <Array<Simbolo>> simbolo_tmp.getMensaje();
-                    lista_tamaños = <Array<Number>> simbolo_tmp.getListaDimensiones();
-                   
-                    if(arreglo_tmp.length > 0 && lista_tamaños.length > 0)
-                    {
-                        var pos_rel : Number;
-                        pos_rel = 0;
-
-                        if(lista_tamaños.length == lista_accesos.length)
-                        {
-                            pos_rel =  lista_accesos[0].valueOf();
-
-                            for(var y: number = 1; y < lista_accesos.length; y++)
-                            {
-                                pos_rel = (pos_rel.valueOf() * lista_tamaños[y].valueOf()) + lista_accesos[y].valueOf();
-                            }
-
-                            if(pos_rel < 0)
-                            {
-                                _return = new Simbolo(tipo_rol.error, new Tipo(tipo_dato.CADENA), "33-12");
-                                _return.setFila(this.fila);
-                                _return.setColumna(this.columna);
-                                _return.setMensaje("Sentencia Asignación: Los valores de acceso no deben ser valores negativos.");
-                                return _return;
-                            }
-                            else
-                            {
-                                if(pos_rel < arreglo_tmp.length)
-                                {
-                                    _acceso = arreglo_tmp[pos_rel.valueOf()];
-                                }
-                                else
-                                {
-                                    _return = new Simbolo(tipo_rol.error, new Tipo(tipo_dato.CADENA), "33-12");
-                                    _return.setFila(this.fila);
-                                    _return.setColumna(this.columna);
-                                    _return.setMensaje("Sentencia Asignación: El valor de las posiciones de acceso es mayor al tamaño del arreglo.");
-                                    return _return;
-                                }
-                            }
-                        }
-                        else
-                        {
-                            _return = new Simbolo(tipo_rol.error, new Tipo(tipo_dato.CADENA), "33-12");
-                            _return.setFila(this.fila);
-                            _return.setColumna(this.columna);
-                            _return.setMensaje("Sentencia Asignación: El cantidad de accesos no coincide con las dimensiones del arreglo.");
-                            return _return;
-                        }
-                    }
-                    else
-                    {   
-                        _return = new Simbolo(tipo_rol.error, new Tipo(tipo_dato.CADENA), "33-12");
-                        _return.setFila(this.fila);
-                        _return.setColumna(this.columna);
-                        _return.setMensaje("Sentencia Asignación: El arreglo no a sido instanciado.");
-                        return _return;
-                    }
+                    var val_tmp: Simbolo;
+                    val_tmp = this.acceso1[x].traducir(salida);
+                    lista_accesos.push(val_tmp);
                 }
-                else if(simbolo_tmp.getRol() == tipo_rol.error)
+  
+                let etiqueta_posicion_stack_array = "t" + Tabla_Simbolos.getInstance().getTemporal();                          
+                let etiqueta_posicion_heap_array = "t" + Tabla_Simbolos.getInstance().getTemporal();
+                let etiqueta_posicion_length_array = "t" + Tabla_Simbolos.getInstance().getTemporal();
+                let etiqueta_length_array = "t" + Tabla_Simbolos.getInstance().getTemporal();
+                let etiqueta_length_total_array = "t" + Tabla_Simbolos.getInstance().getTemporal();
+                let etiqueta_pos_especifica_array = "t" + Tabla_Simbolos.getInstance().getTemporal();
+                let etiqueta_valor_array = "t" + Tabla_Simbolos.getInstance().getTemporal();
+
+                Middle.getInstance().setOuput("");
+                Middle.getInstance().setOuput("//Acceso a Arreglo");
+                if(!_global)
                 {
-                    _return = simbolo_tmp;
-                    return _return;
+                    Middle.getInstance().setOuput(etiqueta_posicion_stack_array + " = P + " +  simbolo_tmp.getPos_S() + ";");
                 }
                 else
                 {
-                    _return = new Simbolo(tipo_rol.error, new Tipo(tipo_dato.CADENA), "33-12");
-                    _return.setFila(this.fila);
-                    _return.setColumna(this.columna);
-                    _return.setMensaje("Sentencia Asignación: Se especificaron dimension(es) de acceso para un No arreglo.");
-                    return _return;
-                } 
+                    Middle.getInstance().setOuput(etiqueta_posicion_stack_array + " = 0 + " +  simbolo_tmp.getPos_S() + ";");
+                }
+                
+                Middle.getInstance().setOuput(etiqueta_posicion_length_array + " = Stack[(int)" + etiqueta_posicion_stack_array + "];");
+                Middle.getInstance().setOuput(etiqueta_posicion_heap_array + " = " + etiqueta_posicion_length_array + " + 1;");
+                Middle.getInstance().setOuput(etiqueta_length_array + " = Heap[(int)" + etiqueta_posicion_length_array + "];");
+                Middle.getInstance().setOuput(etiqueta_length_total_array + " = " + etiqueta_posicion_heap_array + " + " + etiqueta_length_array +  ";");
+
+                for(var i = 0; i < lista_accesos.length; i++)
+                {   
+                    if(i==0)
+                    {
+                        Middle.getInstance().setOuput(etiqueta_pos_especifica_array + " = " + etiqueta_posicion_heap_array  + " + " + lista_accesos[i].getMensaje() + ";"); 
+                    }                                                                                                                   
+                }
+
+                _acceso = new Simbolo(tipo_rol.valor, simbolo_tmp.getTipo(), "");
+                _acceso.setFila(this.fila);
+                _acceso.setColumna(this.columna);
+                _acceso.setMensaje(etiqueta_pos_especifica_array);
             }
             else if(this.tipo == 2)
             {
+                _global = false;
+                _arreglo = false;
+                _type    = true;
                 _acceso = this.acceso2.traducir(salida);
             }
             else
@@ -493,23 +402,38 @@ class Sentencia_Asignacion extends Instruction
             //console.log("==========");console.log(_acceso); console.log(this.valor);console.log("==========");
             _val_fin = this.valor.traducir(salida);
             //console.log("++++++++++");console.log(_acceso); console.log(_val_fin);  console.log("++++++++++");
-
-            let temporal_posR =  "t" + Tabla_Simbolos.getInstance().getTemporal();
-            let temporal_posS =  "t" + Tabla_Simbolos.getInstance().getTemporal();
-            let temporal_valor = "t" + Tabla_Simbolos.getInstance().getTemporal();
-
             Middle.getInstance().setOuput("//Asignacion ");
-            if(!_global)
+            if(_arreglo == false && _type == false)
+            {   
+                let temporal_posR =  "t" + Tabla_Simbolos.getInstance().getTemporal();
+                let temporal_posS =  "t" + Tabla_Simbolos.getInstance().getTemporal();
+                let temporal_valor = "t" + Tabla_Simbolos.getInstance().getTemporal();
+
+                if(!_global)
+                {
+                    Middle.getInstance().setOuput(temporal_posS + " =  P + 0;");
+                }
+                else
+                {
+                    Middle.getInstance().setOuput(temporal_posS + " =  0 + 0;");
+                }
+                Middle.getInstance().setOuput(temporal_posR + " =  " + temporal_posS +  " + " + _acceso.getPos_S() + ";");
+                Middle.getInstance().setOuput(temporal_valor + " = "  + _val_fin.getMensaje() + ";");
+                Middle.getInstance().setOuput("Stack[(int)" + temporal_posR + "] = " + temporal_valor + ";");
+            }
+            else if(_arreglo == true && _type == false)
+            {   //console.log(_acceso); console.log(_val_fin);
+                Middle.getInstance().setOuput("Heap[(int)" + _acceso.getMensaje() + "] = " + _val_fin.getMensaje() + ";");
+            }
+            else if(_arreglo == false && _type == true)
             {
-                Middle.getInstance().setOuput(temporal_posS + " =  P + 0;");
+
             }
             else
             {
-                Middle.getInstance().setOuput(temporal_posS + " =  0 + 0;");
+                Middle.getInstance().clear3D();
+                Middle.getInstance().setOuput("Error Asignación: Rol no definido;");
             }
-            Middle.getInstance().setOuput(temporal_posR + " =  " + temporal_posS +  " + " + _acceso.getPos_S() + ";");
-            Middle.getInstance().setOuput(temporal_valor + " = "  + _val_fin.getMensaje() + ";");
-            Middle.getInstance().setOuput("Stack[(int)" + temporal_posR + "] = " + temporal_valor + ";");
 
             _return = new Simbolo(tipo_rol.aceptado,new Tipo(tipo_dato.CADENA),"10-4"); 
             _return.setMensaje("Asignación Succesful");

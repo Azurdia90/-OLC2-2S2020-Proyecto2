@@ -49,8 +49,6 @@ export class FormularioTablaSimbolosComponent implements OnInit {
         }
       }
     }
-    
-    console.log(this.lista);
   }
 
   private traducir_Rol(p_tipo: number)

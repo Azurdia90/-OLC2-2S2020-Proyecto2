@@ -73,10 +73,11 @@ class Sentencia_Instancia extends Instruction
                 }
                 
                 _return = new Simbolo(tipo_rol.arreglo, tipo_arreglo, "");
-                _return.setMensaje("Arreglo creado exitosamente");
                 _return.getListaFunciones().push(new Funcion_Length(this.fila,this.columna));
                 _return.getListaFunciones().push(new Funcion_Push(this.fila,this.columna));
                 _return.getListaFunciones().push(new Funcion_Pop(this.fila,this.columna));
+                _return.getListaDimensiones().push(arreglo_val.length);
+                _return.setMensaje("Arreglo creado exitosamente");
                 
                 this.entorno_padre = entorno_padre;
                 this.nivel = nivel;
@@ -181,19 +182,21 @@ class Sentencia_Instancia extends Instruction
 
                 Middle.getInstance().setOuput("");
                 Middle.getInstance().setOuput(temporal_posH + " = H;"); 
-                Middle.getInstance().setOuput("Heap[H] = " + arreglo_val.length + ";"); 
+                Middle.getInstance().setOuput("Heap[(int)H] = " + arreglo_val.length + ";"); 
                 Middle.getInstance().setOuput("H = H + 1;");   
 
                 for(var x = 0; x < arreglo_val.length; x++)
                 {
-                    Middle.getInstance().setOuput("Heap[H] = " + arreglo_val[x].getMensaje() + ";"); 
+                    Middle.getInstance().setOuput("Heap[(int)H] = " + arreglo_val[x].getMensaje() + ";"); 
                     Middle.getInstance().setOuput("H = H + 1;");  
                 }                
                  
                 _return = new Simbolo(tipo_rol.arreglo,arreglo_val[0].getTipo(), "");
+                _return.getListaDimensiones().push(arreglo_val.length);
                 _return.setFila(this.fila);
                 _return.setColumna(this.columna);
                 _return.setMensaje(temporal_posH);
+               
                 return _return;
                 
             }

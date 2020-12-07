@@ -30,7 +30,7 @@ class Resta extends Expresion
         let _return : Simbolo;
         
         try
-        {
+        {   
             let op1 : Simbolo = (this.operador_izq == null) ? null : this.operador_izq.analizar(entorno_padre, nivel);
             let op2 : Simbolo = (this.operador_der == null) ? null : this.operador_der.analizar(entorno_padre, nivel);
 
@@ -118,7 +118,7 @@ class Resta extends Expresion
                 op1 = (this.operador_izq == null) ? null : this.operador_izq.traducir(salida);
                 op2 = (this.operador_der == null) ? null : this.operador_der.traducir(salida);
             }
-
+            //if(op1 == undefined){console.log(this.operador_izq);}if(op2 == undefined){console.log(this.operador_der);}
             let tipo_resta :tipo_operacion_resultado;
 
             if (op1.getRol() != tipo_rol.valor && op1.getRol() != tipo_rol.arreglo)
@@ -130,7 +130,7 @@ class Resta extends Expresion
             {
                 return op2;
             }
-
+            
             tipo_resta = this.matriz_operacion_resta[op1.getTipo().getTipo()] [op2.getTipo().getTipo()];
 
             switch(tipo_resta)

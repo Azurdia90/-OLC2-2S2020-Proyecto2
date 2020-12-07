@@ -86,7 +86,7 @@ class Sentencia_Declaracion extends Instruction
             etapa = 4//Verificar Rol y Tipos Sean Validos
             if(this.rol != _val_fin.getRol())
             {
-                if( !( ((this.rol == tipo_rol.valor && (this.tipo.Equals(new Tipo(tipo_dato.NULO)) || this.tipo.Equals(new Tipo(tipo_dato.VOID)))) &&  _val_fin.getRol() == tipo_rol.type) || (this.rol == tipo_rol.type &&  (_val_fin.getRol() == tipo_rol.valor && (_val_fin.getTipo().Equals(new Tipo(tipo_dato.NULO)) || _val_fin.getTipo().Equals(new Tipo(tipo_dato.VOID))))) ) )
+                if( !(((this.rol == tipo_rol.valor && (this.tipo.Equals(new Tipo(tipo_dato.NULO)) || this.tipo.Equals(new Tipo(tipo_dato.VOID)))) &&  _val_fin.getRol() == tipo_rol.type) || ((this.rol == tipo_rol.valor && (this.tipo.Equals(new Tipo(tipo_dato.NULO)) || this.tipo.Equals(new Tipo(tipo_dato.VOID)))) &&  _val_fin.getRol() == tipo_rol.arreglo) || (this.rol == tipo_rol.arreglo &&  (_val_fin.getRol() == tipo_rol.valor && (_val_fin.getTipo().Equals(new Tipo(tipo_dato.NULO)) || _val_fin.getTipo().Equals(new Tipo(tipo_dato.VOID))))) || (this.rol == tipo_rol.type &&  (_val_fin.getRol() == tipo_rol.valor && (_val_fin.getTipo().Equals(new Tipo(tipo_dato.NULO)) || _val_fin.getTipo().Equals(new Tipo(tipo_dato.VOID))))) ) )
                 {
                     if(this.rol == tipo_rol.valor && _val_fin.getRol() == tipo_rol.arreglo)
                     {
@@ -179,11 +179,8 @@ class Sentencia_Declaracion extends Instruction
                     }
                     else if(this.rol == tipo_rol.arreglo)
                     {
-                        var arreglo_tmp: Array<Simbolo>;
-                        var lista_dimensiones_tmp: Array<Number>;
-
-                        arreglo_tmp: new Array<Simbolo>();
-                        lista_dimensiones_tmp: new Array<Number>();
+                        let arreglo_tmp: Array<Simbolo>;
+                        let lista_dimensiones_tmp: Array<Number>;
 
                         for(var x = 0; x < this.dimensiones; x++);
                         {
@@ -218,13 +215,13 @@ class Sentencia_Declaracion extends Instruction
                         {
                             _val_fin = new Simbolo(tipo_rol.arreglo, new Tipo(tipo_dato.NULO), "");
                             _val_fin.setListaDimensiones(lista_dimensiones_tmp);
-                            _val_fin.setMensaje("null");
+                            _val_fin.setMensaje("0");
                         }
                     }
                     else if(this.rol == tipo_rol.type)
                     {
                         _val_fin = new Simbolo(tipo_rol.type, new Tipo(tipo_dato.NULO), "");
-                        _val_fin.setMensaje("null");
+                        _val_fin.setMensaje("0");
                     }
                     else
                     {
@@ -357,7 +354,7 @@ class Sentencia_Declaracion extends Instruction
             if(this.valor == undefined && this.valor_ext == undefined)
             {
                 _val_fin = new Simbolo(tipo_rol.valor, new Tipo(tipo_dato.VOID), "");
-                _val_fin.setMensaje("null");
+                _val_fin.setMensaje("0");
             }
             else if(this.valor == undefined && this.valor_ext != undefined)
             {

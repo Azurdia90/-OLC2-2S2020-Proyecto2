@@ -77,15 +77,6 @@ class Sentencia_While extends Instruction
                     continue;
                 }       
             }  
-
-            if(_return.getRol() == tipo_rol.detener)
-            {
-                _return = new Simbolo(tipo_rol.aceptado,new Tipo(tipo_dato.CADENA), "10-4");
-                _return.setFila(this.fila);
-                _return.setColumna(this.columna);
-                _return.setMensaje("Sentencia While Ejecutada correctamente");  
-                return _return;
-            }    
                        
             _return = new Simbolo(tipo_rol.aceptado,new Tipo(tipo_dato.CADENA), "10-4");
             _return.setFila(this.fila);
@@ -114,12 +105,12 @@ class Sentencia_While extends Instruction
             let etiqueta_positiva = "l" + Tabla_Simbolos.getInstance().getEtiqueta();
             let etiqueta_negativa = "l" + Tabla_Simbolos.getInstance().getEtiqueta(); 
 
+            Middle.getInstance().setOuput("//sentencia While");
             Middle.getInstance().setOuput(etiqueta_inicio + ":");
 
             tmp_val = (this.sentencia_comparacion == null) ? null : this.sentencia_comparacion.traducir(salida);
-            
-            etapa = 1;
-            Middle.getInstance().setOuput("//sentencia While");
+
+            etapa = 1;            
             Middle.getInstance().setOuput("if(" + tmp_val.getMensaje() + ") goto " + etiqueta_positiva + ";");
             Middle.getInstance().setOuput("goto " + etiqueta_negativa + ";"); 
             Middle.getInstance().setOuput(etiqueta_positiva + ":"); 
@@ -133,9 +124,10 @@ class Sentencia_While extends Instruction
                 this.lista_sentencias[x].setEtiquetaReturn(this.etiqueta_return);
 
                 val_sentencia = this.lista_sentencias[x].traducir(salida)
+                _return = val_sentencia;
+
                 if (val_sentencia.getRol() == tipo_rol.error)
                 {                        
-                    _return = val_sentencia;
                     return _return;
                 }    
             }  

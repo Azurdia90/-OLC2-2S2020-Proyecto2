@@ -8,6 +8,7 @@ import Tipo from './Tipo';
 
 class Funcion extends Instruction
 {
+    protected rol  : tipo_rol;
     protected tipo : Tipo;
     protected identificador : String;
     protected identificador_3D : String;

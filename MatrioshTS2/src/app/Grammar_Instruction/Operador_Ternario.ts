@@ -63,7 +63,7 @@ class Operador_Ternario extends Expresion
 
                 if(op_izq.getTipo().Equals(op_der.getTipo()))
                 {
-                    return this.operador_izq;
+                    return op_izq;
                 }
                 else
                 {

@@ -18,7 +18,6 @@ class Sentencia_Return extends Instruction
     public analizar(entorno_padre : Entorno, nivel : number)
     {
         var _return: Simbolo;
-        var _return_tmp  : Simbolo;
         try
         {
             if(this.valor != undefined)
@@ -26,17 +25,16 @@ class Sentencia_Return extends Instruction
                 this.entorno_padre = entorno_padre;
                 this.nivel = nivel;
 
-                _return_tmp = this.valor.analizar(entorno_padre, nivel);
-                _return = _return_tmp;
+                _return = this.valor.analizar(entorno_padre, nivel);
+                //console.log(_return);
                 return  _return;
             }
             else
             {
-                var simbolo_retorno = new Simbolo(tipo_rol.valor, new Tipo(tipo_dato.VOID), "");
+                _return = new Simbolo(tipo_rol.valor, new Tipo(tipo_dato.VOID), "");
                 _return.setFila(this.fila);
                 _return.setColumna(this.columna);
-                simbolo_retorno.setMensaje("null");
-
+                _return.setMensaje("null");
                 return _return;
             }
         }
@@ -54,6 +52,7 @@ class Sentencia_Return extends Instruction
     {
         try
         {    
+            let _return: Simbolo;
             var temporal_retorno = "t" + Tabla_Simbolos.getInstance().getTemporal();
 
             if(this.valor != undefined)
@@ -73,7 +72,7 @@ class Sentencia_Return extends Instruction
                 Middle.getInstance().setOuput("goto " + this.etiqueta_return + ";");
             }
 
-            let _return: Simbolo = new Simbolo(tipo_rol.aceptado,new Tipo(tipo_dato.CADENA), "10-4")
+            _return = new Simbolo(tipo_rol.aceptado,new Tipo(tipo_dato.CADENA), "10-4")
             _return.setFila(this.fila);
             _return.setColumna(this.columna);
             _return.setMensaje("Sentencia Return successful");  

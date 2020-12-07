@@ -40,7 +40,7 @@ class Not extends Expresion
                 return op1;
             }
 
-            if (!(op1.getTipo().getTipo() == tipo_dato.BOOLEANO))
+            if (!(op1.getTipo().Equals( new Tipo(tipo_dato.BOOLEANO))))
             {
                 this.entorno_padre = entorno_padre;
                 this.nivel = nivel;
@@ -90,7 +90,7 @@ class Not extends Expresion
 
             op1 = (this.operador_izq == null) ? null : this.operador_izq.traducir(salida);
 
-            Middle.getInstance().setOuput(temporal_resultado + " == 1;");
+            Middle.getInstance().setOuput(temporal_resultado + " = 1;");
             Middle.getInstance().setOuput("if (" + op1.getMensaje() + ") goto " + etiqueta_positiva + ";");
             Middle.getInstance().setOuput( "goto " + etiqueta_negativa + ";"); 
             Middle.getInstance().setOuput(etiqueta_positiva + ":"); 

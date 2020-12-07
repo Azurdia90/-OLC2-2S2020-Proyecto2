@@ -110,7 +110,7 @@ class Funcion_Log extends Funcion
                 let tam_metodo = this.entorno_local.getSize();
                 let temporal_simulado = "t" + Tabla_Simbolos.getInstance().getTemporal();
                 let temporal_contador = "t" + Tabla_Simbolos.getInstance().getTemporal();
-                console.log(this.valores_imprimir);
+                
                 if(this.valores_imprimir[i].getTipo().getTipo() == tipo_dato.VOID || this.valores_imprimir[i].getTipo().getTipo() == tipo_dato.NULO)
                 {
                     continue;

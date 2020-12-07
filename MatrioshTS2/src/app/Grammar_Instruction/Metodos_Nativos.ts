@@ -19,7 +19,6 @@ class Metodos_Nativos
     {
         var proc_impresion_booleano : string;
 
-
         var proc_impresion_numero: string;
 
         var proc_impresion_cadena : string;
@@ -30,6 +29,10 @@ class Metodos_Nativos
 
         var proc_cast_numero_cadena : string;
 
+        var proc_toLowerCase : String;
+
+        var proc_toUpperCase : String;
+
         var proc_pow_potencia_numero : string;
 
         var proc_cast_cadena_numero : string;
@@ -37,6 +40,8 @@ class Metodos_Nativos
         var proc_cast_cadena_numero : string;
 
         var proc_length_array : string;
+
+        var proc_length_string : string ;
 
         var all_proc_impresion : string;
 
@@ -267,6 +272,72 @@ class Metodos_Nativos
                                     +"    Stack[(int)t31] = t8;\n"
                                     +"}\n";
 
+        proc_toLowerCase  =  "void toLowerCase_String()\n"
+                            +"{\n"
+                            +"    //t0 this, t1 retorno;\n" 
+                            +"    t1 = H;\n"
+                            +"    t2 = t1;\n"                   
+                            +"    t3 = P + 2;\n"
+                            +"    t4 = Stack[(int)t3];\n"
+                            +"    l25:\n"
+                            +"    t5 = Heap[(int)t4];\n"
+                            +"    if(t5 == 3) goto l27;\n"
+                            +"    if(t5 < 65) goto l26;\n"
+                            +"    if(t5 > 90) goto l26;\n"
+                            +"    t6 = t5;\n"
+                            +"    t6 = t6 + 32;\n"
+                            +"    Heap[(int)t2] = t6;\n"
+                            +"    t4 = t4 + 1;\n"
+                            +"    t2 = t2 + 1;\n"
+                            +"    H = H + 1;\n"
+                            +"    goto l25;\n"
+                            +"    l26:\n"
+                            +"    t6 = t5;\n"
+                            +"    Heap[(int)t2] = t6;\n"
+                            +"    t4 = t4 + 1;\n"
+                            +"    t2 = t2 + 1;\n"
+                            +"    H = H + 1;\n"
+                            +"    goto l25;\n"
+                            +"    l27:\n"
+                            +"    Heap[(int)t2] = 3;\n"
+                            +"    H = H + 1;\n"
+                            +"    t6 = P + 1;\n"
+                            +"    Stack[(int)t6] = t1;\n"
+                            +"}\n"; 
+                
+        proc_toUpperCase =   "void toUpperCase_String()\n"
+                            +"{\n"
+                            +"    //t0 this, t1 retorno;\n" 
+                            +"    t1 = H;\n"
+                            +"    t2 = t1;\n"                   
+                            +"    t3 = P + 2;\n"
+                            +"    t4 = Stack[(int)t3];\n"
+                            +"    l28:\n"
+                            +"    t5 = Heap[(int)t4];\n"
+                            +"    if(t5 == 3) goto l30;\n"
+                            +"    if(t5 < 97) goto l29;\n"
+                            +"    if(t5 > 122) goto l29;\n"
+                            +"    t6 = t5;\n"
+                            +"    t6 = t6 - 32;\n"
+                            +"    Heap[(int)t2] = t6;\n"
+                            +"    t4 = t4 + 1;\n"
+                            +"    t2 = t2 + 1;\n"
+                            +"    H = H + 1;\n"
+                            +"    goto l28;\n"
+                            +"    l29:\n"
+                            +"    t6 = t5;\n"
+                            +"    Heap[(int)t2] = t6;\n"
+                            +"    t4 = t4 + 1;\n"
+                            +"    t2 = t2 + 1;\n"
+                            +"    H = H + 1;\n"
+                            +"    goto l28;\n"
+                            +"    l30:\n"
+                            +"    Heap[(int)t2] = 3;\n"
+                            +"    H = H + 1;\n"
+                            +"    t6 = P + 1;\n"
+                            +"    Stack[(int)t6] = t1;\n"
+                            +"}\n"; 
+
         proc_cast_cadena_numero  =  "void cast_cadena_numero() \n"
                                     +"{\n"
                                     +"    //t0 this, t1 retorno;\n"
@@ -328,13 +399,30 @@ class Metodos_Nativos
                             +"    t3 = Heap[(int)t2];\n"
                             +"    t4 = P + 1;\n"
                             +"    Stack[(int)t4] = t3;\n"
+                            +"}\n";
+
+        proc_length_string = "void length_string()\n"
+                            +"{"
+                            +"    //t0 this, t1 retorno;\n"
+                            +"    t1 = P + 2;\n"
+                            +"    t4 = 0;\n"
+                            +"    t2 = Stack[(int)t1];\n"
+                            +"    l23:\n"
+                            +"    t3 = Heap[(int)t2];\n"
+                            +"    if(t3 == 3) goto l24;\n"
+                            +"    t2 = t2 + 1;\n"
+                            +"    t4 = t4 + 1;\n"
+                            +"    goto l23;\n"
+                            +"    l24:\n"
+                            +"    t4 = P + 1;\n"
+                            +"    Stack[(int)t4] = t4;\n"
                             +"}\n";  
 
         all_proc_impresion = "\n"+proc_impresion_booleano+"\n"+proc_impresion_numero+"\n"+"\n"+proc_impresion_cadena+"\n"
                              +proc_pow_potencia_numero+"\n"+proc_concatenacion_cadena+"\n"
                              +proc_cast_boolean_cadena+"\n"+proc_cast_numero_cadena+"\n"
-                             +proc_cast_cadena_numero+"\n"
-                             +proc_length_array;
+                             +proc_cast_cadena_numero+"\n"+proc_toLowerCase+"\n"+proc_toUpperCase+"\n"
+                             +proc_length_array + "\n" + proc_length_string;
 
         return all_proc_impresion;
     }

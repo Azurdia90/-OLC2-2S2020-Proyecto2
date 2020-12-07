@@ -85,42 +85,101 @@ class Dato_Primitivo extends Expresion
                 {   
                     _return = Tabla_Simbolos.getInstance().getSimbolo_global(this.valor);                   
                 }  
+                //console.log(_return);
                 return  _return;
             }
             else if(this.tipo.getTipo() == tipo_dato.IDENTIFICADOR && this.dimensiones.length > 0)
             {   etapa = 2;
-                var simbolo_tmp : Simbolo;
-
                 this.entorno_padre = entorno_padre;
                 this.nivel = nivel;
-
+                
+                var simbolo_tmp : Simbolo;
+                
                 if(entorno_padre.existsSimbolo(this.valor, nivel))
                 {                 
                     simbolo_tmp = entorno_padre.getSimbolo(this.valor, nivel);
                 }
                 else
                 {   
-                    simbolo_tmp = Tabla_Simbolos.getInstance().getSimbolo_global(this.valor,);                     
-                }   
+                    if(Tabla_Simbolos.getInstance().existsSimbolo_global(this.valor))
+                    {
+                        simbolo_tmp = Tabla_Simbolos.getInstance().getSimbolo_global(this.valor);                    
+                    }
+                    else
+                    {
+                        this.entorno_padre = entorno_padre;
+                        this.nivel = nivel;
+
+                        _return = new Simbolo(tipo_rol.error,new Tipo(tipo_dato.CADENA), "33-12");
+                        _return.setFila(this.fila);
+                        _return.setColumna(this.columna);
+                        _return.setMensaje("La variable: \"" + this.valor+ "\" NO se encuentra en el entorno local.");
+                        return _return;
+                    }
+                } 
                 
                 if(simbolo_tmp.getRol() == tipo_rol.arreglo)
-                {          
-                    _return = simbolo_tmp;
+                {
+                    this.entorno_padre = entorno_padre;
+                    this.nivel = nivel;
+                    
+                    var lista_accesos : Array<Number>;
+
+                    lista_accesos = new Array<Number>();
+
+                    for(var x = 0; x < this.dimensiones.length; x++)
+                    {
+                        var val_tmp: Simbolo;
+                        val_tmp = this.dimensiones[x].analizar(entorno_padre,nivel);
+
+                        if(val_tmp.getRol() == tipo_rol.valor && val_tmp.getTipo().getTipo() == tipo_dato.NUMERO)
+                        {
+                            lista_accesos.push(Number(val_tmp.getMensaje()));
+                        }
+                        else if(val_tmp.getRol() == tipo_rol.error && val_tmp.getTipo().getTipo() == tipo_dato.CADENA)
+                        {
+                            this.entorno_padre = entorno_padre;
+                            this.nivel = nivel;
+                            return val_tmp;
+                        }
+                        else
+                        {
+                            this.entorno_padre = entorno_padre;
+                            this.nivel = nivel;
+
+                            _return = new Simbolo(tipo_rol.error, new Tipo(tipo_dato.CADENA), "33-12");
+                            _return.setFila(this.fila);
+                            _return.setColumna(this.columna);
+                            _return.setMensaje("Sentencia Acceso: El valor de acceso debe ser tipo númerico.");
+                            return _return;
+                        }
+                    }
+
+                    _return = new Simbolo(tipo_rol.valor, simbolo_tmp.getTipo(), "");
+                    _return.setFila(this.fila);
+                    _return.setColumna(this.columna);
+                    _return.setMensaje("Sentencia Acceso [] succesful");
                     return _return;
                 }
                 else if(simbolo_tmp.getRol() == tipo_rol.error)
                 {
+                    this.entorno_padre = entorno_padre;
+                    this.nivel = nivel;
+
                     _return = simbolo_tmp;
                     return _return;
                 }
                 else
                 {
+                    this.entorno_padre = entorno_padre;
+                    this.nivel = nivel;
+
                     _return = new Simbolo(tipo_rol.error, new Tipo(tipo_dato.CADENA), "33-12");
                     _return.setFila(this.fila);
                     _return.setColumna(this.columna);
-                    _return.setMensaje("Se especificaron dimension(es) de acceso para un No arreglo.");
+                    _return.setMensaje("Sentencia Acceso: Se especificaron dimension(es) de acceso para un No arreglo.");
                     return _return;
-                } 
+                }
             }                               
             else
             {
@@ -189,11 +248,38 @@ class Dato_Primitivo extends Expresion
                 Middle.getInstance().setOuput("\n");
                 Middle.getInstance().setOuput(temporal_pos_heap + " =  H;");
                 
+                var escape : boolean = false
                 for(var i = 0; i < cadena.length; i++)
                 {
                     var caracter= cadena.charCodeAt(i);
-                    Middle.getInstance().setOuput("Heap[(int)H] = " + caracter + ";");
-                    Middle.getInstance().setOuput("H = H + 1;");                    
+        
+                    if(caracter == 92)
+                    {
+                        escape = true;
+                    }
+                    else
+                    {
+                        if(escape)
+                        {
+                            switch(caracter)
+                            {
+                                case 110:
+                                    caracter = 10;
+                                    break;
+                                case 114:
+                                    caracter = 13;
+                                    break;
+                                case 116:
+                                    caracter = 11;
+                                    break;
+                                default :
+                                    caracter = 0;
+                            }
+                            escape = false;
+                        }
+                        Middle.getInstance().setOuput("Heap[(int)H] = " + caracter + ";");
+                        Middle.getInstance().setOuput("H = H + 1;");  
+                    }              
                 }
 
                 Middle.getInstance().setOuput("Heap[(int)H] = 3;");
@@ -220,7 +306,7 @@ class Dato_Primitivo extends Expresion
                 }
                 else
                 {   
-                    retorno = Tabla_Simbolos.getInstance().getSimbolo_global(this.valor);   
+                    retorno = Tabla_Simbolos.getInstance().getSimbolo_global(this.valor);
                     Middle.getInstance().setOuput(temporal_posicion_stack +  " = 0 + " + retorno.getPos_S() + ";");                
                 }  
 
@@ -232,9 +318,8 @@ class Dato_Primitivo extends Expresion
                 return _return;
             }
             else if(this.tipo.getTipo() == tipo_dato.IDENTIFICADOR && this.dimensiones.length > 0)
-            {   
+            {   etapa = 2;
                 var simbolo_tmp : Simbolo;
-                etapa = 2;
 
                 if(this.entorno_padre.existsSimbolo(this.valor))
                 {                 
@@ -245,16 +330,48 @@ class Dato_Primitivo extends Expresion
                     simbolo_tmp = Tabla_Simbolos.getInstance().getSimbolo_global(this.valor);                      
                 }   
                 
-                if(simbolo_tmp.getRol() == tipo_rol.arreglo)
-                {          
-                    _return = simbolo_tmp;
-                    return _return;
-                }
-                else
+                var lista_accesos : Array<Simbolo>;
+
+                lista_accesos = new Array<Simbolo>();
+
+                for(var x = 0; x < this.dimensiones.length; x++)
                 {
-                    _return = simbolo_tmp;
-                    return _return;
+                    var val_tmp: Simbolo;
+                    val_tmp = this.dimensiones[x].traducir(salida);
+                    lista_accesos.push(val_tmp);
                 }
+  
+                let etiqueta_posicion_stack_array = "t" + Tabla_Simbolos.getInstance().getTemporal();                          
+                let etiqueta_posicion_heap_array = "t" + Tabla_Simbolos.getInstance().getTemporal();
+                let etiqueta_posicion_length_array = "t" + Tabla_Simbolos.getInstance().getTemporal();
+                let etiqueta_length_array = "t" + Tabla_Simbolos.getInstance().getTemporal();
+                let etiqueta_length_total_array = "t" + Tabla_Simbolos.getInstance().getTemporal();
+                let etiqueta_pos_especifica_array = "t" + Tabla_Simbolos.getInstance().getTemporal();
+                let etiqueta_valor_array = "t" + Tabla_Simbolos.getInstance().getTemporal();
+
+                Middle.getInstance().setOuput("");
+                Middle.getInstance().setOuput("//Acceso a Arreglo");
+                Middle.getInstance().setOuput(etiqueta_posicion_stack_array + " = P + " +  simbolo_tmp.getPos_S() + ";");
+                Middle.getInstance().setOuput(etiqueta_posicion_length_array + " = Stack[(int)" + etiqueta_posicion_stack_array + "];");
+                Middle.getInstance().setOuput(etiqueta_posicion_heap_array + " = " + etiqueta_posicion_length_array + " + 1;");
+                Middle.getInstance().setOuput(etiqueta_length_array + " = Heap[(int)" + etiqueta_posicion_length_array + "];");
+                Middle.getInstance().setOuput(etiqueta_length_total_array + " = " + etiqueta_posicion_heap_array + " + " + etiqueta_length_array +  ";");
+
+                for(var i = 0; i < lista_accesos.length; i++)
+                {   
+                    if(i==0)
+                    {
+                        Middle.getInstance().setOuput(etiqueta_pos_especifica_array + " = " + etiqueta_posicion_heap_array  + " + " + lista_accesos[i].getMensaje() + ";"); 
+                    }                                                                                                                   
+                }
+    
+                Middle.getInstance().setOuput(etiqueta_valor_array+ " = Heap[(int)" + etiqueta_pos_especifica_array + "];");
+
+                _return = new Simbolo(tipo_rol.valor, simbolo_tmp.getTipo(), "");
+                _return.setFila(this.fila);
+                _return.setColumna(this.columna);
+                _return.setMensaje(etiqueta_valor_array);
+                return _return;
             }                               
             else
             {   etapa = 3;

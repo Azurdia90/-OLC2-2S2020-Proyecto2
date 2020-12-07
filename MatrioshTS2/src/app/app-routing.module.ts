@@ -23,6 +23,10 @@ const routes: Routes = [
     loadChildren: () => import('./Pages/grafica/grafica.module').then( m => m.GraficaPageModule)
   },
   {
+    path: 'optimizacion',
+    loadChildren: () => import('./Pages/optimizacion/optimizacion.module').then( m => m.OptimizacionPageModule)
+  },
+  {
     path: '',
     redirectTo: 'home',
     pathMatch: 'full'

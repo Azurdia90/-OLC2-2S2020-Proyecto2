@@ -136,7 +136,7 @@ class Modulo extends Expresion
             {
                 case tipo_operacion_resultado.modulo_numero:
                     var etiqueta_actual = Tabla_Simbolos.getInstance().getTemporal();
-                    Middle.getInstance().setOuput("t" + etiqueta_actual + " = " + op1.getMensaje().toString() + " % " + op2.getMensaje().toString() + ";");               
+                    Middle.getInstance().setOuput("t" + etiqueta_actual + " = ((int)" + op1.getMensaje().toString() + ") % ((int)" + op2.getMensaje().toString() + ");");               
       
                     _return = new Simbolo(tipo_rol.valor,new Tipo(tipo_dato.NUMERO), "");
                     _return.setFila(this.fila);

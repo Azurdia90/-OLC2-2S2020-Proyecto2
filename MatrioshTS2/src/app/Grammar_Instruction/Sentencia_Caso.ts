@@ -97,21 +97,6 @@ class Sentencia_Caso extends Instruction
                     _return = val_sentencia;
                     return _return;
                 }
-                else if (val_sentencia.getRol() == tipo_rol.detener)
-                {     
-                    _return = val_sentencia;                 
-                    return _return;
-                }
-                else if (val_sentencia.getRol() == tipo_rol.continuar)
-                {   
-                    _return = val_sentencia;                                      
-                    return _return;
-                }
-                else if (val_sentencia.getRol() == tipo_rol.retornar)
-                {
-                    _return = val_sentencia;                    
-                    return _return;
-                }
                 else
                 {     
                     _return = val_sentencia;
@@ -143,21 +128,22 @@ class Sentencia_Caso extends Instruction
         let etapa   : number;
         try
         {   etapa = 1;
+
+            let etiqueta_positiva = "l" + Tabla_Simbolos.getInstance().getEtiqueta();
+            let temporal_caso : String = "";
+
             if(!this.default)
             {
                 tmp_val = (this.valor_comparacion == null) ? null : this.valor_comparacion.traducir(salida);
+                temporal_caso = "if(" + this.valor_padre_t.getMensaje() + "==" + tmp_val.getMensaje() + ") goto " + etiqueta_positiva + ";\n"; 
             }
             else
             {
                 tmp_val = this.valor_padre_t;
+                temporal_caso = "if(" + this.valor_padre_t.getMensaje() + "==" + tmp_val.getMensaje() + ") goto " + etiqueta_positiva + ";\n"; 
             }
-
-            let etiqueta_positiva = "l" + Tabla_Simbolos.getInstance().getEtiqueta(); 
-            let etiqueta_negativa = "l" + Tabla_Simbolos.getInstance().getEtiqueta();  
-        
-            Middle.getInstance().setOuput("if(" + this.valor_padre_t.getMensaje() + "==" + tmp_val.getMensaje() + ") goto " + etiqueta_positiva + ";");
-            Middle.getInstance().setOuput("goto " + etiqueta_negativa + ";"); 
-            Middle.getInstance().setOuput(etiqueta_positiva + ":"); 
+            
+            Middle.getInstance().setOuput(etiqueta_positiva + ":");     
 
             let val_sentencia: Simbolo;
             etapa = 2;
@@ -180,13 +166,17 @@ class Sentencia_Caso extends Instruction
                     continue;
                 }       
             }  
+
+            if(this.default)
+            {
+                Middle.getInstance().setOuput("goto " + this.etiqueta_break + ";"); 
+            }
+
             etapa= 3;
-            Middle.getInstance().setOuput(etiqueta_negativa + ":"); 
-            
             _return = new Simbolo(tipo_rol.aceptado,new Tipo(tipo_dato.CADENA), "10-4");
             _return.setFila(this.fila);
             _return.setColumna(this.columna);
-            _return.setMensaje("Sentencia Caso Ejecutada correctamente");  
+            _return.setMensaje(temporal_caso);  
             return _return;
             
         }

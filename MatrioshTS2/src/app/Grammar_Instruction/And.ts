@@ -112,7 +112,7 @@ class And extends Expresion
                 op2 = (this.operador_der == null) ? null : this.operador_der.traducir(salida);
             }
 
-            Middle.getInstance().setOuput(temporal_resultado + " == 1;");
+            Middle.getInstance().setOuput(temporal_resultado + " = 1;");
             Middle.getInstance().setOuput("if (" + op1.getMensaje() + ") goto " + etiqueta_positiva1 + ";");
             Middle.getInstance().setOuput("goto " + etiqueta_negativa1 + ";\n");             
             Middle.getInstance().setOuput(etiqueta_positiva1 + ":");             

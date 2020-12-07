@@ -93,37 +93,12 @@ class Sentencia_For extends Instruction
                     _return = val_sentencia;
                     return _return;
                 }
-                else if (val_sentencia.getRol() == tipo_rol.detener)
-                {     
-                    _return = val_sentencia;                    
-                    break;
-                }
-                else if (val_sentencia.getRol() == tipo_rol.continuar)
-                {   
-                    _return = val_sentencia;                     
-                    break;
-                }
-                else if (val_sentencia.getRol() == tipo_rol.retornar)
-                {
-                    _return = val_sentencia;                     
-                    return _return;
-                }
                 else
                 {     
                     _return = val_sentencia;
                     continue;
                 }       
-            }  
-
-            if(_return.getRol() == tipo_rol.detener)
-            {
-                Tabla_Simbolos.getInstance().getStack().pop();
-                _return = new Simbolo(tipo_rol.aceptado,new Tipo(tipo_dato.CADENA), "10-4");
-                _return.setFila(this.fila);
-                _return.setColumna(this.columna);
-                _return.setMensaje("Sentencia For Ejecutada correctamente");  
-                return _return;
-            }     
+            }      
 
             tmp_val3 =  (this.sentencia3 == null) ? null : this.sentencia3.analizar(entorno_padre,entorno_padre.getLastNivel());
             etapa = 4;
@@ -173,6 +148,8 @@ class Sentencia_For extends Instruction
 
             tmp_val1 =  (this.sentencia1 == null) ? null : this.sentencia1.traducir(salida);
 
+            Middle.getInstance().setOuput("");
+            Middle.getInstance().setOuput("//CICLO FOR");
             Middle.getInstance().setOuput(etiqueta_inicio + ":");
 
             etapa = 1;

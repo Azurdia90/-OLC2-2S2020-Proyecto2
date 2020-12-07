@@ -42,7 +42,7 @@ class Sentencia_If extends Instruction
             
             tmp_val = (this.sentencia_comparacion == null) ? null : this.sentencia_comparacion.analizar(entorno_padre, nivel);
             
-            if (tmp_val == null)
+            if (tmp_val == undefined)
             {
                 _return = new Simbolo(tipo_rol.aceptado,new Tipo(tipo_dato.CADENA), "10-4");
                 _return.setFila(this.fila);
@@ -67,8 +67,6 @@ class Sentencia_If extends Instruction
 
             //ANALISIS DE IF    
             etapa = 1;
-            console.log("y entonces!!!");
-            console.log(this.lista_sentencias_if);
             let entorno_actual: SubEntorno = new SubEntorno(this.identificador1);
             entorno_padre._push(entorno_actual);
             
@@ -159,6 +157,8 @@ class Sentencia_If extends Instruction
             
             tmp_val = (this.sentencia_comparacion == null) ? null : this.sentencia_comparacion.traducir(salida);
            
+            Middle.getInstance().setOuput("");
+            Middle.getInstance().setOuput("//IF");
             Middle.getInstance().setOuput("if(" + tmp_val.getMensaje() + ") goto " + etiqueta_positiva + ";");
             Middle.getInstance().setOuput("goto " + etiqueta_negativa + ";");
             Middle.getInstance().setOuput(etiqueta_positiva + ":"); 

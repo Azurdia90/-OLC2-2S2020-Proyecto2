@@ -104,17 +104,21 @@ class Sentencia_Switch extends Instruction
         try
         {   etapa = 1; 
             
-            let etiqueta_break = "l" + Tabla_Simbolos.getInstance().getEtiqueta(); 
+            let etiqueta_switch = "l" + Tabla_Simbolos.getInstance().getEtiqueta(); 
+            this.etiqueta_break  = "l" + Tabla_Simbolos.getInstance().getEtiqueta();
+            let temporal_casos  = "";
 
             tmp_val = (this.valor_condicion == null) ? null : this.valor_condicion.traducir(salida);
 
             var tmp_caso: Sentencia_Caso;
             var val_caso: Simbolo;
             
+            Middle.getInstance().setOuput("//Sentencia Switch"); 
+            Middle.getInstance().setOuput("goto " + etiqueta_switch + ";"); 
             for(var x = 0; x <  this.lista_casos.length; x++)
             {           
                 this.lista_casos[x].setEtiquetaContinue(this.etiqueta_continue);
-                this.lista_casos[x].setEtiquetaBreak(etiqueta_break);
+                this.lista_casos[x].setEtiquetaBreak(this.etiqueta_break);
                 this.lista_casos[x].setEtiquetaReturn(this.etiqueta_return);
                 tmp_caso = <Sentencia_Caso> this.lista_casos[x]; 
                 tmp_caso.setValorPadreT(tmp_val);        
@@ -127,12 +131,13 @@ class Sentencia_Switch extends Instruction
                 }
                 else
                 {     
-                    _return = val_caso;
+                    temporal_casos = temporal_casos.concat(val_caso.getMensaje().toString());
                     continue;
                 }       
             }               
-            Middle.getInstance().setOuput(etiqueta_break + ":"); 
-            Middle.getInstance().setOuput("P = P - 0;"); 
+            Middle.getInstance().setOuput(etiqueta_switch + ":"); 
+            Middle.getInstance().setOuput(temporal_casos);
+            Middle.getInstance().setOuput(this.etiqueta_break + ":"); 
 
             _return = new Simbolo(tipo_rol.aceptado,new Tipo(tipo_dato.CADENA), "10-4");
             _return.setFila(this.fila);
